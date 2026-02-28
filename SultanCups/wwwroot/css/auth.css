@@ -282,24 +282,6 @@ body {
         transform: none !important;
     }
 
-/* link under button */
-.auth-link {
-    text-align: center;
-    margin-top: 14px;
-    font-size: 13px;
-    color: var(--muted);
-}
-
-    .auth-link a {
-        color: #1d4ed8;
-        font-weight: 900;
-        text-decoration: none;
-    }
-
-        .auth-link a:hover {
-            text-decoration: underline;
-        }
-
 /* =============== DIALOG + LOADING =============== */
 
 .auth-loading,
@@ -369,9 +351,18 @@ body {
     background: linear-gradient(135deg, #1d4ed8, #60a5fa);
 }
 
+.auth-logo img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%; /* 👈 هذا المطلوب */
+    object-fit: cover;
+    box-shadow: 0 14px 34px rgba(2,6,23,.14);
+}
+
+
 /* page enter/leave animation */
 .auth-anim {
-    animation: authEnter .45s ease both;
+    animation: authEnter .4s ease both;
 }
 
 @keyframes authEnter {

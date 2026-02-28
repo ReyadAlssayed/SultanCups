@@ -8,13 +8,14 @@
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["css/auth.css"]" />
+    <link rel="stylesheet" href="@Assets["css/Home.css"]" />
     <link rel="stylesheet" href="@Assets["SultanCups.styles.css"]" />
     <ImportMap />
     <HeadOutlet />
 </head>
 
 <body>
-    <Routes />
+    <Routes @rendermode="InteractiveServer" />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
 </body>

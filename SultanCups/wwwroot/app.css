@@ -36,3 +36,192 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* =======================================================
+   DASHBOARD MODERN DESIGN - Sultan Cups
+   ======================================================= */
+
+/* انتقالات ناعمة عامة */
+* {
+    transition: background-color .2s ease, box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+}
+
+/* ================== Layout Shell ================== */
+
+.app-shell {
+    display: flex;
+    height: 100vh;
+    direction: rtl;
+    background: linear-gradient(135deg, #f4f8fc, #eef3f9);
+}
+
+/* ================== Sidebar ================== */
+
+.app-sidebar {
+    width: 260px;
+    background: #ffffff;
+    border-left: 1px solid #e6edf5;
+    padding: 30px 20px;
+    box-shadow: 4px 0 25px rgba(0,0,0,.04);
+    border-radius: 0 28px 28px 0;
+}
+
+.sidebar-brand {
+    font-size: 18px;
+    font-weight: 900;
+    color: #0b3b7a;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.app-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.app-sidebar li {
+    position: relative;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    border-radius: 18px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #334155;
+    text-align: right;
+}
+
+    /* Hover */
+    .app-sidebar li:hover {
+        background: #edf3fb;
+        transform: translateX(-6px);
+        box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    }
+
+    /* خط سفلي متحرك */
+    .app-sidebar li::after {
+        content: "";
+        position: absolute;
+        right: 18px;
+        bottom: 8px;
+        height: 3px;
+        width: 0;
+        background: linear-gradient(90deg,#2563eb,#3b82f6);
+        border-radius: 5px;
+        transition: width .3s ease;
+    }
+
+    .app-sidebar li:hover::after {
+        width: 45%;
+    }
+
+    /* العنصر النشط */
+    .app-sidebar li.active {
+        background: linear-gradient(90deg,#2563eb,#3b82f6);
+        color: white;
+    }
+
+        .app-sidebar li.active::after {
+            display: none;
+        }
+
+/* ================== Main Area ================== */
+
+.app-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ================== TopBar ================== */
+
+.app-topbar {
+    height: 70px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 35px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+}
+
+.top-title {
+    font-weight: 900;
+    color: #0b3b7a;
+}
+
+.top-search input {
+    width: 360px;
+    padding: 10px 22px;
+    border-radius: 40px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+    .top-search input:focus {
+        border-color: #2563eb;
+        background: white;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+    }
+
+.top-user {
+    font-weight: 600;
+    color: #0b3b7a;
+}
+
+/* ================== Content ================== */
+
+.app-content {
+    padding: 35px;
+    flex: 1;
+}
+
+/* ================== Dashboard Cards ================== */
+
+.dash-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+}
+
+.dash-card {
+    background: white;
+    padding: 28px;
+    border-radius: 26px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.06);
+    position: relative;
+    overflow: hidden;
+}
+
+    .dash-card::before {
+        content: "";
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg,#2563eb,#3b82f6);
+        opacity: .08;
+        border-radius: 50%;
+        top: -40px;
+        left: -40px;
+    }
+
+    .dash-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 30px 60px rgba(0,0,0,.08);
+    }
+
+    .dash-card h3 {
+        font-size: 14px;
+        color: #64748b;
+    }
+
+    .dash-card p {
+        margin-top: 12px;
+        font-size: 26px;
+        font-weight: 900;
+        color: #0b3b7a;
+    }
+

@@ -1,12 +1,13 @@
 ﻿@page "/"
 @layout AuthLayout
+@inject NavigationManager Nav
 
 <EditForm Model="@this" OnSubmit="Submit">
 
     <div class="auth-login">
 
         <div class="auth-logo">
-            <img src="images/logo.png" alt="Sultan Cups Logo" />
+            <img src="images/Icon.jpg" alt="Sultan Cups Logo" />
         </div>
 
         <h2 class="auth-title">تسجيل الدخول</h2>
@@ -46,10 +47,7 @@
             @(isLoading ? "جاري المعالجة..." : "دخول")
         </button>
 
-        <div class="auth-link">
-            ليس لديك حساب؟ <a href="/register">إنشاء حساب</a>
-        </div>
-
+     
     </div>
 </EditForm>
 
@@ -79,26 +77,16 @@
     void TogglePassword()
         => passwordType = passwordType == "password" ? "text" : "password";
 
+
     async Task Submit()
     {
         if (isLoading) return;
 
-        // UI فقط (بدون ربط قاعدة)
         isLoading = true;
-        await Task.Delay(650);
-        isLoading = false;
+        await Task.Delay(400);
 
-        ShowError("واجهة فقط الآن (بدون ربط قاعدة).");
+        Nav.NavigateTo("/home");
+        isLoading = false; // احتياط
     }
-
-    void ShowError(string text)
-    {
-        dialogMessage = text;
-        dialogType = "error";
-        dialogIcon = "✖";
-        showDialog = true;
-        isLoading = false;
-    }
-
     void CloseDialog() => showDialog = false;
 }

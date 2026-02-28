@@ -17,13 +17,13 @@
 
                 @if (IsRegister)
                 {
-                    <button type="button" class="auth-ghost" @onclick="GoLogin">
+                    <button class="auth-ghost" @onclick="GoLogin">
                         تسجيل الدخول
                     </button>
                 }
                 else
                 {
-                    <button type="button" class="auth-ghost" @onclick="GoRegister">
+                    <button class="auth-ghost" @onclick="GoRegister">
                         حساب جديد
                     </button>
                 }
@@ -41,21 +41,23 @@
 @code {
     bool isLeaving = false;
 
-    bool IsRegister => Nav.Uri.Contains("/register", StringComparison.OrdinalIgnoreCase);
+    bool IsRegister =>
+        Nav.ToBaseRelativePath(Nav.Uri)
+           .StartsWith("register", StringComparison.OrdinalIgnoreCase);
 
-    async Task GoLogin()
+    async Task NavigateSmooth(string url)
     {
         if (isLeaving) return;
+
         isLeaving = true;
-        await Task.Delay(650);
-        Nav.NavigateTo("/login", forceLoad: true);
+        StateHasChanged();
+
+        await Task.Delay(250); // 👈 مدة قصيرة جداً smooth
+
+        Nav.NavigateTo(url);
+        isLeaving = false;
     }
 
-    async Task GoRegister()
-    {
-        if (isLeaving) return;
-        isLeaving = true;
-        await Task.Delay(650);
-        Nav.NavigateTo("/register", forceLoad: true);
-    }
+    Task GoLogin() => NavigateSmooth("/");
+    Task GoRegister() => NavigateSmooth("/register");
 }

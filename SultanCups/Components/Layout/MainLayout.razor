@@ -1,9 +1,66 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Nav
 
-@Body
+<div class="app-shell">
+
+    <aside class="app-sidebar">
+        <div class="sidebar-brand">
+            مصنع أكواب السلطان
+        </div>
+
+        <nav>
+            <ul>
+                <li @onclick="GoHome">لوحة التحكم</li>
+                <li>الطلبات</li>
+                <li>المبيعات</li>
+                <li>المصروفات</li>
+                <li>الموظفين</li>
+                <li>المخزون</li>
+                <li>التقارير</li>
+                <li>الإعدادات</li>
+                <li @onclick="Logout" style="color:#b91c1c;">تسجيل الخروج</li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="app-main">
+
+        <header class="app-topbar">
+            <div class="top-title">لوحة التحكم</div>
+
+            <div class="top-search">
+                <input placeholder="ابحث في النظام..." />
+            </div>
+
+            <div class="top-user">
+                المسؤول: رياض
+            </div>
+        </header>
+
+        <main class="app-content">
+            @Body
+        </main>
+
+    </div>
+
+</div>
 
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
+    حدث خطأ غير متوقع.
+    <a href="." class="reload">إعادة تحميل</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+
+    void GoHome()
+    {
+        Nav.NavigateTo("/home");
+    }
+
+    void Logout()
+    {
+        Nav.NavigateTo("/");
+    }
+
+}
