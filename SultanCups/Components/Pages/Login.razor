@@ -1,0 +1,104 @@
+﻿@page "/"
+@layout AuthLayout
+
+<EditForm Model="@this" OnSubmit="Submit">
+
+    <div class="auth-login">
+
+        <div class="auth-logo">
+            <img src="images/logo.png" alt="Sultan Cups Logo" />
+        </div>
+
+        <h2 class="auth-title">تسجيل الدخول</h2>
+
+        <div class="auth-fields">
+
+            <div class="auth-field">
+                <label>اسم المسؤول</label>
+                <input placeholder="اكتب اسمك الكامل"
+                       maxlength="40"
+                       @bind="fullName"
+                       disabled="@isLoading" />
+            </div>
+
+            <div class="auth-field auth-password">
+                <label>كلمة المرور</label>
+
+                <input type="@passwordType"
+                       placeholder="أدخل كلمة المرور"
+                       maxlength="40"
+                       @bind="password"
+                       disabled="@isLoading" />
+
+                <button type="button"
+                        class="auth-toggle"
+                        @onclick="TogglePassword"
+                        disabled="@isLoading">
+                    @(passwordType == "password" ? "إظهار" : "إخفاء")
+                </button>
+            </div>
+
+        </div>
+
+        <button type="submit"
+                class="auth-btn @(isLoading ? "is-busy" : "")"
+                disabled="@isLoading">
+            @(isLoading ? "جاري المعالجة..." : "دخول")
+        </button>
+
+        <div class="auth-link">
+            ليس لديك حساب؟ <a href="/register">إنشاء حساب</a>
+        </div>
+
+    </div>
+</EditForm>
+
+@if (showDialog)
+{
+    <div class="auth-dialog">
+        <div class="auth-dialog-box @dialogType">
+            <div class="auth-dialog-icon">@dialogIcon</div>
+            <p>@dialogMessage</p>
+            <button @onclick="CloseDialog">حسناً</button>
+        </div>
+    </div>
+}
+
+@code {
+    string fullName = "";
+    string password = "";
+    string passwordType = "password";
+
+    bool isLoading = false;
+
+    bool showDialog = false;
+    string dialogMessage = "";
+    string dialogType = "";
+    string dialogIcon = "";
+
+    void TogglePassword()
+        => passwordType = passwordType == "password" ? "text" : "password";
+
+    async Task Submit()
+    {
+        if (isLoading) return;
+
+        // UI فقط (بدون ربط قاعدة)
+        isLoading = true;
+        await Task.Delay(650);
+        isLoading = false;
+
+        ShowError("واجهة فقط الآن (بدون ربط قاعدة).");
+    }
+
+    void ShowError(string text)
+    {
+        dialogMessage = text;
+        dialogType = "error";
+        dialogIcon = "✖";
+        showDialog = true;
+        isLoading = false;
+    }
+
+    void CloseDialog() => showDialog = false;
+}

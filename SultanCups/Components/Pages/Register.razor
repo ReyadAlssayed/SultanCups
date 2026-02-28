@@ -1,0 +1,146 @@
+﻿@page "/register"
+@layout AuthLayout
+
+<EditForm Model="@this" OnSubmit="Submit">
+
+    <div class="auth-register">
+
+        <div class="auth-logo">
+            <img src="images/logo.png" alt="Sultan Cups Logo" />
+        </div>
+
+        <h2 class="auth-title">عمل حساب مسؤول جديد</h2>
+
+        <div class="auth-fields">
+
+            <div class="auth-field">
+                <label>اسم المسؤول</label>
+                <input placeholder="اكتب الاسم الكامل"
+                       maxlength="30"
+                       @bind="fullName"
+                       disabled="@isLoading" />
+            </div>
+
+            <div class="auth-field">
+                <label>رقم الهاتف</label>
+                <input placeholder="اكتب رقم الهاتف"
+                       maxlength="10"
+                       @bind="phone"
+                       disabled="@isLoading" />
+            </div>
+
+            <div class="auth-field">
+                <label>الصلاحية</label>
+                <select @bind="role" disabled="@isLoading">
+                    <option value="Admin2">مسؤول ثاني</option>
+                    <option value="Admin1">مسؤول أول</option>
+                </select>
+            </div>
+
+            <div class="auth-field auth-password">
+                <label>كلمة المرور</label>
+
+                <input type="@passwordType"
+                       placeholder="أدخل كلمة المرور"
+                       maxlength="30"
+                       @bind="password"
+                       disabled="@isLoading" />
+
+                <button type="button"
+                        class="auth-toggle"
+                        @onclick="TogglePassword"
+                        disabled="@isLoading">
+                    @(passwordType == "password" ? "إظهار" : "إخفاء")
+                </button>
+            </div>
+
+            <div class="auth-field auth-password">
+                <label>تأكيد كلمة المرور</label>
+
+                <input type="@confirmPasswordType"
+                       placeholder="أعد إدخال كلمة المرور"
+                       maxlength="30"
+                       @bind="confirmPassword"
+                       disabled="@isLoading" />
+
+                <button type="button"
+                        class="auth-toggle"
+                        @onclick="ToggleConfirmPassword"
+                        disabled="@isLoading">
+                    @(confirmPasswordType == "password" ? "إظهار" : "إخفاء")
+                </button>
+            </div>
+
+        </div>
+
+        <button type="submit"
+                class="auth-btn @(isLoading ? "is-busy" : "")"
+                disabled="@isLoading">
+            @(isLoading ? "جاري المعالجة..." : "عمل حساب")
+        </button>
+
+        <div class="auth-link">
+            لديك حساب؟ <a href="/login">تسجيل الدخول</a>
+        </div>
+
+    </div>
+</EditForm>
+
+@if (showDialog)
+{
+    <div class="auth-dialog">
+        <div class="auth-dialog-box @dialogType">
+            <div class="auth-dialog-icon">@dialogIcon</div>
+            <p>@dialogMessage</p>
+            <button @onclick="CloseDialog">حسناً</button>
+        </div>
+    </div>
+}
+
+@code {
+    string fullName = "";
+    string phone = "";
+    string role = "Admin2";
+
+    string password = "";
+    string confirmPassword = "";
+
+    string passwordType = "password";
+    string confirmPasswordType = "password";
+
+    bool isLoading = false;
+
+    bool showDialog = false;
+    string dialogMessage = "";
+    string dialogType = "";
+    string dialogIcon = "";
+
+    void TogglePassword()
+        => passwordType = passwordType == "password" ? "text" : "password";
+
+    void ToggleConfirmPassword()
+        => confirmPasswordType = confirmPasswordType == "password" ? "text" : "password";
+
+    async Task Submit()
+    {
+        if (isLoading) return;
+
+        // UI فقط (بدون ربط قاعدة)
+        isLoading = true;
+        await Task.Delay(650);
+        isLoading = false;
+
+        ShowSuccess("تم (تصميم فقط الآن). لاحقًا سنربط الحفظ بقاعدة البيانات.");
+    }
+
+    void ShowSuccess(string text)
+    {
+        dialogMessage = text;
+        dialogType = "success";
+        dialogIcon = "✔";
+        showDialog = true;
+        isLoading = false;
+    }
+
+    void CloseDialog() => showDialog = false;
+}
