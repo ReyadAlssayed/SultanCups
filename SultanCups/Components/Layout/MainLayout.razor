@@ -1,66 +1,174 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager Nav
 
-<div class="app-shell">
+<div class="app-shell @(IsSidebarCollapsed ? "sidebar-collapsed" : "")">
 
     <aside class="app-sidebar">
-        <div class="sidebar-brand">
-            مصنع أكواب السلطان
+        <div class="sidebar-head">
+            <div class="sidebar-brand">مصنع أكواب السلطان</div>
+
+            <button class="sidebar-toggle" @onclick="ToggleSidebar" title="إخفاء/إظهار القائمة">
+                @(IsSidebarCollapsed ? "⟩" : "⟨")
+            </button>
         </div>
 
-        <nav>
-            <ul>
-                <li @onclick="GoHome">لوحة التحكم</li>
-                <li>الطلبات</li>
-                <li>المبيعات</li>
-                <li>المصروفات</li>
-                <li>الموظفين</li>
-                <li>المخزون</li>
-                <li>التقارير</li>
-                <li>الإعدادات</li>
-                <li @onclick="Logout" style="color:#b91c1c;">تسجيل الخروج</li>
-            </ul>
+        <nav class="sidebar-nav">
+
+            <!-- الرئيسية -->
+            <div class="nav-group">
+                <button class="nav-parent"
+                        @onclick='@(() => Go("/Stats"))'>
+                    الرئيسية
+                </button>
+            </div>
+
+            <!-- المبيعات -->
+            <div class="nav-group">
+                <button class="nav-parent @(OpenKey == "sales" ? "active" : "")"
+                        @onclick='@(() => Toggle("sales"))'>
+                    المبيعات
+                    <span class="chev">@(OpenKey == "sales" ? "▾" : "▸")</span>
+                </button>
+
+                <div class="nav-children @(OpenKey == "sales" ? "open" : "")">
+                    <button class="nav-child" @onclick='@(() => Go("/invoices"))'>الفواتير (الطلبيات)</button>
+                    <button class="nav-child" @onclick='@(() => Go("/marketers"))'>المسوقين</button>
+                    <button class="nav-child" @onclick='@(() => Go("/debts"))'>الديون</button>
+                </div>
+            </div>
+
+            <!-- الإنتاج والمنتجات -->
+            <div class="nav-group">
+                <button class="nav-parent @(OpenKey == "prod" ? "active" : "")"
+                        @onclick='@(() => Toggle("prod"))'>
+                    الإنتاج والمنتجات
+                    <span class="chev">@(OpenKey == "prod" ? "▾" : "▸")</span>
+                </button>
+
+                <div class="nav-children @(OpenKey == "prod" ? "open" : "")">
+                    <button class="nav-child" @onclick='@(() => Go("/products"))'>المنتجات</button>
+                    <button class="nav-child" @onclick='@(() => Go("/production"))'>الإنتاج</button>
+                </div>
+            </div>
+
+            <!-- المخزون -->
+            <div class="nav-group">
+                <button class="nav-parent @(OpenKey == "stock" ? "active" : "")"
+                        @onclick='@(() => Toggle("stock"))'>
+                    المخزون
+                    <span class="chev">@(OpenKey == "stock" ? "▾" : "▸")</span>
+                </button>
+
+                <div class="nav-children @(OpenKey == "stock" ? "open" : "")">
+                    <button class="nav-child" @onclick='@(() => Go("/raw"))'>المواد الخام</button>
+                    <button class="nav-child" @onclick='@(() => Go("/stores"))'>الخزنات</button>
+                    <button class="nav-child" @onclick='@(() => Go("/suppliers"))'>الموردين</button>
+                </div>
+            </div>
+
+            <!-- المالية -->
+            <div class="nav-group">
+                <button class="nav-parent @(OpenKey == "finance" ? "active" : "")"
+                        @onclick='@(() => Toggle("finance"))'>
+                    المالية
+                    <span class="chev">@(OpenKey == "finance" ? "▾" : "▸")</span>
+                </button>
+
+                <div class="nav-children @(OpenKey == "finance" ? "open" : "")">
+                    <button class="nav-child" @onclick='@(() => Go("/salaries"))'>الرواتب</button>
+                    <button class="nav-child" @onclick='@(() => Go("/other-expenses"))'>المصروفات الأخرى</button>
+                    <button class="nav-child" @onclick='@(() => Go("/financial-events"))'>الأحداث المالية</button>
+                </div>
+            </div>
+
+            <!-- الموارد البشرية -->
+            <div class="nav-group">
+                <button class="nav-parent @(OpenKey == "hr" ? "active" : "")"
+                        @onclick='@(() => Toggle("hr"))'>
+                    الموارد البشرية
+                    <span class="chev">@(OpenKey == "hr" ? "▾" : "▸")</span>
+                </button>
+
+                <div class="nav-children @(OpenKey == "hr" ? "open" : "")">
+                    <button class="nav-child" @onclick='@(() => Go("/employees"))'>الموظفين</button>
+                    <button class="nav-child" @onclick='@(() => Go("/employee-events"))'>الأحداث الوظيفية</button>
+                </div>
+            </div>
+
+            <!-- الإدارة -->
+            <div class="nav-group">
+                <button class="nav-parent @(OpenKey == "admin" ? "active" : "")"
+                        @onclick='@(() => Toggle("admin"))'>
+                    الإدارة
+                    <span class="chev">@(OpenKey == "admin" ? "▾" : "▸")</span>
+                </button>
+
+                <div class="nav-children @(OpenKey == "admin" ? "open" : "")">
+                    <button class="nav-child" @onclick='@(() => Go("/admins"))'>المسؤولين</button>
+                    <button class="nav-child" @onclick='@(() => Go("/Settings"))'>الإعدادات</button>
+                    <button class="nav-child" @onclick='@(() => Go("/backup"))'>النسخ / الرجوع</button>
+                </div>
+            </div>
+
+            <div class="nav-sep"></div>
+
+            <button class="nav-logout" @onclick="Logout">
+                تسجيل الخروج
+            </button>
+
         </nav>
     </aside>
 
     <div class="app-main">
+        <div class="app-card">
 
-        <header class="app-topbar">
-            <div class="top-title">لوحة التحكم</div>
+            <header class="app-topbar">
+                <div class="top-title">
+                    <div class="top-h1">مرحبًا بك</div>
+                    <div class="top-sub">نظام مصنع أكواب السلطان</div>
+                </div>
 
-            <div class="top-search">
-                <input placeholder="ابحث في النظام..." />
-            </div>
+                <div class="top-search">
+                    <input placeholder="ابحث..." />
+                </div>
 
-            <div class="top-user">
-                المسؤول: رياض
-            </div>
-        </header>
+                <div class="top-user">
+                    <span class="user-dot"></span>
+                    <span>المسؤول: رياض</span>
+                </div>
+            </header>
 
-        <main class="app-content">
-            @Body
-        </main>
+            <main class="app-content">
+                @Body
+            </main>
 
+        </div>
     </div>
 
 </div>
 
-<div id="blazor-error-ui" data-nosnippet>
-    حدث خطأ غير متوقع.
-    <a href="." class="reload">إعادة تحميل</a>
-    <span class="dismiss">🗙</span>
-</div>
-
 @code {
+    string? OpenKey = "null";
 
-    void GoHome()
+    bool IsSidebarCollapsed = false;
+
+    void ToggleSidebar()
     {
-        Nav.NavigateTo("/home");
+        IsSidebarCollapsed = !IsSidebarCollapsed;
+    }
+
+    void Toggle(string key)
+    {
+        OpenKey = (OpenKey == key) ? null : key;
+    }
+
+    void Go(string url)
+    {
+        Nav.NavigateTo(url);
     }
 
     void Logout()
     {
         Nav.NavigateTo("/");
     }
-
 }

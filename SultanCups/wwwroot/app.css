@@ -38,193 +38,316 @@ h1:focus {
 }
 
 /* =======================================================
-   DASHBOARD MODERN DESIGN - Sultan Cups
+   Sultan Cups - Admin Layout (RTL Modern Card)
+   Clean Final Stable Version
    ======================================================= */
 
-/* انتقالات ناعمة عامة */
-* {
-    transition: background-color .2s ease,
-                box-shadow .2s ease,
-                transform .2s ease,
-                border-color .2s ease;
+:root {
+    --bg: #cfd8ff;
+    --bg2: #e7ecff;
+    --card: #ffffff;
+    --line: #e7edf6;
+    --text: #0f172a;
+    --muted: #64748b;
+    --blue: #4f7df8;
+    --blue2: #3f6df0;
+    --blueDark: #2f55c9;
+    --shadow: 0 22px 60px rgba(2,6,23,.12);
+    --shadow2: 0 12px 28px rgba(2,6,23,.10);
 }
 
-/* ================== Layout Shell ================== */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    direction: rtl;
+    font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial;
+    color: var(--text);
+    background: radial-gradient(900px 420px at 20% -120px, rgba(79,125,248,.25) 0%, rgba(79,125,248,0) 65%), radial-gradient(900px 420px at 80% -120px, rgba(63,109,240,.20) 0%, rgba(63,109,240,0) 65%), linear-gradient(180deg,var(--bg) 0%, var(--bg2) 100%);
+}
+
+/* ================== Layout ================== */
 
 .app-shell {
+    min-height: 100vh;
     display: flex;
-    height: 100vh;
-    direction: rtl;
-    background: linear-gradient(135deg, #f4f8fc, #eef3f9);
+    gap: 16px;
+    padding: 16px;
+    transition: padding .22s ease;
 }
 
 /* ================== Sidebar ================== */
 
 .app-sidebar {
-    width: 260px;
-    background: #ffffff;
-    border-left: 1px solid #e6edf5;
-    padding: 30px 20px;
-    box-shadow: 4px 0 25px rgba(0,0,0,.04);
-    border-radius: 0 28px 28px 0;
+    width: 240px;
+    background: linear-gradient(180deg,var(--blue) 0%, var(--blue2) 100%);
+    border-radius: 26px;
+    padding: 12px 14px;
+    box-shadow: var(--shadow2);
+    color: #fff;
+    position: sticky;
+    top: 16px;
+    height: calc(100vh - 32px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: width .24s ease, padding .24s ease;
+}
+
+/* رأس الشريط */
+.sidebar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.22);
+    margin-bottom: 10px;
+    flex: 0 0 auto;
 }
 
 .sidebar-brand {
     font-size: 18px;
     font-weight: 900;
-    color: #0b3b7a;
-    margin-bottom: 40px;
-    text-align: center;
-}
-
-.app-sidebar ul {
-    list-style: none;
-    padding: 0;
+    color: #fff;
     margin: 0;
 }
 
-.app-sidebar li {
-    position: relative;
-    padding: 14px 18px;
-    margin-bottom: 10px;
-    border-radius: 18px;
+/* القائمة */
+.sidebar-nav {
+    flex: 1 1 auto;
+    overflow: auto;
+    padding-bottom: 10px;
+}
+
+    .sidebar-nav::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,.25);
+        border-radius: 999px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-track {
+        background: rgba(255,255,255,.08);
+        border-radius: 999px;
+    }
+
+/* عناصر القائمة */
+
+.nav-group {
+    margin: 12px 6px;
+}
+
+.nav-parent {
+    width: 100%;
+    border: 0;
+    background: rgba(255,255,255,.10);
+    color: #fff;
+    padding: 13px 14px;
+    border-radius: 14px;
+    font-weight: 900;
     cursor: pointer;
-    font-weight: 600;
-    color: #334155;
-    text-align: right;
+    display: flex;
+    justify-content: space-between;
+    transition: .2s ease;
 }
 
-/* Hover */
-.app-sidebar li:hover {
-    background: #edf3fb;
-    transform: translateX(-6px);
-    box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    .nav-parent:hover {
+        background: rgba(255,255,255,.22);
+        transform: translateX(-4px);
+    }
+
+    .nav-parent.active {
+        background: rgba(255,255,255,.30);
+    }
+
+.nav-children {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .28s ease;
+    margin-top: 12px;
+    padding-right: 16px;
+    border-right: 2px solid rgba(255,255,255,.35);
 }
 
-/* خط سفلي متحرك */
-.app-sidebar li::after {
-    content: "";
-    position: absolute;
-    right: 18px;
-    bottom: 8px;
-    height: 3px;
-    width: 0;
-    background: linear-gradient(90deg,#2563eb,#3b82f6);
-    border-radius: 5px;
-    transition: width .3s ease;
+    .nav-children.open {
+        max-height: 600px;
+    }
+
+.nav-child {
+    width: 100%;
+    border: 0;
+    background: #ffffff;
+    color: #1e293b;
+    padding: 11px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    margin: 8px 0;
+    box-shadow: 0 6px 16px rgba(2,6,23,.10);
+    transition: .18s ease;
 }
 
-.app-sidebar li:hover::after {
-    width: 45%;
+    .nav-child:hover {
+        transform: translateX(-3px);
+        box-shadow: 0 10px 24px rgba(2,6,23,.18);
+        background: #f8faff;
+    }
+
+/* تسجيل الخروج */
+
+.nav-sep {
+    height: 1px;
+    background: rgba(255,255,255,.30);
+    margin: 18px 10px;
 }
 
-/* العنصر النشط */
-.app-sidebar li.active {
-    background: linear-gradient(90deg,#2563eb,#3b82f6);
-    color: white;
+.nav-logout {
+    width: calc(100% - 12px);
+    margin: 0 6px 12px;
+    border: 0;
+    background: rgba(255,255,255,.18);
+    color: #ffe5e5;
+    padding: 13px 14px;
+    border-radius: 14px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: .2s ease;
 }
 
-.app-sidebar li.active::after {
-    display: none;
+    .nav-logout:hover {
+        background: rgba(255,255,255,.28);
+        transform: translateX(-3px);
+    }
+
+/* زر الطي */
+
+.sidebar-toggle {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 18px;
+    color: #fff;
+    background: rgba(255,255,255,.16);
+    box-shadow: 0 10px 22px rgba(2,6,23,.14);
+    transition: .18s ease;
 }
 
-/* ================== Main Area ================== */
+    .sidebar-toggle:hover {
+        background: rgba(255,255,255,.24);
+    }
+
+/* الوضع المطوي */
+
+.app-shell.sidebar-collapsed .app-sidebar {
+    width: 74px;
+    padding: 14px 10px;
+}
+
+.app-shell.sidebar-collapsed .sidebar-nav {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(8px);
+}
+
+/* ================== Main ================== */
 
 .app-main {
     flex: 1;
     display: flex;
-    flex-direction: column;
+    min-width: 0;
 }
 
-/* ================== TopBar ================== */
+.app-card {
+    width: 100%;
+    background: rgba(255,255,255,.55);
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* ================== Topbar ================== */
 
 .app-topbar {
-    height: 70px;
-    background: #ffffff;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 35px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.05);
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,.92);
+    border-bottom: 1px solid var(--line);
 }
 
 .top-title {
+    min-width: 200px;
+}
+
+.top-h1 {
+    font-size: 21px;
     font-weight: 900;
-    color: #0b3b7a;
+    color: #0b2a66;
 }
 
-.top-search input {
-    width: 360px;
-    padding: 10px 22px;
-    border-radius: 40px;
-    border: 1px solid #e2e8f0;
-    background: #f8fafc;
+.top-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
 }
 
-.top-search input:focus {
-    border-color: #2563eb;
-    background: white;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+.top-search {
+    margin: 0 auto;
+    max-width: 520px;
+    width: 100%;
 }
+
+    .top-search input {
+        width: 100%;
+        padding: 11px 16px;
+        border-radius: 14px;
+        border: 1px solid #dbe6ff;
+        background: #ffffff;
+        outline: none;
+        box-shadow: 0 10px 18px rgba(2,6,23,.06);
+    }
 
 .top-user {
-    font-weight: 600;
-    color: #0b3b7a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    color: #18335c;
 }
 
-/* ================== Content ================== */
-
-.app-content {
-    padding: 35px;
-    flex: 1;
-}
-
-/* ================== Dashboard Cards ================== */
-
-.dash-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 25px;
-}
-
-.dash-card {
-    background: white;
-    padding: 28px;
-    border-radius: 26px;
-    box-shadow: 0 20px 40px rgba(0,0,0,.06);
-    position: relative;
-    overflow: hidden;
-}
-
-.dash-card::before {
-    content: "";
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    background: linear-gradient(135deg,#2563eb,#3b82f6);
-    opacity: .08;
+.user-dot {
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    top: -40px;
-    left: -40px;
+    background: #22c55e;
 }
 
-.dash-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 30px 60px rgba(0,0,0,.08);
-}
+/* ================== Responsive ================== */
 
-.dash-card h3 {
-    font-size: 14px;
-    color: #64748b;
-}
+@media (max-width: 740px) {
+    .app-shell {
+        flex-direction: column;
+    }
 
-.dash-card p {
-    margin-top: 12px;
-    font-size: 26px;
-    font-weight: 900;
-    color: #0b3b7a;
+    .app-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        top: auto;
+    }
 }
-
