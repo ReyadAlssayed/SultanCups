@@ -1,0 +1,293 @@
+﻿/* =======================================================
+   Employees.css (Premium Table like Admins UI)
+   All classes prefixed with emp-
+   ======================================================= */
+
+:root {
+    --emp-bg: #f3f6fb;
+    --emp-card: rgba(255,255,255,.75);
+    --emp-card-solid: #ffffff;
+    --emp-line: rgba(148,163,184,.28);
+    --emp-text: #0f172a;
+    --emp-muted: #64748b;
+    --emp-primary: #2563eb;
+    --emp-shadow: 0 28px 70px rgba(2,6,23,.10);
+    --emp-shadow2: 0 14px 32px rgba(2,6,23,.08);
+}
+
+/* ================= Page ================= */
+
+.emp-page {
+    padding: 26px;
+    direction: rtl;
+}
+
+.emp-header {
+    margin-bottom: 14px;
+}
+
+.emp-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 950;
+    color: var(--emp-text);
+    letter-spacing: .2px;
+}
+
+.emp-sub {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--emp-muted);
+}
+
+/* ================= Card / Container ================= */
+
+.emp-card {
+    background: var(--emp-card);
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 22px;
+    box-shadow: var(--emp-shadow);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* Table wrapper */
+.emp-table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 14px;
+}
+
+    .emp-table-wrap::-webkit-scrollbar {
+        height: 10px;
+        width: 10px;
+    }
+
+    .emp-table-wrap::-webkit-scrollbar-thumb {
+        background: rgba(37,99,235,.25);
+        border-radius: 999px;
+    }
+
+    .emp-table-wrap::-webkit-scrollbar-track {
+        background: rgba(148,163,184,.15);
+        border-radius: 999px;
+    }
+
+/* ================= Table ================= */
+
+.emp-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    min-width: 860px;
+}
+
+    /* Header row */
+    .emp-table thead th {
+        background: transparent;
+        color: var(--emp-muted);
+        font-size: 12px;
+        font-weight: 950;
+        padding: 10px 16px;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    /* Body rows as rounded cards */
+    .emp-table tbody tr {
+        filter: drop-shadow(0 10px 22px rgba(2,6,23,.06));
+        transition: transform .16s ease, filter .16s ease;
+    }
+
+        .emp-table tbody tr:hover {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 16px 30px rgba(2,6,23,.10));
+        }
+
+    /* Cells */
+    .emp-table tbody td {
+        background: var(--emp-card-solid);
+        border-top: 1px solid rgba(226,232,240,.85);
+        border-bottom: 1px solid rgba(226,232,240,.85);
+        padding: 14px 16px;
+        font-weight: 900;
+        color: var(--emp-text);
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+        .emp-table tbody td:first-child {
+            border-right: 1px solid rgba(226,232,240,.85);
+            border-radius: 0;
+        }
+
+        .emp-table tbody td:last-child {
+            border-left: 1px solid rgba(226,232,240,.85);
+            border-radius: 0;
+        }
+
+
+        /* Subtle separators inside row */
+        .emp-table tbody td + td {
+            position: relative;
+        }
+
+            .emp-table tbody td + td::before {
+                content: "";
+                position: absolute;
+                right: 0;
+                top: 12%;
+                bottom: 12%;
+                width: 2px;
+                background: rgba(100,116,139,.45);
+            }
+
+/* ================= Column Styles ================= */
+
+.emp-name {
+    font-weight: 950;
+    color: #0b2a66;
+}
+
+.emp-phone {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    letter-spacing: .4px;
+    color: #111827;
+}
+
+.emp-job {
+    color: #1f2937;
+}
+
+/* ================= Active Badge ================= */
+
+.emp-active {
+    text-align: right;
+}
+
+.emp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 950;
+    border: 1px solid transparent;
+    background: rgba(241,245,249,.9);
+    color: #0f172a;
+}
+
+    .emp-badge::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #94a3b8;
+    }
+
+.emp-on {
+    background: rgba(16,185,129,.10);
+    border-color: rgba(16,185,129,.22);
+    color: #065f46;
+}
+
+    .emp-on::before {
+        background: #22c55e;
+    }
+
+.emp-off {
+    background: rgba(239,68,68,.10);
+    border-color: rgba(239,68,68,.20);
+    color: #991b1b;
+}
+
+    .emp-off::before {
+        background: #ef4444;
+    }
+
+.emp-rank {
+    font-weight: 900;
+    color: #1e293b;
+}
+
+.emp-salary {
+    font-weight: 900;
+    color: #065f46;
+}
+
+/* ===== Top bar ===== */
+
+.emp-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.emp-title-center {
+    font-size: 28px;
+    font-weight: 950;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* زر إضافة */
+
+.emp-add-btn {
+    background: #2563eb;
+    color: white;
+    border: 0;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+    .emp-add-btn:hover {
+        background: #1e40af;
+    }
+
+/* ===== Actions ===== */
+
+.emp-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.emp-edit {
+    background: #3b82f6;
+    color: white;
+    border: 0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.emp-delete {
+    background: #ef4444;
+    color: white;
+    border: 0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+/* ================= Responsive ================= */
+
+@media (max-width: 900px) {
+    .emp-page {
+        padding: 16px;
+    }
+
+    .emp-title {
+        font-size: 24px;
+    }
+
+    .emp-table-wrap {
+        padding: 10px;
+    }
+}

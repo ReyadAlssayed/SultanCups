@@ -1,0 +1,63 @@
+﻿@page "/marketers"
+@layout Layout.MainLayout
+@inject NavigationManager Nav
+
+<div class="mk-page">
+
+    <div class="mk-topbar">
+        <button class="mk-add-btn">إضافة مسوق</button>
+        <h2 class="mk-title-center">المسوقين</h2>
+        <div></div>
+    </div>
+
+    <div class="mk-card">
+
+        <div class="mk-table-wrap">
+            <table class="mk-table">
+
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>رقم الهاتف</th>
+                        <th>العنوان</th>
+                        <th>العمولة لكل كرتونة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var m in Marketer)
+                    {
+                        <tr>
+                            <td class="mk-name">@m.Name</td>
+                            <td class="mk-phone">@m.Phone</td>
+                            <td class="mk-address">@m.Address</td>
+                            <td class="mk-commission">@m.Commission د.ل</td>
+
+                            <td class="mk-actions">
+                                <button class="mk-edit">تعديل</button>
+                                <button class="mk-delete">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    List<MarketerRow> Marketer = new()
+    {
+        new("محمد سالم","0912345678","زليتن",2),
+        new("علي مفتاح","0921112233","مصراتة",3),
+        new("سالم رمضان","0919998877","طرابلس",2.5m)
+    };
+
+    public record MarketerRow(string Name, string Phone, string Address, decimal Commission);
+
+}

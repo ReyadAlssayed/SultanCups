@@ -1,0 +1,278 @@
+﻿/* =======================================================
+   Salaries.css (Premium Table)
+   All classes prefixed with sal-
+   ======================================================= */
+
+:root {
+    --sal-card: rgba(255,255,255,.75);
+    --sal-card-solid: #ffffff;
+    --sal-text: #0f172a;
+    --sal-muted: #64748b;
+    --sal-shadow: 0 28px 70px rgba(2,6,23,.10);
+}
+
+/* Page */
+.sal-page {
+    padding: 26px;
+    direction: rtl;
+}
+
+/* Topbar */
+.sal-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.sal-title-center {
+    font-size: 28px;
+    font-weight: 950;
+    color: var(--sal-text);
+    margin: 0;
+}
+
+.sal-add-btn {
+    background: #2563eb;
+    color: #fff;
+    border: 0;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+    .sal-add-btn:hover {
+        background: #1e40af;
+    }
+
+/* Card */
+.sal-card {
+    background: var(--sal-card);
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 22px;
+    box-shadow: var(--sal-shadow);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* Table wrap */
+.sal-table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 14px;
+}
+
+    .sal-table-wrap::-webkit-scrollbar {
+        height: 10px;
+        width: 10px;
+    }
+
+    .sal-table-wrap::-webkit-scrollbar-thumb {
+        background: rgba(37,99,235,.25);
+        border-radius: 999px;
+    }
+
+    .sal-table-wrap::-webkit-scrollbar-track {
+        background: rgba(148,163,184,.15);
+        border-radius: 999px;
+    }
+
+/* Table */
+.sal-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    min-width: 1400px;
+}
+
+    .sal-table thead th {
+        background: transparent;
+        color: var(--sal-muted);
+        font-size: 12px;
+        font-weight: 950;
+        padding: 10px 16px;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .sal-table tbody tr {
+        filter: drop-shadow(0 10px 22px rgba(2,6,23,.06));
+        transition: transform .16s ease, filter .16s ease;
+    }
+
+        .sal-table tbody tr:hover {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 16px 30px rgba(2,6,23,.10));
+        }
+
+    .sal-table tbody td {
+        background: var(--sal-card-solid);
+        border-top: 1px solid rgba(226,232,240,.85);
+        border-bottom: 1px solid rgba(226,232,240,.85);
+        padding: 14px 16px;
+        font-weight: 900;
+        color: var(--sal-text);
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+        /* بدون radius للأطراف */
+        .sal-table tbody td:first-child {
+            border-right: 1px solid rgba(226,232,240,.85);
+            border-radius: 0;
+        }
+
+        .sal-table tbody td:last-child {
+            border-left: 1px solid rgba(226,232,240,.85);
+            border-radius: 0;
+        }
+
+        /* فواصل داخلية أوضح */
+        .sal-table tbody td + td {
+            position: relative;
+        }
+
+            .sal-table tbody td + td::before {
+                content: "";
+                position: absolute;
+                right: 0;
+                top: 12%;
+                bottom: 12%;
+                width: 2px;
+                background: rgba(100,116,139,.35);
+            }
+
+/* Columns */
+.sal-name {
+    color: #0b2a66;
+    font-weight: 950;
+}
+
+.sal-emp-type {
+    color: #1e293b;
+}
+
+.sal-salary-type {
+    color: #1f2937;
+}
+
+.sal-money {
+    color: #111827;
+}
+
+.sal-remain {
+    color: #991b1b;
+    font-weight: 950;
+}
+
+.sal-date {
+    color: #334155;
+}
+
+.sal-cash {
+    color: #0f172a;
+}
+
+.sal-notes {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Status badge */
+.sal-status {
+    text-align: right;
+}
+
+.sal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 950;
+    border: 1px solid transparent;
+    background: rgba(241,245,249,.9);
+    color: #0f172a;
+}
+
+    .sal-badge::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #94a3b8;
+    }
+
+.sal-on {
+    background: rgba(16,185,129,.10);
+    border-color: rgba(16,185,129,.22);
+    color: #065f46;
+}
+
+    .sal-on::before {
+        background: #22c55e;
+    }
+
+.sal-partial {
+    background: rgba(245,158,11,.12);
+    border-color: rgba(245,158,11,.25);
+    color: #92400e;
+}
+
+    .sal-partial::before {
+        background: #f59e0b;
+    }
+
+.sal-off {
+    background: rgba(239,68,68,.10);
+    border-color: rgba(239,68,68,.20);
+    color: #991b1b;
+}
+
+    .sal-off::before {
+        background: #ef4444;
+    }
+
+/* Actions */
+.sal-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.sal-edit {
+    background: #3b82f6;
+    color: #fff;
+    border: 0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.sal-delete {
+    background: #ef4444;
+    color: #fff;
+    border: 0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width:900px) {
+    .sal-page {
+        padding: 16px;
+    }
+
+    .sal-title-center {
+        font-size: 24px;
+    }
+
+    .sal-table-wrap {
+        padding: 10px;
+    }
+}

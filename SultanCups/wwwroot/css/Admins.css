@@ -1,0 +1,269 @@
+﻿/* =======================================================
+   Admins.css  (Premium Table like reference UI)
+   All classes prefixed with ad-
+   ======================================================= */
+
+:root {
+    --ad-bg: #f3f6fb;
+    --ad-card: rgba(255,255,255,.75);
+    --ad-card-solid: #ffffff;
+    --ad-line: rgba(148,163,184,.28);
+    --ad-text: #0f172a;
+    --ad-muted: #64748b;
+    --ad-primary: #2563eb;
+    --ad-primary2: #1e40af;
+    --ad-shadow: 0 28px 70px rgba(2,6,23,.10);
+    --ad-shadow2: 0 14px 32px rgba(2,6,23,.08);
+}
+
+/* ================= Page ================= */
+
+.ad-page {
+    padding: 26px;
+    direction: rtl;
+}
+
+.ad-header {
+    margin-bottom: 14px;
+}
+
+.ad-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 950;
+    color: var(--ad-text);
+    letter-spacing: .2px;
+}
+
+.ad-sub {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ad-muted);
+}
+
+/* ================= Card / Container ================= */
+
+.ad-card {
+    background: var(--ad-card);
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 22px;
+    box-shadow: var(--ad-shadow);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* Table wrapper */
+.ad-table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 14px;
+}
+
+    /* Scrollbar */
+    .ad-table-wrap::-webkit-scrollbar {
+        height: 10px;
+        width: 10px;
+    }
+
+    .ad-table-wrap::-webkit-scrollbar-thumb {
+        background: rgba(37,99,235,.25);
+        border-radius: 999px;
+    }
+
+    .ad-table-wrap::-webkit-scrollbar-track {
+        background: rgba(148,163,184,.15);
+        border-radius: 999px;
+    }
+
+/* ================= Table ================= */
+
+.ad-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; /* row gaps like reference */
+    min-width: 860px;
+}
+
+    /* Header row */
+    .ad-table thead th {
+        background: transparent;
+        color: var(--ad-muted);
+        font-size: 12px;
+        font-weight: 950;
+        padding: 10px 16px;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    /* Body rows as rounded cards */
+    .ad-table tbody tr {
+        filter: drop-shadow(0 10px 22px rgba(2,6,23,.06));
+        transition: transform .16s ease, filter .16s ease;
+    }
+
+        .ad-table tbody tr:hover {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 16px 30px rgba(2,6,23,.10));
+        }
+
+    /* Cells */
+    .ad-table tbody td {
+        background: var(--ad-card-solid);
+        border-top: 1px solid rgba(226,232,240,.85);
+        border-bottom: 1px solid rgba(226,232,240,.85);
+        padding: 14px 16px;
+        font-weight: 900;
+        color: var(--ad-text);
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+        .ad-table tbody td:first-child {
+            border-right: 1px solid rgba(226,232,240,.85);
+            border-radius: 0;
+        }
+
+        .ad-table tbody td:last-child {
+            border-left: 1px solid rgba(226,232,240,.85);
+            border-radius: 0;
+        }
+
+        /* Subtle separators inside row */
+        .ad-table tbody td + td {
+            position: relative;
+        }
+
+            .ad-table tbody td + td::before {
+                content: "";
+                position: absolute;
+                right: 0;
+                top: 12%;
+                bottom: 12%;
+                width: 2px;
+                background: rgba(100,116,139,.45);
+            }
+/* ================= Column Styles ================= */
+
+.ad-name {
+    font-weight: 950;
+    color: #0b2a66;
+}
+
+.ad-phone {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    letter-spacing: .4px;
+    color: #111827;
+}
+
+.ad-role {
+    color: #1f2937;
+}
+
+/* ================= Active Badge (minimal like reference) ================= */
+
+.ad-active {
+    text-align: right;
+}
+
+.ad-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 950;
+    border: 1px solid transparent;
+    background: rgba(241,245,249,.9);
+    color: #0f172a;
+}
+
+    /* Small dot */
+    .ad-badge::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #94a3b8;
+    }
+
+/* Active */
+.ad-on {
+    background: rgba(16,185,129,.10);
+    border-color: rgba(16,185,129,.22);
+    color: #065f46;
+}
+
+    .ad-on::before {
+        background: #22c55e;
+    }
+
+/* Inactive */
+.ad-off {
+    background: rgba(239,68,68,.10);
+    border-color: rgba(239,68,68,.20);
+    color: #991b1b;
+}
+
+    .ad-off::before {
+        background: #ef4444;
+    }
+
+/* ===== عنوان الصفحة ===== */
+
+.ad-header-center {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.ad-title-center {
+    font-size: 28px;
+    font-weight: 950;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* ===== أزرار الإجراءات ===== */
+
+.ad-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.ad-edit {
+    background: #3b82f6;
+    color: white;
+    border: 0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.ad-delete {
+    background: #ef4444;
+    color: white;
+    border: 0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+/* ================= Responsive ================= */
+
+@media (max-width: 900px) {
+    .ad-page {
+        padding: 16px;
+    }
+
+    .ad-title {
+        font-size: 24px;
+    }
+
+    .ad-table-wrap {
+        padding: 10px;
+    }
+}

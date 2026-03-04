@@ -1,0 +1,102 @@
+﻿@page "/Salaries"
+@layout Layout.MainLayout
+@inject NavigationManager Nav
+
+<div class="sal-page">
+
+    <!-- Top bar -->
+    <div class="sal-topbar">
+        <button class="sal-add-btn">إضافة راتب</button>
+        <h2 class="sal-title-center">الرواتب</h2>
+        <div></div>
+    </div>
+
+    <div class="sal-card">
+
+        <div class="sal-table-wrap">
+            <table class="sal-table">
+                <thead>
+                    <tr>
+                        <th>اسم الموظف</th>
+                        <th>نوع الموظف</th>
+                        <th>نوع الراتب</th>
+                        <th>القيمة المستحقة</th>
+                        <th>القيمة المدفوعة</th>
+                        <th>القيمة المتبقية</th>
+                        <th>الحالة</th>
+                        <th>تاريخ الدفع</th>
+                        <th>الخزنة</th>
+                        <th>ملاحظة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var s in Salarie)
+                    {
+                        <tr>
+                            <td class="sal-name">@s.EmployeeName</td>
+                            <td class="sal-emp-type">@s.EmployeeType</td>
+                            <td class="sal-salary-type">@s.SalaryType</td>
+
+                            <td class="sal-money">@s.Amount د.ل</td>
+                            <td class="sal-money">@s.PaidAmount د.ل</td>
+                            <td class="sal-remain">@s.Remaining د.ل</td>
+
+                            <td class="sal-status">
+                                <span class="sal-badge @GetStatusClass(s.Status)">
+                                    @s.Status
+                                </span>
+                            </td>
+
+                            <td class="sal-date">@s.SalaryDate</td>
+                            <td class="sal-cash">@s.CashBoxName</td>
+                            <td class="sal-notes">@s.Notes</td>
+
+                            <td class="sal-actions">
+                                <button class="sal-edit">تعديل</button>
+                                <button class="sal-delete">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    // بيانات تجريبية للتصميم فقط
+    List<SalaryRow> Salarie = new()
+    {
+        new("سالم محمد","مهندس","راتب أساسي",2500,2500,"خالص","2026-03-04","خزنة المصنع",""),
+        new("محمود علي","مهندس","طلعة",1800,1000,"خالص جزئي","2026-03-03","خزنة أحمد","صاحب احمد مثلا"),
+        new("خالد سالم","فني","راتب أساسي",1200,0,"غير خالص","2026-03-01","خزنة محمد","سلفة ربما !")
+    };
+
+    public record SalaryRow(
+        string EmployeeName,
+        string EmployeeType,
+        string SalaryType,
+        decimal Amount,
+        decimal PaidAmount,
+        string Status,
+        string SalaryDate,
+        string CashBoxName,
+        string? Notes
+    )
+    {
+        public decimal Remaining => Amount - PaidAmount;
+    }
+
+    string GetStatusClass(string status) => status switch
+    {
+        "خالص" => "sal-on",
+        "خالص جزئي" => "sal-partial",
+        _ => "sal-off"
+    };
+}

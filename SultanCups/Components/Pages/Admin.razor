@@ -1,0 +1,69 @@
+﻿@page "/Admins"
+@layout Layout.MainLayout
+@inject NavigationManager Nav
+
+<div class="ad-page">
+
+    <!-- العنوان في الوسط -->
+    <div class="ad-header-center">
+        <h2 class="ad-title-center">مسؤولي النظام</h2>
+    </div>
+
+    <div class="ad-card">
+
+        <div class="ad-table-wrap">
+            <table class="ad-table">
+
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>اسم المستخدم</th>
+                        <th>رقم الهاتف</th>
+                        <th>الدور</th>
+                        <th>نشط</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var a in Admins)
+                    {
+                        <tr>
+                            <td class="ad-name">@a.FullName</td>
+                            <td>@a.Username</td>
+                            <td class="ad-phone">@a.Phone</td>
+                            <td class="ad-role">@a.Role</td>
+
+                            <td class="ad-active">
+                                <span class="ad-badge @(a.IsActive ? "ad-on" : "ad-off")">
+                                    @(a.IsActive ? "نشط" : "غير نشط")
+                                </span>
+                            </td>
+
+                            <td class="ad-actions">
+                                <button class="ad-edit">تعديل</button>
+                                <button class="ad-delete">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    List<AdminRow> Admins = new()
+    {
+        new("رياض السيد","riyad","0910772372","Admin1",true),
+        new("محمد علي","mohamed","0920000000","Admin2",true),
+        new("أحمد سالم","ahmed","0911111111","Admin2",false)
+    };
+
+    public record AdminRow(string FullName, string Username, string Phone, string Role, bool IsActive);
+
+}

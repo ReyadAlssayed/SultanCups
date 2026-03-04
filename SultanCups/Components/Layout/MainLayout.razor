@@ -5,10 +5,12 @@
 
     <aside class="app-sidebar">
         <div class="sidebar-head">
-            <div class="sidebar-brand">مصنع أكواب السلطان</div>
+            <div class="sidebar-brand">أكواب السلطان</div>
 
-            <button class="sidebar-toggle" @onclick="ToggleSidebar" title="إخفاء/إظهار القائمة">
-                @(IsSidebarCollapsed ? "⟩" : "⟨")
+            <button class="sidebar-toggle"
+                    @onclick="ToggleSidebar"
+                    title="إخفاء/إظهار القائمة">
+                ☰
             </button>
         </div>
 
@@ -32,6 +34,7 @@
 
                 <div class="nav-children @(OpenKey == "sales" ? "open" : "")">
                     <button class="nav-child" @onclick='@(() => Go("/invoices"))'>الفواتير (الطلبيات)</button>
+                    <button class="nav-child" @onclick='@(() => Go("/returns"))'>البضاعة الراجعة</button>
                     <button class="nav-child" @onclick='@(() => Go("/marketers"))'>المسوقين</button>
                     <button class="nav-child" @onclick='@(() => Go("/debts"))'>الديون</button>
                 </div>
@@ -75,7 +78,7 @@
                 </button>
 
                 <div class="nav-children @(OpenKey == "finance" ? "open" : "")">
-                    <button class="nav-child" @onclick='@(() => Go("/salaries"))'>الرواتب</button>
+                    <button class="nav-child" @onclick='@(() => Go("/Salaries"))'>الرواتب</button>
                     <button class="nav-child" @onclick='@(() => Go("/other-expenses"))'>المصروفات الأخرى</button>
                     <button class="nav-child" @onclick='@(() => Go("/financial-events"))'>الأحداث المالية</button>
                 </div>
@@ -104,7 +107,7 @@
                 </button>
 
                 <div class="nav-children @(OpenKey == "admin" ? "open" : "")">
-                    <button class="nav-child" @onclick='@(() => Go("/admins"))'>المسؤولين</button>
+                    <button class="nav-child" @onclick='@(() => Go("/Admins"))'>المسؤولين</button>
                     <button class="nav-child" @onclick='@(() => Go("/Settings"))'>الإعدادات</button>
                     <button class="nav-child" @onclick='@(() => Go("/backup"))'>النسخ / الرجوع</button>
                 </div>

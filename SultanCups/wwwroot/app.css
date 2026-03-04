@@ -248,13 +248,23 @@ body {
         background: rgba(255,255,255,.24);
     }
 
-/* الوضع المطوي */
-
 .app-shell.sidebar-collapsed .app-sidebar {
-    width: 74px;
-    padding: 14px 10px;
+    width: 110px; /* بدل 74px */
+    padding: 14px 12px;
+}
+.app-shell.sidebar-collapsed .sidebar-brand {
+    display: none;
 }
 
+.app-shell.sidebar-collapsed .nav-parent,
+.app-shell.sidebar-collapsed .nav-child,
+.app-shell.sidebar-collapsed .nav-logout {
+    font-size: 0; /* يخفي النص */
+}
+
+.app-shell.sidebar-collapsed .chev {
+    display: none;
+}
 .app-shell.sidebar-collapsed .sidebar-nav {
     opacity: 0;
     pointer-events: none;
