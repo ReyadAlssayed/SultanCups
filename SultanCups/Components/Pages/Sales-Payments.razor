@@ -1,0 +1,65 @@
+﻿@page "/Sales-payments"
+@layout Layout.MainLayout
+
+<div class="inv-page">
+
+    <div class="inv-topbar">
+        <button class="inv-btn inv-btn-add">إضافة تحصيل</button>
+
+        <h2 class="inv-title">تحصيل المبيعات</h2>
+
+        <div></div>
+    </div>
+
+    <div class="inv-card">
+        <div class="inv-table-wrap">
+            <table class="inv-table">
+                <thead>
+                    <tr>
+                        <th>رقم الفاتورة</th>
+                        <th>الخزنة</th>
+                        <th>المبلغ المدفوع</th>
+                        <th>طريقة الدفع</th>
+                        <th>تاريخ الدفع</th>
+                        <th>ملاحظات</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var p in Payments)
+                    {
+                        <tr>
+                            <td class="inv-code">@p.orderNumber</td>
+                            <td>@p.cashBox</td>
+                            <td class="inv-money inv-amount">@Fmt(p.amountPaid)</td>
+                            <td>@p.method</td>
+                            <td class="inv-muted">@p.payDate.ToString("yyyy-MM-dd")</td>
+                            <td class="inv-muted">@p.notes</td>
+
+                            <td class="inv-actions-cell">
+                                <button class="inv-small inv-view">تفاصيل</button>
+                                <button class="inv-small inv-edit">تعديل</button>
+                                <button class="inv-small inv-del">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    // بيانات تدريبية فقط (Tuples) - بدون كلاس
+    List<(string orderNumber, string cashBox, decimal amountPaid, string method, DateTime payDate, string notes)> Payments = new()
+    {
+        ("INV-1001","الخزنة الرئيسية",200m,"كاش",new DateTime(2026,3,5),"دفعة أولى"),
+        ("INV-1001","الخزنة الرئيسية",100m,"تحويل مصرفي",new DateTime(2026,3,6),"تكملة"),
+        ("INV-1002","خزنة الفرع",150m,"بطاقة",new DateTime(2026,3,4),""),
+    };
+
+    string Fmt(decimal v) => $"{v:0.00} د.ل";
+}

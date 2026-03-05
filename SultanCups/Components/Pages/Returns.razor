@@ -1,0 +1,65 @@
+﻿@page "/returns"
+@layout Layout.MainLayout
+
+<div class="inv-page">
+
+    <div class="inv-topbar">
+        <button class="inv-btn inv-btn-add">إضافة بضاعة راجعة</button>
+
+        <h2 class="inv-title">البضاعة الراجعة</h2>
+
+        <div></div>
+    </div>
+
+    <div class="inv-card">
+        <div class="inv-table-wrap">
+            <table class="inv-table">
+                <thead>
+                    <tr>
+                        <th>رقم الفاتورة</th>
+                        <th>المنتج</th>
+                        <th>عدد الكراتين</th>
+                        <th>سبب الإرجاع</th>
+                        <th>التاريخ</th>
+                        <th>ملاحظات</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var r in Return)
+                    {
+                        <tr>
+                            <td class="inv-code">@r.orderNumber</td>
+                            <td>@r.product</td>
+                            <td class="inv-money">@r.boxCount</td>
+                            <td class="inv-return-reason">@r.reason</td>
+                            <td class="inv-muted">@r.returnDate.ToString("yyyy-MM-dd")</td>
+                            <td class="inv-muted">@r.notes</td>
+
+                            <td class="inv-actions-cell">
+                                <button class="inv-small inv-view">تفاصيل</button>
+                                <button class="inv-small inv-edit">تعديل</button>
+                                <button class="inv-small inv-del">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    // بيانات تدريبية فقط
+    List<(string orderNumber, string product, int boxCount, string reason, DateTime returnDate, string notes)> Return = new()
+    {
+        ("INV-1001","أكواب 200ml",2,"تلف في الكراتين",new DateTime(2026,3,6),"استبدال"),
+        ("INV-1002","أكواب 300ml",1,"كسر أثناء النقل",new DateTime(2026,3,5),""),
+        ("INV-1003","أكواب 200ml",3,"خطأ في الكمية",new DateTime(2026,3,4),"إرجاع كامل"),
+    };
+
+}

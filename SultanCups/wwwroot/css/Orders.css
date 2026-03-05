@@ -1,0 +1,267 @@
+﻿/* ================= Page ================= */
+
+.inv-page {
+    padding: 26px;
+    direction: rtl;
+}
+
+/* ===== Topbar ===== */
+
+.inv-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.inv-title {
+    font-size: 28px;
+    font-weight: 950;
+    color: #0f172a;
+    margin: 0;
+}
+
+.inv-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.inv-btn {
+    border: 0;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.inv-btn-add {
+    background: #2563eb;
+    color: #fff;
+}
+
+    .inv-btn-add:hover {
+        background: #1e40af;
+    }
+
+.inv-btn-ghost {
+    background: #ffffff;
+    border: 1px solid rgba(148,163,184,.65);
+    color: #0f172a;
+}
+
+    .inv-btn-ghost:hover {
+        background: #f8fafc;
+    }
+
+/* ===== Tabs ===== */
+
+.inv-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.inv-tab {
+    border: 1px solid rgba(148,163,184,.55);
+    background: rgba(255,255,255,.75);
+    color: #0f172a;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-weight: 950;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+}
+
+    .inv-tab.active {
+        background: #0b2a66;
+        color: #fff;
+        border-color: #0b2a66;
+    }
+
+/* ===== Filters ===== */
+
+.inv-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.inv-input, .inv-select {
+    background: rgba(255,255,255,.85);
+    border: 1px solid rgba(148,163,184,.55);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-weight: 900;
+    outline: none;
+}
+
+.inv-input {
+    min-width: 260px;
+}
+
+.inv-select {
+    min-width: 170px;
+}
+
+/* ===== Card ===== */
+
+.inv-card {
+    background: rgba(255,255,255,.75);
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 22px;
+    box-shadow: 0 28px 70px rgba(2,6,23,.10);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* ===== Table ===== */
+
+.inv-table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 14px;
+}
+
+.inv-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    min-width: 1050px;
+}
+
+    .inv-table thead th {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 950;
+        padding: 10px 16px;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .inv-table tbody td {
+        background: #fff;
+        border-top: 1px solid rgba(226,232,240,.85);
+        border-bottom: 1px solid rgba(226,232,240,.85);
+        padding: 14px 16px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+
+        .inv-table tbody td + td {
+            border-right: 1px solid rgba(226,232,240,.6);
+        }
+
+/* ===== Columns ===== */
+
+.inv-code {
+    color: #0b2a66;
+    font-weight: 950;
+}
+
+.inv-muted {
+    color: #64748b;
+    font-weight: 900;
+}
+
+.inv-money {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.inv-pos {
+    color: #065f46;
+}
+
+.inv-neg {
+    color: #9f1239;
+}
+
+/* ===== Status Pill ===== */
+
+.inv-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 950;
+    border: 1px solid rgba(148,163,184,.55);
+    background: rgba(248,250,252,.9);
+}
+
+.inv-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #94a3b8;
+}
+
+.inv-pill.ok {
+    border-color: rgba(5,150,105,.25);
+    background: rgba(236,253,245,.9);
+    color: #065f46;
+}
+
+    .inv-pill.ok .inv-dot {
+        background: #10b981;
+    }
+
+.inv-pill.part {
+    border-color: rgba(245,158,11,.25);
+    background: rgba(255,251,235,.9);
+    color: #92400e;
+}
+
+    .inv-pill.part .inv-dot {
+        background: #f59e0b;
+    }
+
+.inv-pill.bad {
+    border-color: rgba(239,68,68,.25);
+    background: rgba(254,242,242,.9);
+    color: #991b1b;
+}
+
+    .inv-pill.bad .inv-dot {
+        background: #ef4444;
+    }
+
+/* ===== Actions ===== */
+
+.inv-actions-cell {
+    display: flex;
+    gap: 8px;
+}
+
+.inv-small {
+    border: 0;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.inv-view {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.inv-edit {
+    background: #0ea5e9;
+    color: #fff;
+}
+
+.inv-del {
+    background: #ef4444;
+    color: #fff;
+}
+
+
+.inv-amount {
+    color: #22c55e;
+    font-weight: 950;
+}

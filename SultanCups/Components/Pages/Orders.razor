@@ -1,0 +1,76 @@
+﻿@page "/orders"
+@layout Layout.MainLayout
+
+<div class="inv-page">
+
+    <div class="inv-topbar">
+        <button class="inv-btn inv-btn-add">إضافة فاتورة</button>
+
+        <h2 class="inv-title">الطلبيات</h2>
+
+        <div></div>
+    </div>
+
+    <div class="inv-card">
+        <div class="inv-table-wrap">
+            <table class="inv-table">
+                <thead>
+                    <tr>
+                        <th>رقم الفاتورة</th>
+                        <th>المسوّق</th>
+                        <th>المنتج</th>
+                        <th>عدد الكراتين</th>
+                        <th>سعر الكرتونة</th>
+                        <th>السعر الكلي</th>
+                        <th>عمولة/كرتونة</th>
+                        <th>عمولة المسوق الكلية</th>
+                        <th>التاريخ</th>
+                        <th>ملاحظات</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in Order)
+                    {
+                        <tr>
+                            <td class="inv-code">@o.orderNumber</td>
+                            <td>@o.marketer</td>
+                            <td>@o.product</td>
+                            <td class="inv-money">@o.boxCount</td>
+                            <td class="inv-money">@Fmt(o.unitPrice)</td>
+
+                            <td class="inv-money inv-amount">540.00 د.ل</td>
+
+                            <td class="inv-money">@Fmt(o.commPerBox)</td>
+
+                            <td class="inv-money inv-amount">60.00 د.ل</td>
+
+                            <td class="inv-muted">@o.orderDate.ToString("yyyy-MM-dd")</td>
+                            <td class="inv-muted">@o.notes</td>
+
+                            <td class="inv-actions-cell">
+                                <button class="inv-small inv-view">تفاصيل</button>
+                                <button class="inv-small inv-edit">تعديل</button>
+                                <button class="inv-small inv-del">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    // بيانات تدريبية فقط (Tuples) - بدون كلاس
+    List<(string orderNumber, string marketer, string product, int boxCount, decimal unitPrice, decimal commPerBox, DateTime orderDate, string notes)> Order = new()
+    {
+        ("INV-1001","محمد سالم","أكواب 200ml",30,18m,2m,new DateTime(2026,3,5),"طلبية زليتن"),
+        ("INV-1002","علي مفتاح","أكواب 300ml",20,20m,3m,new DateTime(2026,3,4),"توصيل مصراتة"),
+        ("INV-1003","سالم رمضان","أكواب 200ml",15,18m,2.5m,new DateTime(2026,3,3),"مستعجل"),
+    };
+
+    string Fmt(decimal v) => $"{v:0.00} د.ل";
+}

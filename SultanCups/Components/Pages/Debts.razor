@@ -1,0 +1,62 @@
+﻿@page "/Debts"
+@layout Layout.MainLayout
+
+<div class="inv-page">
+
+    <div class="inv-topbar">
+        <button class="inv-btn inv-btn-add">إضافة دين</button>
+
+        <h2 class="inv-title">الديون</h2>
+
+        <div></div>
+    </div>
+
+    <div class="inv-card">
+        <div class="inv-table-wrap">
+            <table class="inv-table">
+                <thead>
+                    <tr>
+                        <th>رقم الفاتورة</th>
+                        <th>تاريخ الدين</th>
+                        <th>المبلغ</th>
+                        <th>ملاحظات</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var d in Debt)
+                    {
+                        <tr>
+                            <td class="inv-code">@d.orderNumber</td>
+                            <td class="inv-muted">@d.debtDate.ToString("yyyy-MM-dd")</td>
+                            <td class="inv-money debt-amount">دين: @Fmt(d.amount)</td>
+                            <td class="inv-muted">@d.notes</td>
+
+                            <td class="inv-actions-cell">
+                                <button class="inv-small inv-view">تفاصيل</button>
+                                <button class="inv-small inv-edit">تعديل</button>
+                                <button class="inv-small inv-del">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    // بيانات تدريبية فقط
+    List<(string orderNumber, DateTime debtDate, decimal amount, string notes)> Debt = new()
+    {
+        ("INV-1001", new DateTime(2026,3,5), 200m, "دين جزئي"),
+        ("INV-1002", new DateTime(2026,3,6), 150m, "تأجيل الدفع"),
+        ("INV-1003", new DateTime(2026,3,7), 300m, "دين كامل"),
+    };
+
+    string Fmt(decimal v) => $"{v:0.00} د.ل";
+}

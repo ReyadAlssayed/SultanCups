@@ -1,0 +1,141 @@
+﻿/* ================= Page ================= */
+
+.sp-page {
+    padding: 26px;
+    direction: rtl;
+}
+
+/* ===== Topbar ===== */
+
+.sp-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.sp-title {
+    font-size: 28px;
+    font-weight: 950;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* زر إضافة */
+
+.sp-btn {
+    background: #2563eb;
+    color: white;
+    border: 0;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+    .sp-btn:hover {
+        background: #1e40af;
+    }
+
+/* ===== Card ===== */
+
+.sp-card {
+    background: rgba(255,255,255,.75);
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 22px;
+    box-shadow: 0 28px 70px rgba(2,6,23,.10);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* ===== Table ===== */
+
+.sp-table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 14px;
+}
+
+.sp-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .sp-table thead th {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 950;
+        padding: 12px 16px;
+        text-align: right;
+    }
+
+    /* صفوف الجدول */
+
+    .sp-table tbody td {
+        background: white;
+        padding: 14px 16px;
+        font-weight: 900;
+    }
+
+    /* فاصل بين السجلات */
+
+    .sp-table tbody tr {
+        border-bottom: 1px solid #dbe3ec;
+    }
+
+    /* تعطيل أي فواصل أعمدة (احتياط) */
+
+    .sp-table td,
+    .sp-table th {
+        border-right: none;
+    }
+
+/* الأعمدة */
+
+.sp-code {
+    font-weight: 950;
+    color: #0b2a66;
+}
+
+.sp-muted {
+    color: #64748b;
+}
+
+.sp-money {
+    font-family: monospace;
+}
+
+/* الإجراءات */
+
+.sp-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.sp-small {
+    border: 0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.sp-view {
+    background: #3b82f6;
+    color: white;
+}
+
+.sp-edit {
+    background: #0ea5e9;
+    color: white;
+}
+
+.sp-del {
+    background: #ef4444;
+    color: white;
+}
+
+.inv-amount {
+    color: #22c55e;
+    font-weight: 950;
+}

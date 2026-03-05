@@ -33,10 +33,12 @@
                 </button>
 
                 <div class="nav-children @(OpenKey == "sales" ? "open" : "")">
-                    <button class="nav-child" @onclick='@(() => Go("/invoices"))'>الفواتير (الطلبيات)</button>
+                    <button class="nav-child" @onclick='@(() => Go("/Orders"))'>الفواتير (الطلبيات)</button>
+                    <button class="nav-child" @onclick='@(() => Go("/sales-payments"))'>تحصيل المبيعات</button>
+                    <button class="nav-child" @onclick='@(() => Go("/debts"))'>الديون</button>
                     <button class="nav-child" @onclick='@(() => Go("/returns"))'>البضاعة الراجعة</button>
                     <button class="nav-child" @onclick='@(() => Go("/marketers"))'>المسوقين</button>
-                    <button class="nav-child" @onclick='@(() => Go("/debts"))'>الديون</button>
+                  
                 </div>
             </div>
 
