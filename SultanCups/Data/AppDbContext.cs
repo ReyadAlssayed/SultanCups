@@ -5,11 +5,11 @@ namespace SultanCups.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options)
-            : base(options)
-        {
-        }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<Admain> admins { get; set; }
+        public DbSet<Employee> employees { get; set; } = null!;
+        public DbSet<Admain> admins { get; set; } = null!;
+        public DbSet<Salary> salaries { get; set; } = null!;
+        public DbSet<CashBox> cash_boxes { get; set; } = null!;
     }
 }
