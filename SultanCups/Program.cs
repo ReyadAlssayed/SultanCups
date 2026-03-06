@@ -11,7 +11,12 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<SalesService>();
+builder.Services.AddScoped<InventoryService>();
+builder.Services.AddScoped<FinanceService>();
+builder.Services.AddScoped<HrService>();
 
 var app = builder.Build();
 
