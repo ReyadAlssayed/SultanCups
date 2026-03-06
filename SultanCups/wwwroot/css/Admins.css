@@ -252,6 +252,74 @@
     cursor: pointer;
 }
 
+/* ================= DIALOG ================= */
+
+.ad-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.ad-dialog-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+    width: 92%;
+    max-width: 420px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+}
+
+    .ad-dialog-box h3 {
+        font-size: 18px;
+        font-weight: 900;
+        text-align: center;
+        margin-bottom: 18px;
+    }
+
+.ad-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 10px;
+    direction: rtl;
+}
+
+.ad-dialog-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.ad-save {
+    flex: 1;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.ad-delete-confirm {
+    flex: 1;
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.ad-cancel {
+    flex: 1;
+    background: #64748b;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+}
 /* ================= Responsive ================= */
 
 @media (max-width: 900px) {

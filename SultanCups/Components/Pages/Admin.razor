@@ -51,8 +51,8 @@
                                 </td>
 
                                 <td class="ad-actions">
-                                    <button class="ad-edit">تعديل</button>
-                                    <button class="ad-delete">حذف</button>
+                                    <button class="ad-edit" @onclick="() => OpenEditDialog(a)">تعديل</button>
+                                    <button class="ad-delete" @onclick="() => OpenDeleteDialog(a)">حذف</button>
                                 </td>
                             </tr>
                         }
@@ -65,9 +65,62 @@
     </div>
 
 </div>
+@if (ShowEditDialog)
+{
+    <div class="ad-dialog-overlay">
+        <div class="ad-dialog-box">
 
+            <h3>تعديل المسؤول</h3>
+
+            <input class="ad-input" placeholder="الاسم" />
+            <input class="ad-input" placeholder="اسم المستخدم" />
+            <input class="ad-input" placeholder="رقم الهاتف" />
+
+            <div class="ad-dialog-actions">
+                <button class="ad-save">حفظ</button>
+                <button class="ad-cancel" @onclick="CloseDialogs">إلغاء</button>
+            </div>
+
+        </div>
+    </div>
+}
+
+@if (ShowDeleteDialog)
+{
+    <div class="ad-dialog-overlay">
+        <div class="ad-dialog-box">
+
+            <h3>هل تريد حذف المسؤول ؟</h3>
+
+            <div class="ad-dialog-actions">
+                <button class="ad-delete-confirm">حذف</button>
+                <button class="ad-cancel" @onclick="CloseDialogs">إلغاء</button>
+            </div>
+
+        </div>
+    </div>
+}
 @code {
     List<SultanCups.Models.Admain>? Admins;
+
+    bool ShowEditDialog = false;
+    bool ShowDeleteDialog = false;
+
+    void OpenEditDialog(SultanCups.Models.Admain a)
+    {
+        ShowEditDialog = true;
+    }
+
+    void OpenDeleteDialog(SultanCups.Models.Admain a)
+    {
+        ShowDeleteDialog = true;
+    }
+
+    void CloseDialogs()
+    {
+        ShowEditDialog = false;
+        ShowDeleteDialog = false;
+    }
 
     protected override async Task OnInitializedAsync()
     {
