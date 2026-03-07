@@ -264,15 +264,6 @@
     z-index: 2000;
 }
 
-.ad-dialog-box {
-    background: #fff;
-    border-radius: 20px;
-    padding: 24px;
-    width: 92%;
-    max-width: 420px;
-    box-shadow: 0 20px 40px rgba(0,0,0,.2);
-}
-
     .ad-dialog-box h3 {
         font-size: 18px;
         font-weight: 900;
@@ -297,15 +288,6 @@
 .ad-save {
     flex: 1;
     background: #2563eb;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 10px;
-}
-
-.ad-delete-confirm {
-    flex: 1;
-    background: #ef4444;
     color: #fff;
     border: none;
     padding: 10px;
@@ -401,6 +383,64 @@
     left: 4px;
 }
 
+.ad-delete-dialog-box {
+    max-width: 430px;
+    overflow: hidden;
+}
+
+.ad-delete-top-image {
+    height: 95px;
+}
+
+.ad-delete-dialog-body {
+    text-align: center;
+    padding-top: 18px;
+}
+
+.ad-delete-icon-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.ad-delete-icon {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 900;
+    box-shadow: 0 10px 24px rgba(220,38,38,.18);
+}
+
+.ad-delete-title {
+    margin: 0 0 8px;
+    font-size: 24px;
+    font-weight: 950;
+    color: #0f172a;
+}
+
+.ad-delete-text {
+    margin: 0 0 18px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.ad-delete-confirm {
+    flex: 1;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    box-shadow: 0 10px 20px rgba(239,68,68,.18);
+}
 /* ================= Responsive ================= */
 
 @media (max-width: 900px) {

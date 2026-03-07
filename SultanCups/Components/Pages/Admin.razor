@@ -76,7 +76,7 @@
         <div class="ad-dialog-box">
 
             <div class="ad-dialog-top-image">
-                <img src="images/Background.png" />
+                <img src="images/Background.jpg" />
             </div>
 
             <div class="ad-dialog-body">
@@ -116,17 +116,29 @@
         </div>
     </div>
 }
-
 @if (ShowDeleteDialog)
 {
     <div class="ad-dialog-overlay">
-        <div class="ad-dialog-box">
+        <div class="ad-dialog-box ad-delete-dialog-box">
 
-            <h3>هل تريد حذف المسؤول ؟</h3>
+            <div class="ad-dialog-top-image ad-delete-top-image">
+                <img src="images/background.jpg" />
+            </div>
 
-            <div class="ad-dialog-actions">
-                <button type="button" class="ad-delete-confirm">حذف</button>
-                <button type="button" class="ad-cancel" @onclick="CloseDialogs">إلغاء</button>
+            <div class="ad-dialog-body ad-delete-dialog-body">
+
+                <div class="ad-delete-icon-wrap">
+                    <div class="ad-delete-icon">!</div>
+                </div>
+
+                <h3 class="ad-delete-title">تأكيد الحذف</h3>
+                <p class="ad-delete-text">هل تريد حذف المسؤول نهائيًا؟</p>
+
+                <div class="ad-dialog-actions">
+                    <button type="button" class="ad-delete-confirm">حذف</button>
+                    <button type="button" class="ad-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
             </div>
 
         </div>
