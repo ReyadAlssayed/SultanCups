@@ -75,15 +75,42 @@
     <div class="ad-dialog-overlay">
         <div class="ad-dialog-box">
 
-            <h3>تعديل المسؤول</h3>
+            <div class="ad-dialog-top-image">
+                <img src="images/Background.png" />
+            </div>
 
-            <input class="ad-input" placeholder="الاسم" />
-            <input class="ad-input" placeholder="اسم المستخدم" />
-            <input class="ad-input" placeholder="رقم الهاتف" />
+            <div class="ad-dialog-body">
 
-            <div class="ad-dialog-actions">
-                <button type="button" class="ad-save">حفظ</button>
-                <button type="button" class="ad-cancel" @onclick="CloseDialogs">إلغاء</button>
+                <h3>تعديل المسؤول</h3>
+
+                <input class="ad-input" placeholder="الاسم" @bind="EditAdmin.full_name" />
+                <input class="ad-input" placeholder="اسم المستخدم" @bind="EditAdmin.username" />
+                <input class="ad-input" placeholder="رقم الهاتف" @bind="EditAdmin.phone" />
+
+                <select class="ad-input" @bind="EditAdmin.role">
+                    <option value="Admin1">Admin1</option>
+                    <option value="Admin2">Admin2</option>
+                </select>
+
+                <div class="ad-switch-row">
+
+                    <span class="ad-switch-label">الحالة</span>
+
+                    <button type="button"
+                            class="ad-switch @(EditAdmin.is_active ? "is-on" : "is-off")"
+                            @onclick="ToggleEditActive">
+
+                        <span class="ad-switch-thumb"></span>
+
+                    </button>
+
+                </div>
+
+                <div class="ad-dialog-actions">
+                    <button type="button" class="ad-save">حفظ</button>
+                    <button type="button" class="ad-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
             </div>
 
         </div>
@@ -112,8 +139,22 @@
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
 
+    SultanCups.Models.Admain? EditAdmin;
+
     void OpenEditDialog(SultanCups.Models.Admain a)
     {
+        EditAdmin = new SultanCups.Models.Admain
+        {
+            admin_id = a.admin_id,
+            full_name = a.full_name,
+            username = a.username,
+            phone = a.phone,
+            role = a.role,
+            is_active = a.is_active,
+            password_hash = a.password_hash,
+            created_at = a.created_at
+        };
+
         ShowEditDialog = true;
     }
 
@@ -122,10 +163,17 @@
         ShowDeleteDialog = true;
     }
 
+    void ToggleEditActive()
+    {
+        if (EditAdmin is null) return;
+        EditAdmin.is_active = !EditAdmin.is_active;
+    }
+
     void CloseDialogs()
     {
         ShowEditDialog = false;
         ShowDeleteDialog = false;
+        EditAdmin = null;
     }
 
     protected override async Task OnInitializedAsync()
