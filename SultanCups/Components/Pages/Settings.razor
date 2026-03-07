@@ -1,6 +1,7 @@
 ﻿@page "/Settings"
 @layout MainLayout
 @inject NavigationManager Nav
+@inject SultanCups.Services.AdminService AdminService
 
 <div class="settings-page">
 
@@ -169,7 +170,7 @@
     void GoToAdmins() => Nav.NavigateTo("/Admins");      // غيّر المسار حسب نظامك
     void GoToBackups() => Nav.NavigateTo("/Backups");    // غيّر المسار حسب نظامك
 
-    void SendSupport()
+    async Task SendSupport()
     {
         if (string.IsNullOrWhiteSpace(SupportNotes))
         {
@@ -177,12 +178,16 @@
             return;
         }
 
-        // هنا اربط الإرسال (DB/WhatsApp/Email) لاحقاً
-        Message = "تم إرسال الملاحظة";
+        await AdminService.SendSupportMessage(
+            CurrentUserName,
+            CurrentUserRole,
+            SupportNotes
+        );
+
+        Message = "تم إرسال الملاحظة للمطور";
         SupportNotes = "";
         ShowSupportDialog = false;
     }
-
     void Logout()
     {
         // ضع منطق الخروج الخاص بك
