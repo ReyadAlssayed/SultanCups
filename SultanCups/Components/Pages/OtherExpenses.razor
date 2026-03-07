@@ -4,10 +4,8 @@
 <div class="oth-page">
 
     <div class="oth-topbar">
-        <button type="button" class="oth-btn oth-btn-add">إضافة مصروف</button>
-
+        <button type="button" class="oth-btn oth-btn-add" @onclick="OpenAddDialog">إضافة مصروف</button>
         <h2 class="oth-title">المصروفات الأخرى</h2>
-
         <div></div>
     </div>
 
@@ -33,13 +31,12 @@
                             <td class="oth-name">@o.name</td>
                             <td class="oth-qty">@o.quantity</td>
                             <td class="oth-money oth-total">@Fmt(o.cost)</td>
-                            <td class="oth-muted">@o.purchaseDate.ToString("yyyy-MM-dd")</td>
+                            <td class="oth-muted">@o.purchaseDate</td>
                             <td class="oth-notes">@o.notes</td>
 
                             <td class="oth-actions-cell">
-                                <button type="button" class="oth-small oth-view">عرض</button>
-                                <button type="button" class="oth-small oth-edit">تعديل</button>
-                                <button type="button" class="oth-small oth-del">حذف</button>
+                                <button type="button" class="oth-small oth-edit" @onclick="() => OpenEditDialog(o)">تعديل</button>
+                                <button type="button" class="oth-small oth-del" @onclick="() => OpenDeleteDialog(o)">حذف</button>
                             </td>
                         </tr>
                     }
@@ -50,13 +47,197 @@
 
 </div>
 
+@if (ShowAddDialog)
+{
+    <div class="oth-dialog-overlay">
+        <div class="oth-dialog-box">
+            <div class="oth-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="oth-dialog-body">
+                <h3>إضافة مصروف</h3>
+
+                <div class="oth-fields">
+
+                    <div class="oth-field">
+                        <label class="oth-label">اسم المصروف</label>
+                        <input class="oth-input" @bind="ExpenseForm.name" />
+                    </div>
+
+                    <div class="oth-field">
+                        <label class="oth-label">الكمية</label>
+                        <input class="oth-input" type="number" @bind="ExpenseForm.quantity" />
+                    </div>
+
+                    <div class="oth-field">
+                        <label class="oth-label">التكلفة (د.ل)</label>
+                        <input class="oth-input" type="number" step="0.01" @bind="ExpenseForm.cost" />
+                    </div>
+
+                    <div class="oth-field">
+                        <label class="oth-label">التاريخ</label>
+                        <input class="oth-input" @bind="ExpenseForm.purchaseDate" />
+                    </div>
+
+                    <div class="oth-field oth-field-full">
+                        <label class="oth-label">ملاحظات</label>
+                        <textarea class="oth-input oth-textarea" @bind="ExpenseForm.notes"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="oth-dialog-actions">
+                    <button type="button" class="oth-save">حفظ</button>
+                    <button type="button" class="oth-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowEditDialog)
+{
+    <div class="oth-dialog-overlay">
+        <div class="oth-dialog-box">
+            <div class="oth-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="oth-dialog-body">
+                <h3>تعديل المصروف</h3>
+
+                <div class="oth-fields">
+
+                    <div class="oth-field">
+                        <label class="oth-label">اسم المصروف</label>
+                        <input class="oth-input" @bind="ExpenseForm.name" />
+                    </div>
+
+                    <div class="oth-field">
+                        <label class="oth-label">الكمية</label>
+                        <input class="oth-input" type="number" @bind="ExpenseForm.quantity" />
+                    </div>
+
+                    <div class="oth-field">
+                        <label class="oth-label">التكلفة (د.ل)</label>
+                        <input class="oth-input" type="number" step="0.01" @bind="ExpenseForm.cost" />
+                    </div>
+
+                    <div class="oth-field">
+                        <label class="oth-label">التاريخ</label>
+                        <input class="oth-input" @bind="ExpenseForm.purchaseDate" />
+                    </div>
+
+                    <div class="oth-field oth-field-full">
+                        <label class="oth-label">ملاحظات</label>
+                        <textarea class="oth-input oth-textarea" @bind="ExpenseForm.notes"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="oth-dialog-actions">
+                    <button type="button" class="oth-save">حفظ</button>
+                    <button type="button" class="oth-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@if (ShowDeleteDialog)
+{
+    <div class="oth-dialog-overlay">
+        <div class="oth-dialog-box oth-delete-dialog-box">
+            <div class="oth-dialog-top-image oth-delete-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="oth-dialog-body oth-delete-dialog-body">
+                <div class="oth-delete-icon-wrap">
+                    <div class="oth-delete-icon">!</div>
+                </div>
+
+                <h3 class="oth-delete-title">تأكيد الحذف</h3>
+                <p class="oth-delete-text">هل تريد حذف هذا المصروف نهائيًا؟</p>
+
+                <div class="oth-dialog-actions">
+                    <button type="button" class="oth-delete-confirm">حذف</button>
+                    <button type="button" class="oth-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
-    List<(int id, string name, int quantity, decimal cost, DateTime purchaseDate, string notes)> OtherExpense = new()
+    List<OtherExpenseRow> OtherExpense = new()
     {
-        (1, "شراء أكياس تغليف", 5, 80.00m, new DateTime(2026, 3, 7), "للمخزن"),
-        (2, "مصاريف تنظيف", 1, 50.00m, new DateTime(2026, 3, 6), "تنظيف المكان"),
-        (3, "أدوات مكتبية", 3, 35.00m, new DateTime(2026, 3, 5), "أقلام ودفاتر")
+        new() { id = 1, name = "شراء أكياس تغليف", quantity = 5, cost = 80.00m, purchaseDate = "2026-03-07", notes = "للمخزن" },
+        new() { id = 2, name = "مصاريف تنظيف", quantity = 1, cost = 50.00m, purchaseDate = "2026-03-06", notes = "تنظيف المكان" },
+        new() { id = 3, name = "أدوات مكتبية", quantity = 3, cost = 35.00m, purchaseDate = "2026-03-05", notes = "أقلام ودفاتر" }
     };
 
+    bool ShowAddDialog = false;
+    bool ShowEditDialog = false;
+    bool ShowDeleteDialog = false;
+
+    OtherExpenseRow ExpenseForm = new();
+
     string Fmt(decimal v) => $"{v:0.00} د.ل";
+
+    void OpenAddDialog()
+    {
+        ExpenseForm = new OtherExpenseRow();
+        ShowAddDialog = true;
+    }
+
+    void OpenEditDialog(OtherExpenseRow o)
+    {
+        ExpenseForm = new OtherExpenseRow
+        {
+            id = o.id,
+            name = o.name,
+            quantity = o.quantity,
+            cost = o.cost,
+            purchaseDate = o.purchaseDate,
+            notes = o.notes
+        };
+
+        ShowEditDialog = true;
+    }
+
+
+    void OpenDeleteDialog(OtherExpenseRow o)
+    {
+        ExpenseForm = new OtherExpenseRow
+        {
+            id = o.id,
+            name = o.name,
+            quantity = o.quantity,
+            cost = o.cost,
+            purchaseDate = o.purchaseDate,
+            notes = o.notes
+        };
+
+        ShowDeleteDialog = true;
+    }
+
+    void CloseDialogs()
+    {
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowDeleteDialog = false;
+    }
+
+    public class OtherExpenseRow
+    {
+        public int id { get; set; }
+        public string name { get; set; } = "";
+        public int quantity { get; set; }
+        public decimal cost { get; set; }
+        public string purchaseDate { get; set; } = "";
+        public string notes { get; set; } = "";
+    }
 }

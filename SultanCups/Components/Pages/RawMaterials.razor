@@ -5,7 +5,7 @@
 <div class="rm-page">
 
     <div class="rm-topbar">
-        <button class="rm-add-btn">إضافة مادة خام</button>
+        <button class="rm-add-btn" @onclick="OpenAddDialog">إضافة مادة خام</button>
         <h2 class="rm-title-center">المواد الخام</h2>
         <div></div>
     </div>
@@ -35,8 +35,8 @@
                             <td class="rm-cost">@r.UnitCost د.ل</td>
 
                             <td class="rm-actions">
-                                <button class="rm-edit">تعديل</button>
-                                <button class="rm-delete">حذف</button>
+                                <button class="rm-edit" @onclick="() => OpenEditDialog(r)">تعديل</button>
+                                <button class="rm-delete" @onclick="() => OpenDeleteDialog(r)">حذف</button>
                             </td>
                         </tr>
                     }
@@ -49,17 +49,174 @@
 
 </div>
 
+@if (ShowAddDialog)
+{
+    <div class="rm-dialog-overlay">
+        <div class="rm-dialog-box">
+
+            <div class="rm-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="rm-dialog-body">
+                <h3>إضافة مادة خام</h3>
+
+                <div class="rm-field">
+                    <label class="rm-label">الاسم</label>
+                    <input class="rm-input" @bind="RawMaterialForm.Name" />
+                </div>
+
+                <div class="rm-field">
+                    <label class="rm-label">الحجم</label>
+                    <input class="rm-input" @bind="RawMaterialForm.Size" />
+                </div>
+
+                <div class="rm-field">
+                    <label class="rm-label">وحدة القياس</label>
+                    <input class="rm-input" @bind="RawMaterialForm.UnitOfMeasure" />
+                </div>
+
+                <div class="rm-field">
+                    <label class="rm-label">تكلفة الوحدة (د.ل)</label>
+                    <input class="rm-input" type="number" @bind="RawMaterialForm.UnitCost" />
+                </div>
+
+                <div class="rm-dialog-actions">
+                    <button type="button" class="rm-save">حفظ</button>
+                    <button type="button" class="rm-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+@if (ShowEditDialog)
+{
+    <div class="rm-dialog-overlay">
+        <div class="rm-dialog-box">
+
+            <div class="rm-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="rm-dialog-body">
+                <h3>تعديل المادة الخام</h3>
+
+                <div class="rm-field">
+                    <label class="rm-label">الاسم</label>
+                    <input class="rm-input" @bind="RawMaterialForm.Name" />
+                </div>
+
+                <div class="rm-field">
+                    <label class="rm-label">الحجم</label>
+                    <input class="rm-input" @bind="RawMaterialForm.Size" />
+                </div>
+
+                <div class="rm-field">
+                    <label class="rm-label">وحدة القياس</label>
+                    <input class="rm-input" @bind="RawMaterialForm.UnitOfMeasure" />
+                </div>
+
+                <div class="rm-field">
+                    <label class="rm-label">تكلفة الوحدة (د.ل)</label>
+                    <input class="rm-input" type="number" @bind="RawMaterialForm.UnitCost" />
+                </div>
+
+                <div class="rm-dialog-actions">
+                    <button type="button" class="rm-save">حفظ</button>
+                    <button type="button" class="rm-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+@if (ShowDeleteDialog)
+{
+    <div class="rm-dialog-overlay">
+        <div class="rm-dialog-box rm-delete-dialog-box">
+
+            <div class="rm-dialog-top-image rm-delete-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="rm-dialog-body rm-delete-dialog-body">
+
+                <div class="rm-delete-icon-wrap">
+                    <div class="rm-delete-icon">!</div>
+                </div>
+
+                <h3 class="rm-delete-title">تأكيد الحذف</h3>
+                <p class="rm-delete-text">هل تريد حذف المادة الخام نهائيًا؟</p>
+
+                <div class="rm-dialog-actions">
+                    <button type="button" class="rm-delete-confirm">حذف</button>
+                    <button type="button" class="rm-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
 @code {
 
-    // بيانات تجريبية للتصميم فقط
     List<RawMaterialRow> RawMaterial = new()
-{
-    new("قاع 2.5", "66 mm", "كجم", 500),
-    new("قاع 6", "62 mm", "كجم", 1200),
-    new("نايلون أصفر", "60 mm", "طن", 800),
-    new("غطاء شفاف", "62 mm", "كجم", 450),
-    new("كرتون تغليف", "كبير", "صندوق", 300),
-};
+    {
+        new("قاع 2.5", "66 mm", "كجم", 500),
+        new("قاع 6", "62 mm", "كجم", 1200),
+        new("نايلون أصفر", "60 mm", "طن", 800),
+        new("غطاء شفاف", "62 mm", "كجم", 450),
+        new("كرتون تغليف", "كبير", "صندوق", 300),
+    };
 
-    public record RawMaterialRow(string Name, string Size, string UnitOfMeasure, decimal UnitCost);
+    bool ShowAddDialog = false;
+    bool ShowEditDialog = false;
+    bool ShowDeleteDialog = false;
+
+    RawMaterialRow RawMaterialForm = new("", "", "", 0);
+
+    void OpenAddDialog()
+    {
+        RawMaterialForm = new RawMaterialRow("", "", "", 0);
+        ShowAddDialog = true;
+    }
+
+    void OpenEditDialog(RawMaterialRow r)
+    {
+        RawMaterialForm = new RawMaterialRow(r.Name, r.Size, r.UnitOfMeasure, r.UnitCost);
+        ShowEditDialog = true;
+    }
+
+    void OpenDeleteDialog(RawMaterialRow r)
+    {
+        RawMaterialForm = r;
+        ShowDeleteDialog = true;
+    }
+
+    void CloseDialogs()
+    {
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowDeleteDialog = false;
+    }
+
+    public class RawMaterialRow
+    {
+        public string Name { get; set; }
+        public string Size { get; set; }
+        public string UnitOfMeasure { get; set; }
+        public decimal UnitCost { get; set; }
+
+        public RawMaterialRow(string name, string size, string unitOfMeasure, decimal unitCost)
+        {
+            Name = name;
+            Size = size;
+            UnitOfMeasure = unitOfMeasure;
+            UnitCost = unitCost;
+        }
+    }
 }
