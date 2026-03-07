@@ -28,11 +28,15 @@
                 <tbody>
                     @if (Admins is null)
                     {
-                        <tr><td colspan="6">جاري التحميل...</td></tr>
+                        <tr>
+                            <td colspan="6">جاري التحميل...</td>
+                        </tr>
                     }
                     else if (Admins.Count == 0)
                     {
-                        <tr><td colspan="6">لا توجد بيانات</td></tr>
+                        <tr>
+                            <td colspan="6">لا توجد بيانات</td>
+                        </tr>
                     }
                     else
                     {
@@ -65,6 +69,7 @@
     </div>
 
 </div>
+
 @if (ShowEditDialog)
 {
     <div class="ad-dialog-overlay">
@@ -100,6 +105,7 @@
         </div>
     </div>
 }
+
 @code {
     List<SultanCups.Models.Admain>? Admins;
 
