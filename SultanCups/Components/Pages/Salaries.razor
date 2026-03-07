@@ -6,7 +6,7 @@
 <div class="sal-page">
 
     <div class="sal-topbar">
-        <button type="button" class="sal-add-btn">إضافة راتب</button>
+        <button type="button" class="sal-add-btn" @onclick="OpenAddDialog">إضافة راتب</button>
         <h2 class="sal-title-center">الرواتب</h2>
         <div></div>
     </div>
@@ -68,8 +68,8 @@
                                 <td class="sal-notes">@s.notes</td>
 
                                 <td class="sal-actions">
-                                    <button type="button" class="sal-edit">تعديل</button>
-                                    <button type="button" class="sal-delete">حذف</button>
+                                    <button type="button" class="sal-edit" @onclick="() => OpenEditDialog(s)">تعديل</button>
+                                    <button type="button" class="sal-delete" @onclick="() => OpenDeleteDialog(s)">حذف</button>
                                 </td>
                             </tr>
                         }
@@ -83,8 +83,161 @@
 
 </div>
 
+@if (ShowAddDialog)
+{
+    <div class="sal-dialog-overlay">
+        <div class="sal-dialog-box">
+
+            <div class="sal-dialog-top-image">
+                <img src="images/background.jpg" />
+            </div>
+
+            <div class="sal-dialog-body">
+
+                <h3>إضافة راتب</h3>
+
+                <div class="sal-form-grid">
+
+                    <select class="sal-input">
+                        <option>اختر الموظف</option>
+                    </select>
+
+                    <select class="sal-input" @bind="SalaryForm.salary_type">
+                        <option value="راتب أساسي">راتب أساسي</option>
+                        <option value="مكافأة">مكافأة</option>
+                    </select>
+
+                    <input class="sal-input" placeholder="القيمة المستحقة" @bind="SalaryForm.amount" />
+
+                    <input class="sal-input" placeholder="القيمة المدفوعة" @bind="SalaryForm.paid_amount" />
+
+                    <input class="sal-input" placeholder="القيمة المتبقية" />
+
+                    <select class="sal-input">
+                        <option>الحالة</option>
+                        <option value="خالص">خالص</option>
+                        <option value="خالص جزئي">خالص جزئي</option>
+                        <option value="غير خالص">غير خالص</option>
+                    </select>
+
+                    <input class="sal-input" type="date" />
+
+                    <select class="sal-input">
+                        <option>الخزنة</option>
+                    </select>
+
+                    <input class="sal-input" placeholder="ملاحظة" @bind="SalaryForm.notes" style="grid-column:span 2" />
+
+                </div>
+                <div class="sal-dialog-actions">
+                    <button class="sal-save">حفظ</button>
+                    <button class="sal-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowEditDialog)
+{
+    <div class="sal-dialog-overlay">
+        <div class="sal-dialog-box">
+
+            <div class="sal-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="sal-dialog-body">
+
+                <h3>تعديل راتب</h3>
+
+                <div class="sal-form-grid">
+
+                    <select class="sal-input">
+                        <option>اختر الموظف</option>
+                    </select>
+
+                    <select class="sal-input" @bind="SalaryForm.salary_type">
+                        <option value="راتب أساسي">راتب أساسي</option>
+                        <option value="مكافأة">مكافأة</option>
+                    </select>
+
+                    <input class="sal-input" placeholder="القيمة المستحقة" @bind="SalaryForm.amount" />
+
+                    <input class="sal-input" placeholder="القيمة المدفوعة" @bind="SalaryForm.paid_amount" />
+
+                    <input class="sal-input" placeholder="القيمة المتبقية" />
+
+                    <select class="sal-input">
+                        <option>الحالة</option>
+                        <option value="خالص">خالص</option>
+                        <option value="خالص جزئي">خالص جزئي</option>
+                        <option value="غير خالص">غير خالص</option>
+                    </select>
+
+                    <input class="sal-input" type="date" />
+
+                    <select class="sal-input">
+                        <option>الخزنة</option>
+                    </select>
+
+                    <input class="sal-input" placeholder="ملاحظة" @bind="SalaryForm.notes" style="grid-column:span 2" />
+
+                </div>
+                <select class="sal-input">
+                    <option>الخزنة</option>
+                </select>
+
+                <input class="sal-input" placeholder="ملاحظة" @bind="SalaryForm.notes" />
+                <div class="sal-dialog-actions">
+                    <button class="sal-save">حفظ</button>
+                    <button class="sal-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowDeleteDialog)
+{
+    <div class="sal-dialog-overlay">
+        <div class="sal-dialog-box sal-delete-dialog-box">
+
+            <div class="sal-dialog-top-image sal-delete-top-image">
+                <img src="images/background.jpg" />
+            </div>
+
+            <div class="sal-dialog-body sal-delete-dialog-body">
+
+                <div class="sal-delete-icon-wrap">
+                    <div class="sal-delete-icon">!</div>
+                </div>
+
+                <h3 class="sal-delete-title">تأكيد الحذف</h3>
+                <p class="sal-delete-text">هل تريد حذف الراتب؟</p>
+
+                <div class="sal-dialog-actions">
+                    <button class="sal-delete-confirm">حذف</button>
+                    <button class="sal-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+
 @code {
     List<SultanCups.Models.Salary>? Salarie;
+
+    bool ShowAddDialog;
+    bool ShowEditDialog;
+    bool ShowDeleteDialog;
+
+    SultanCups.Models.Salary SalaryForm = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -97,4 +250,29 @@
         "خالص جزئي" => "sal-partial",
         _ => "sal-off"
     };
+
+    void OpenAddDialog()
+    {
+        SalaryForm = new SultanCups.Models.Salary();
+        ShowAddDialog = true;
+    }
+
+    void OpenEditDialog(SultanCups.Models.Salary s)
+    {
+        SalaryForm = s;
+        ShowEditDialog = true;
+    }
+
+    void OpenDeleteDialog(SultanCups.Models.Salary s)
+    {
+        SalaryForm = s;
+        ShowDeleteDialog = true;
+    }
+
+    void CloseDialogs()
+    {
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowDeleteDialog = false;
+    }
 }

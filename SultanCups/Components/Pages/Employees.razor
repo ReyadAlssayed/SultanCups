@@ -8,7 +8,7 @@
     <!-- Header -->
     <div class="emp-topbar">
 
-        <button class="emp-add-btn">
+        <button class="emp-add-btn" @onclick="OpenAddDialog">
             إضافة موظف
         </button>
 
@@ -45,8 +45,8 @@
                             <td class="emp-salary">@e.base_salary د.ل</td>
 
                             <td class="emp-actions">
-                                <button class="emp-edit">تعديل</button>
-                                <button class="emp-delete">حذف</button>
+                                <button class="emp-edit" @onclick="() => OpenEditDialog(e)">تعديل</button>
+                                <button class="emp-delete" @onclick="() => OpenDeleteDialog(e)">حذف</button>
                             </td>
                         </tr>
                     }
@@ -59,13 +59,146 @@
 
 </div>
 
+@if (ShowAddDialog)
+{
+    <div class="emp-dialog-overlay">
+        <div class="emp-dialog-box">
+
+            <div class="emp-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="emp-dialog-body">
+                <h3>إضافة موظف</h3>
+
+                <input class="emp-input" placeholder="الاسم" @bind="EmployeeForm.full_name" />
+                <input class="emp-input" placeholder="رقم الهاتف" @bind="EmployeeForm.phone" />
+
+                <select class="emp-input" @bind="EmployeeForm.rank">
+                    <option value="فني">فني</option>
+                    <option value="مهندس">مهندس</option>
+                </select>
+
+                <input class="emp-input" type="number" placeholder="الراتب الأساسي" @bind="EmployeeForm.base_salary" />
+
+                <div class="emp-dialog-actions">
+                    <button type="button" class="emp-save">حفظ</button>
+                    <button type="button" class="emp-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+@if (ShowEditDialog)
+{
+    <div class="emp-dialog-overlay">
+        <div class="emp-dialog-box">
+
+            <div class="emp-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="emp-dialog-body">
+                <h3>تعديل الموظف</h3>
+
+                <input class="emp-input" placeholder="الاسم" @bind="EmployeeForm.full_name" />
+                <input class="emp-input" placeholder="رقم الهاتف" @bind="EmployeeForm.phone" />
+
+                <select class="emp-input" @bind="EmployeeForm.rank">
+                    <option value="فني">فني</option>
+                    <option value="مهندس">مهندس</option>
+                </select>
+
+                <input class="emp-input" type="number" placeholder="الراتب الأساسي" @bind="EmployeeForm.base_salary" />
+
+                <div class="emp-dialog-actions">
+                    <button type="button" class="emp-save">حفظ</button>
+                    <button type="button" class="emp-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+@if (ShowDeleteDialog)
+{
+    <div class="emp-dialog-overlay">
+        <div class="emp-dialog-box emp-delete-dialog-box">
+
+            <div class="emp-dialog-top-image emp-delete-top-image">
+                <img src="images/background.jpg" />
+            </div>
+
+            <div class="emp-dialog-body emp-delete-dialog-body">
+
+                <div class="emp-delete-icon-wrap">
+                    <div class="emp-delete-icon">!</div>
+                </div>
+
+                <h3 class="emp-delete-title">تأكيد الحذف</h3>
+                <p class="emp-delete-text">هل تريد حذف الموظف نهائيًا؟</p>
+
+                <div class="emp-dialog-actions">
+                    <button type="button" class="emp-delete-confirm">حذف</button>
+                    <button type="button" class="emp-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
 @code {
 
     List<SultanCups.Models.Employee> Employee = new();
 
+    bool ShowAddDialog = false;
+    bool ShowEditDialog = false;
+    bool ShowDeleteDialog = false;
+
+    SultanCups.Models.Employee EmployeeForm = new();
+
+
     protected override async Task OnInitializedAsync()
     {
         Employee = await HrService.GetEmployees();
+    }
+
+    void OpenAddDialog()
+    {
+        EmployeeForm = new SultanCups.Models.Employee();
+        ShowAddDialog = true;
+    }
+
+    void OpenEditDialog(SultanCups.Models.Employee e)
+    {
+        EmployeeForm = new SultanCups.Models.Employee
+        {
+            employee_id = e.employee_id,
+            full_name = e.full_name,
+            phone = e.phone,
+            rank = e.rank,
+            base_salary = e.base_salary
+        };
+
+        ShowEditDialog = true;
+    }
+
+    void OpenDeleteDialog(SultanCups.Models.Employee e)
+    {
+        EmployeeForm = e;
+        ShowDeleteDialog = true;
+    }
+
+    void CloseDialogs()
+    {
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowDeleteDialog = false;
     }
 
 }

@@ -262,6 +262,158 @@
     cursor: pointer;
 }
 
+.sal-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.sal-dialog-box {
+    background: #fff;
+    border-radius: 24px;
+    padding: 0;
+    width: 92%;
+    max-width: 460px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+    overflow: hidden;
+}
+
+.sal-dialog-top-image {
+    width: 100%;
+    height: 110px;
+    overflow: hidden;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+    .sal-dialog-top-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.sal-dialog-body {
+    padding: 22px;
+}
+
+.sal-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 10px;
+    direction: rtl;
+}
+
+.sal-dialog-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.sal-save {
+    flex: 1;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+}
+
+.sal-cancel {
+    flex: 1;
+    background: #64748b;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+}
+
+.sal-delete-dialog-box {
+    max-width: 430px;
+    overflow: hidden;
+}
+
+.sal-delete-top-image {
+    height: 95px;
+}
+
+.sal-delete-dialog-body {
+    text-align: center;
+    padding-top: 18px;
+}
+
+.sal-delete-icon-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.sal-delete-icon {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#fee2e2,#fecaca);
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 900;
+    box-shadow: 0 10px 24px rgba(220,38,38,.18);
+}
+
+.sal-delete-title {
+    margin: 0 0 8px;
+    font-size: 24px;
+    font-weight: 950;
+    color: #0f172a;
+}
+
+.sal-delete-text {
+    margin: 0 0 18px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.sal-delete-confirm {
+    flex: 1;
+    background: linear-gradient(135deg,#ef4444,#dc2626);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    box-shadow: 0 10px 20px rgba(239,68,68,.18);
+}
+.sal-dialog-body h3 {
+    font-size: 18px;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.sal-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+    .sal-form-grid .sal-input {
+        margin-bottom: 0;
+    }
+
+@media (max-width:700px) {
+    .sal-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
 /* Responsive */
 @media (max-width:900px) {
     .sal-page {
