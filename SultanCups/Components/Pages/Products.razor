@@ -1,0 +1,53 @@
+﻿@page "/Products"
+@layout Layout.MainLayout
+
+<div class="prod-page">
+
+    <div class="prod-topbar">
+        <button class="prod-btn prod-btn-add">إضافة منتج</button>
+
+        <h2 class="prod-title">المنتجات</h2>
+
+        <div></div>
+    </div>
+
+    <div class="prod-card">
+        <div class="prod-table-wrap">
+            <table class="prod-table">
+                <thead>
+                    <tr>
+                        <th>رقم القيد</th>
+                        <th>اسم المنتج</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Product)
+                    {
+                        <tr>
+                            <td class="prod-code">@p.productId</td>
+                            <td class="prod-name">@p.name</td>
+
+                            <td class="prod-actions-cell">
+                                <button class="prod-small prod-view">عرض</button>
+                                <button class="prod-small prod-edit">تعديل</button>
+                                <button class="prod-small prod-del">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    List<(int productId, string name)> Product = new()
+    {
+        (1, "كوب كبير 6"),
+        (2, "كوب صغير 2.5"),
+        (3, "أكواب 200ml"),
+        (4, "أكواب 300ml")
+    };
+}

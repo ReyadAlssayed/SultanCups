@@ -1,0 +1,62 @@
+﻿@page "/production"
+@layout Layout.MainLayout
+
+<div class="pro-page">
+
+    <div class="pro-topbar">
+        <button class="pro-btn pro-btn-add">إضافة إنتاج</button>
+
+        <h2 class="pro-title">الإنتاج</h2>
+
+        <div></div>
+    </div>
+
+    <div class="pro-card">
+        <div class="pro-table-wrap">
+            <table class="pro-table">
+                <thead>
+                    <tr>
+                        <th>رقم القيد</th>
+                        <th>اسم المنتج</th>
+                        <th>عدد الكراتين</th>
+                        <th>تكلفة الكرتونة</th>
+                        <th>التكلفة الكلية</th>
+                        <th>تاريخ الإنتاج</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in ProductionList)
+                    {
+                        <tr>
+                            <td class="pro-code">@p.productionId</td>
+                            <td class="pro-name">@p.productName</td>
+                            <td class="pro-money">@p.boxCount</td>
+                            <td class="pro-money">@Fmt(p.boxCost)</td>
+                            <td class="pro-money pro-total">@Fmt(p.boxCount * p.boxCost)</td>
+                            <td class="pro-muted">@p.productionDate.ToString("yyyy-MM-dd")</td>
+
+                            <td class="pro-actions-cell">
+                                <button class="pro-small pro-view">عرض</button>
+                                <button class="pro-small pro-edit">تعديل</button>
+                                <button class="pro-small pro-del">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    List<(int productionId, string productName, int boxCount, decimal boxCost, DateTime productionDate)> ProductionList = new()
+    {
+        (1, "كوب كبير 6", 50, 3.00m, new DateTime(2026, 3, 7)),
+        (2, "كوب صغير 2.5", 40, 2.20m, new DateTime(2026, 3, 6)),
+        (3, "أكواب 200ml", 30, 2.80m, new DateTime(2026, 3, 5))
+    };
+
+    string Fmt(decimal v) => $"{v:0.00} د.ل";
+}

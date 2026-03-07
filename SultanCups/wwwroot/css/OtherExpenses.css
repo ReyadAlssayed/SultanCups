@@ -1,0 +1,180 @@
+﻿/* ================= Page ================= */
+
+.oth-page {
+    padding: 26px;
+    direction: rtl;
+}
+
+/* ===== Topbar ===== */
+
+.oth-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.oth-title {
+    font-size: 28px;
+    font-weight: 950;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* ===== Buttons ===== */
+
+.oth-btn {
+    border: 0;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.oth-btn-add {
+    background: #2563eb;
+    color: #fff;
+}
+
+    .oth-btn-add:hover {
+        background: #1e40af;
+    }
+
+/* ===== Card ===== */
+
+.oth-card {
+    background: rgba(255,255,255,.75);
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 22px;
+    box-shadow: 0 28px 70px rgba(2,6,23,.10);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* ===== Table ===== */
+
+.oth-table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 14px;
+}
+
+.oth-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    min-width: 980px;
+}
+
+    .oth-table thead th {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 950;
+        padding: 10px 16px;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .oth-table tbody td {
+        background: #fff;
+        border-top: 1px solid rgba(226,232,240,.85);
+        border-bottom: 1px solid rgba(226,232,240,.85);
+        padding: 14px 16px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+        .oth-table tbody td + td {
+            border-right: 1px solid rgba(226,232,240,.6);
+        }
+
+/* ===== Columns ===== */
+
+.oth-code {
+    color: #0b2a66;
+    font-weight: 950;
+    width: 110px;
+}
+
+.oth-name {
+    color: #0f172a;
+    font-weight: 950;
+}
+
+.oth-qty {
+    color: #0f172a;
+    font-weight: 900;
+}
+
+.oth-money {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.oth-total {
+    color: #16a34a;
+    font-weight: 950;
+}
+
+.oth-muted {
+    color: #64748b;
+    font-weight: 900;
+}
+
+.oth-notes {
+    color: #475569;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== Actions ===== */
+
+.oth-actions-cell {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.oth-small {
+    border: 0;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.oth-view {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.oth-edit {
+    background: #0ea5e9;
+    color: #fff;
+}
+
+.oth-del {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 768px) {
+    .oth-page {
+        padding: 16px;
+    }
+
+    .oth-title {
+        font-size: 22px;
+    }
+
+    .oth-btn {
+        padding: 9px 14px;
+    }
+
+    .oth-table {
+        min-width: 820px;
+    }
+}

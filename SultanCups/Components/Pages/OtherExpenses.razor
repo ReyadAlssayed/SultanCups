@@ -1,0 +1,62 @@
+﻿@page "/OtherExpenses"
+@layout Layout.MainLayout
+
+<div class="oth-page">
+
+    <div class="oth-topbar">
+        <button type="button" class="oth-btn oth-btn-add">إضافة مصروف</button>
+
+        <h2 class="oth-title">المصروفات الأخرى</h2>
+
+        <div></div>
+    </div>
+
+    <div class="oth-card">
+        <div class="oth-table-wrap">
+            <table class="oth-table">
+                <thead>
+                    <tr>
+                        <th>رقم القيد</th>
+                        <th>اسم المصروف</th>
+                        <th>الكمية</th>
+                        <th>التكلفة</th>
+                        <th>التاريخ</th>
+                        <th>ملاحظات</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in OtherExpense)
+                    {
+                        <tr>
+                            <td class="oth-code">@o.id</td>
+                            <td class="oth-name">@o.name</td>
+                            <td class="oth-qty">@o.quantity</td>
+                            <td class="oth-money oth-total">@Fmt(o.cost)</td>
+                            <td class="oth-muted">@o.purchaseDate.ToString("yyyy-MM-dd")</td>
+                            <td class="oth-notes">@o.notes</td>
+
+                            <td class="oth-actions-cell">
+                                <button type="button" class="oth-small oth-view">عرض</button>
+                                <button type="button" class="oth-small oth-edit">تعديل</button>
+                                <button type="button" class="oth-small oth-del">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    List<(int id, string name, int quantity, decimal cost, DateTime purchaseDate, string notes)> OtherExpense = new()
+    {
+        (1, "شراء أكياس تغليف", 5, 80.00m, new DateTime(2026, 3, 7), "للمخزن"),
+        (2, "مصاريف تنظيف", 1, 50.00m, new DateTime(2026, 3, 6), "تنظيف المكان"),
+        (3, "أدوات مكتبية", 3, 35.00m, new DateTime(2026, 3, 5), "أقلام ودفاتر")
+    };
+
+    string Fmt(decimal v) => $"{v:0.00} د.ل";
+}

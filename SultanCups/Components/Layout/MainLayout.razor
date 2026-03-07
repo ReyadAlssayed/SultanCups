@@ -7,7 +7,8 @@
         <div class="sidebar-head">
             <div class="sidebar-brand">أكواب السلطان</div>
 
-            <button class="sidebar-toggle"
+            <button type="button"
+                    class="sidebar-toggle"
                     @onclick="ToggleSidebar"
                     title="إخفاء/إظهار القائمة">
                 ☰
@@ -18,7 +19,8 @@
 
             <!-- الرئيسية -->
             <div class="nav-group">
-                <button class="nav-parent"
+                <button type="button"
+                        class="nav-parent"
                         @onclick='@(() => Go("/Stats"))'>
                     الرئيسية
                 </button>
@@ -26,98 +28,103 @@
 
             <!-- المبيعات -->
             <div class="nav-group">
-                <button class="nav-parent @(OpenKey == "sales" ? "active" : "")"
+                <button type="button"
+                        class="nav-parent @(OpenKey == "sales" ? "active" : "")"
                         @onclick='@(() => Toggle("sales"))'>
                     المبيعات
                     <span class="chev">@(OpenKey == "sales" ? "▾" : "▸")</span>
                 </button>
 
                 <div class="nav-children @(OpenKey == "sales" ? "open" : "")">
-                    <button class="nav-child" @onclick='@(() => Go("/Orders"))'>الفواتير (الطلبيات)</button>
-                    <button class="nav-child" @onclick='@(() => Go("/sales-payments"))'>تحصيل المبيعات</button>
-                    <button class="nav-child" @onclick='@(() => Go("/debts"))'>الديون</button>
-                    <button class="nav-child" @onclick='@(() => Go("/returns"))'>البضاعة الراجعة</button>
-                    <button class="nav-child" @onclick='@(() => Go("/marketers"))'>المسوقين</button>
-                  
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/Orders"))'>الفواتير (الطلبيات)</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/sales-payments"))'>تحصيل المبيعات</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/debts"))'>الديون</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/returns"))'>البضاعة الراجعة</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/marketers"))'>المسوقين</button>
                 </div>
             </div>
 
             <!-- الإنتاج والمنتجات -->
             <div class="nav-group">
-                <button class="nav-parent @(OpenKey == "prod" ? "active" : "")"
+                <button type="button"
+                        class="nav-parent @(OpenKey == "prod" ? "active" : "")"
                         @onclick='@(() => Toggle("prod"))'>
                     الإنتاج والمنتجات
                     <span class="chev">@(OpenKey == "prod" ? "▾" : "▸")</span>
                 </button>
 
                 <div class="nav-children @(OpenKey == "prod" ? "open" : "")">
-                    <button class="nav-child" @onclick='@(() => Go("/products"))'>المنتجات</button>
-                    <button class="nav-child" @onclick='@(() => Go("/production"))'>الإنتاج</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/Products"))'>المنتجات</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/Production"))'>الإنتاج</button>
                 </div>
             </div>
 
             <!-- المخزون -->
             <div class="nav-group">
-                <button class="nav-parent @(OpenKey == "stock" ? "active" : "")"
+                <button type="button"
+                        class="nav-parent @(OpenKey == "stock" ? "active" : "")"
                         @onclick='@(() => Toggle("stock"))'>
                     المخزون
                     <span class="chev">@(OpenKey == "stock" ? "▾" : "▸")</span>
                 </button>
 
                 <div class="nav-children @(OpenKey == "stock" ? "open" : "")">
-                    <button class="nav-child" @onclick='@(() => Go("/raw"))'>المواد الخام</button>
-                    <button class="nav-child" @onclick='@(() => Go("/stores"))'>الخزنات</button>
-                    <button class="nav-child" @onclick='@(() => Go("/suppliers"))'>الموردين</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/raw"))'>المواد الخام</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/stores"))'>الخزنات</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/suppliers"))'>الموردين</button>
                 </div>
             </div>
 
             <!-- المالية -->
             <div class="nav-group">
-                <button class="nav-parent @(OpenKey == "finance" ? "active" : "")"
+                <button type="button"
+                        class="nav-parent @(OpenKey == "finance" ? "active" : "")"
                         @onclick='@(() => Toggle("finance"))'>
                     المالية
                     <span class="chev">@(OpenKey == "finance" ? "▾" : "▸")</span>
                 </button>
 
                 <div class="nav-children @(OpenKey == "finance" ? "open" : "")">
-                    <button class="nav-child" @onclick='@(() => Go("/Salaries"))'>الرواتب</button>
-                    <button class="nav-child" @onclick='@(() => Go("/other-expenses"))'>المصروفات الأخرى</button>
-                    <button class="nav-child" @onclick='@(() => Go("/financial-events"))'>الأحداث المالية</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/Salaries"))'>الرواتب</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/OtherExpenses"))'>المصروفات الأخرى</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/financial-events"))'>الأحداث المالية</button>
                 </div>
             </div>
 
             <!-- الموارد البشرية -->
             <div class="nav-group">
-                <button class="nav-parent @(OpenKey == "hr" ? "active" : "")"
+                <button type="button"
+                        class="nav-parent @(OpenKey == "hr" ? "active" : "")"
                         @onclick='@(() => Toggle("hr"))'>
                     الموارد البشرية
                     <span class="chev">@(OpenKey == "hr" ? "▾" : "▸")</span>
                 </button>
 
                 <div class="nav-children @(OpenKey == "hr" ? "open" : "")">
-                    <button class="nav-child" @onclick='@(() => Go("/employees"))'>الموظفين</button>
-                    <button class="nav-child" @onclick='@(() => Go("/employee-events"))'>الأحداث الوظيفية</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/employees"))'>الموظفين</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/employee-events"))'>الأحداث الوظيفية</button>
                 </div>
             </div>
 
             <!-- الإدارة -->
             <div class="nav-group">
-                <button class="nav-parent @(OpenKey == "admin" ? "active" : "")"
+                <button type="button"
+                        class="nav-parent @(OpenKey == "admin" ? "active" : "")"
                         @onclick='@(() => Toggle("admin"))'>
                     الإدارة
                     <span class="chev">@(OpenKey == "admin" ? "▾" : "▸")</span>
                 </button>
 
                 <div class="nav-children @(OpenKey == "admin" ? "open" : "")">
-                    <button class="nav-child" @onclick='@(() => Go("/Admins"))'>المسؤولين</button>
-                    <button class="nav-child" @onclick='@(() => Go("/Settings"))'>الإعدادات</button>
-                    <button class="nav-child" @onclick='@(() => Go("/backup"))'>النسخ / الرجوع</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/Admins"))'>المسؤولين</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/Settings"))'>الإعدادات</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/backup"))'>النسخ / الرجوع</button>
                 </div>
             </div>
 
             <div class="nav-sep"></div>
 
-            <button class="nav-logout" @onclick="Logout">
+            <button type="button" class="nav-logout" @onclick="Logout">
                 تسجيل الخروج
             </button>
 

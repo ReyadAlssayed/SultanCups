@@ -1,0 +1,154 @@
+﻿/* ================= Page ================= */
+
+.prod-page {
+    padding: 26px;
+    direction: rtl;
+}
+
+/* ===== Topbar ===== */
+
+.prod-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.prod-title {
+    font-size: 28px;
+    font-weight: 950;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* ===== Buttons ===== */
+
+.prod-btn {
+    border: 0;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.prod-btn-add {
+    background: #2563eb;
+    color: #fff;
+}
+
+    .prod-btn-add:hover {
+        background: #1e40af;
+    }
+
+/* ===== Card ===== */
+
+.prod-card {
+    background: rgba(255,255,255,.75);
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 22px;
+    box-shadow: 0 28px 70px rgba(2,6,23,.10);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* ===== Table ===== */
+
+.prod-table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 14px;
+}
+
+.prod-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    min-width: 700px;
+}
+
+    .prod-table thead th {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 950;
+        padding: 10px 16px;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .prod-table tbody td {
+        background: #fff;
+        border-top: 1px solid rgba(226,232,240,.85);
+        border-bottom: 1px solid rgba(226,232,240,.85);
+        padding: 14px 16px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+        .prod-table tbody td + td {
+            border-right: 1px solid rgba(226,232,240,.6);
+        }
+
+/* ===== Columns ===== */
+
+.prod-code {
+    color: #0b2a66;
+    font-weight: 950;
+    width: 120px;
+}
+
+.prod-name {
+    color: #0f172a;
+    font-weight: 950;
+}
+
+/* ===== Actions ===== */
+
+.prod-actions-cell {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.prod-small {
+    border: 0;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.prod-view {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.prod-edit {
+    background: #0ea5e9;
+    color: #fff;
+}
+
+.prod-del {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 768px) {
+    .prod-page {
+        padding: 16px;
+    }
+
+    .prod-title {
+        font-size: 22px;
+    }
+
+    .prod-btn {
+        padding: 9px 14px;
+    }
+
+    .prod-table {
+        min-width: 620px;
+    }
+}
