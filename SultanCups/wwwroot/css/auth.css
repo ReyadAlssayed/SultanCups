@@ -407,6 +407,42 @@ body {
     background: transparent;
 }
 
+.taskhub-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    direction: ltr;
+}
+
+.taskhub-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .taskhub-icon svg {
+        width: 36px;
+        height: 36px;
+    }
+
+.taskhub-text {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: .3px;
+    line-height: 1;
+}
+
+.taskhub-task{
+    color:#1f2937;
+}
+
+.taskhub-hub{
+    color:#2563eb;
+}
 /* mobile */
 @media (max-width: 820px) {
     .auth-card {
