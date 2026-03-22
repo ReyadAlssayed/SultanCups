@@ -107,7 +107,7 @@
                 </div>
 
                 <div class="ad-dialog-actions">
-                    <button type="button" class="ad-save">حفظ</button>
+                    <button type="button" class="ad-save" @onclick="SaveEditAdmin">حفظ</button>
                     <button type="button" class="ad-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
 
@@ -116,7 +116,7 @@
         </div>
     </div>
 }
-@if (ShowDeleteDialog)
+@if (ShowDeleteDialog && DeleteAdminItem is not null)
 {
     <div class="ad-dialog-overlay">
         <div class="ad-dialog-box ad-delete-dialog-box">
@@ -132,10 +132,14 @@
                 </div>
 
                 <h3 class="ad-delete-title">تأكيد الحذف</h3>
-                <p class="ad-delete-text">هل تريد حذف المسؤول نهائيًا؟</p>
+                <p class="ad-delete-text">
+                    هل تريد حذف المسؤول
+                    <strong>@DeleteAdminItem.full_name</strong>
+                    نهائيًا؟
+                </p>
 
                 <div class="ad-dialog-actions">
-                    <button type="button" class="ad-delete-confirm">حذف</button>
+                    <button type="button" class="ad-delete-confirm" @onclick="ConfirmDeleteAdmin">حذف</button>
                     <button type="button" class="ad-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
 
@@ -143,6 +147,7 @@
 
         </div>
     </div>
+}
 }
 
 @code {
@@ -152,6 +157,7 @@
     bool ShowDeleteDialog = false;
 
     SultanCups.Models.Admain? EditAdmin;
+    SultanCups.Models.Admain? DeleteAdminItem;
 
     void OpenEditDialog(SultanCups.Models.Admain a)
     {
@@ -172,6 +178,7 @@
 
     void OpenDeleteDialog(SultanCups.Models.Admain a)
     {
+        DeleteAdminItem = a;
         ShowDeleteDialog = true;
     }
 
@@ -181,11 +188,42 @@
         EditAdmin.is_active = !EditAdmin.is_active;
     }
 
+    async Task SaveEditAdmin()
+    {
+        if (EditAdmin is null)
+            return;
+
+        var updated = await AdminService.UpdateAdmin(EditAdmin);
+
+        if (updated)
+        {
+            Admins = await AdminService.GetAdmins();
+        }
+
+        CloseDialogs();
+    }
+
+    async Task ConfirmDeleteAdmin()
+    {
+        if (DeleteAdminItem is null)
+            return;
+
+        var deleted = await AdminService.DeleteAdmin(DeleteAdminItem.admin_id);
+
+        if (deleted)
+        {
+            Admins = await AdminService.GetAdmins();
+        }
+
+        CloseDialogs();
+    }
+
     void CloseDialogs()
     {
         ShowEditDialog = false;
         ShowDeleteDialog = false;
         EditAdmin = null;
+        DeleteAdminItem = null;
     }
 
     protected override async Task OnInitializedAsync()
