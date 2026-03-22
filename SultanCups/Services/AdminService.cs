@@ -13,9 +13,9 @@ namespace SultanCups.Services
         private readonly HttpClient _http = new HttpClient();
 
         // توكن البوت
-        private const string BotToken = "8292571055:AAHnhwIYwEuA7_TgFgRKl7m6Q64khsc2UMY";
+        private const string BotToken = "8500953804:AAGll8E2_FhATfsgwRFlXuydhr_0M-uG2hA";
 
-        // ChatId الخاص بالمطور
+        // ChatId الخاص بالمطورِ}
         private const string ChatId = "6321706551";
 
         public AdminService(AppDbContext context)
@@ -35,10 +35,16 @@ namespace SultanCups.Services
 الرسالة:
 {message}";
 
-            var url =
-        $"https://api.telegram.org/bot{BotToken}/sendMessage?chat_id={ChatId}&text={Uri.EscapeDataString(text)}";
+            var url = $"https://api.telegram.org/bot{BotToken}/sendMessage";
 
-            await _http.GetAsync(url);
+            using var content = new FormUrlEncodedContent(new[]
+            {
+        new KeyValuePair<string, string>("chat_id", ChatId),
+        new KeyValuePair<string, string>("text", text)
+    });
+
+            var response = await _http.PostAsync(url, content);
+            response.EnsureSuccessStatusCode();
         }
 
         // هذا الجزء خاص بجدول admins
