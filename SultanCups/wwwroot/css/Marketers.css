@@ -1,11 +1,8 @@
-﻿/* ================= Page ================= */
-
+﻿/* ================= Marketers Page ================= */
 .mk-page {
     padding: 26px;
     direction: rtl;
 }
-
-/* ===== Top bar ===== */
 
 .mk-topbar {
     display: flex;
@@ -21,8 +18,6 @@
     margin: 0;
 }
 
-/* زر إضافة */
-
 .mk-add-btn {
     background: #2563eb;
     color: white;
@@ -33,12 +28,7 @@
     cursor: pointer;
 }
 
-    .mk-add-btn:hover {
-        background: #1e40af;
-    }
-
-/* ===== Card ===== */
-
+/* ===== Card & Table ===== */
 .mk-card {
     background: rgba(255,255,255,.75);
     border: 1px solid rgba(255,255,255,.55);
@@ -47,8 +37,6 @@
     overflow: hidden;
     backdrop-filter: blur(10px);
 }
-
-/* ===== Table ===== */
 
 .mk-table-wrap {
     width: 100%;
@@ -59,14 +47,15 @@
 .mk-table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 10px;
+    border-spacing: 0; /* جعل الجدول متصلاً */
+    min-width: 800px;
 }
 
     .mk-table thead th {
         color: #64748b;
         font-size: 12px;
         font-weight: 950;
-        padding: 10px 16px;
+        padding: 12px 16px;
         text-align: right;
     }
 
@@ -75,26 +64,14 @@
         border-top: 1px solid rgba(226,232,240,.85);
         border-bottom: 1px solid rgba(226,232,240,.85);
         padding: 14px 16px;
-        font-weight: 900;
+        font-weight: 800;
+        white-space: nowrap;
     }
 
-        /* الفواصل */
-
+        /* فواصل الأعمدة الرقيقة */
         .mk-table tbody td + td {
-            position: relative;
+            border-right: 1px solid rgba(226,232,240,.6);
         }
-
-            .mk-table tbody td + td::before {
-                content: "";
-                position: absolute;
-                right: 0;
-                top: 12%;
-                bottom: 12%;
-                width: 2px;
-                background: rgba(100,116,139,.35);
-            }
-
-/* الأعمدة */
 
 .mk-name {
     font-weight: 950;
@@ -102,34 +79,37 @@
 }
 
 .mk-phone {
-    font-family: monospace;
+    font-family: ui-monospace, monospace;
 }
 
 .mk-commission {
     color: #065f46;
+    font-weight: 950;
 }
 
 /* الإجراءات */
-
 .mk-actions {
     display: flex;
     gap: 8px;
 }
 
+.mk-edit, .mk-delete {
+    border: 0;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
 .mk-edit {
     background: #3b82f6;
     color: white;
-    border: 0;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 800;
 }
 
 .mk-delete {
     background: #ef4444;
     color: white;
-    border: 0;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 800;
 }
+
+/* ملاحظة: استخدم كلاسات inv-dialog التي أرسلتها في الـ CSS الكامل 
+لأنها تدعم توزيع الحقول حقلين في كل سطر بشكل تلقائي */

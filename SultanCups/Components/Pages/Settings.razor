@@ -35,7 +35,7 @@
         <div class="settings-item" @onclick="GoToBackups">
             <div class="item-left">
                 <img src="images/tracking.png" class="item-icon" />
-                <span>النسخ / الرجوع</span>
+                <span>النسخ الاحتياطي الى ملف excel</span>
             </div>
             <span class="arrow">›</span>
         </div>
@@ -155,7 +155,6 @@
 }
 
 @code {
-    // لاحقاً اربطها بهوية الأدمن في نظامك
     string CurrentUserName = "رياض";
     string CurrentUserRole = "مسؤول أول";
     string AppVersionText = "SultanCups · .NET · v1.0";
@@ -167,8 +166,13 @@
     string SupportNotes = "";
     string Message = "";
 
-    void GoToAdmins() => Nav.NavigateTo("/Admins");      // غيّر المسار حسب نظامك
-    void GoToBackups() => Nav.NavigateTo("/Backups");    // غيّر المسار حسب نظامك
+    // تم دمج الدوال في نسخة واحدة نظيفة لكل وجهة
+    void GoToAdmins() => Nav.NavigateTo("/Admins");
+    
+    void GoToBackups()
+    {
+        Nav.NavigateTo("/Backup");
+    }
 
     async Task SendSupport()
     {
@@ -188,9 +192,9 @@
         SupportNotes = "";
         ShowSupportDialog = false;
     }
+
     void Logout()
     {
-        // ضع منطق الخروج الخاص بك
         Nav.NavigateTo("/", true);
     }
 }

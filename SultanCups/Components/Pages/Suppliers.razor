@@ -1,0 +1,127 @@
+﻿@page "/Suppliers"
+@layout Layout.MainLayout
+
+<div class="inv-page">
+    <div class="inv-topbar">
+        <button class="inv-btn inv-btn-add" @onclick="OpenAddDialog">إضافة مورد</button>
+        <h2 class="inv-title">إدارة الموردين</h2>
+        <div></div>
+    </div>
+
+    <div class="inv-card">
+        <div class="inv-table-wrap">
+            <table class="inv-table">
+                <thead>
+                    <tr>
+                        <th>اسم المورد</th>
+                        <th>رقم الهاتف</th>
+                        <th>الموقع</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in SuppliersList)
+                    {
+                        <tr>
+                            <td class="inv-code">@s.Name</td>
+                            <td>@s.Phone</td>
+                            <td>@s.Location</td>
+                            <td class="inv-muted">@s.Email</td>
+                            <td class="inv-actions-cell">
+                                <button class="inv-small inv-edit" @onclick="() => OpenEditDialog(s)">تعديل</button>
+                                <button class="inv-small inv-del" @onclick="() => OpenDeleteDialog(s)">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@* --- نافذة الإضافة والتعديل --- *@
+@if (ShowAddDialog || ShowEditDialog)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box">
+            <div class="inv-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+            <div class="inv-dialog-body">
+                <h3>@(ShowAddDialog ? "إضافة مورد جديد" : "تعديل بيانات المورد")</h3>
+                <div class="inv-fields-grid">
+                    <div class="inv-field">
+                        <label class="inv-label">اسم المورد</label>
+                        <input class="inv-input-dialog" @bind="SupplierForm.Name" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">رقم الهاتف</label>
+                        <input class="inv-input-dialog" @bind="SupplierForm.Phone" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">البريد الإلكتروني</label>
+                        <input class="inv-input-dialog" @bind="SupplierForm.Email" />
+                    </div>
+                    <div class="inv-field full-width">
+                        <label class="inv-label">الموقع / العنوان</label>
+                        <input class="inv-input-dialog" @bind="SupplierForm.Location" />
+                    </div>
+                </div>
+                <div class="inv-dialog-actions">
+                    <button type="button" class="inv-save">حفظ</button>
+                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* --- نافذة تأكيد الحذف --- *@
+@if (ShowDeleteDialog)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box inv-delete-dialog-box">
+            <div class="inv-dialog-top-image inv-delete-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+            <div class="inv-dialog-body inv-delete-dialog-body">
+                <div class="inv-delete-icon-wrap"><div class="inv-delete-icon">!</div></div>
+                <h3 class="inv-delete-title">تأكيد الحذف</h3>
+                <p class="inv-delete-text">هل أنت متأكد من حذف المورد "@SupplierForm.Name"؟</p>
+                <div class="inv-dialog-actions">
+                    <button type="button" class="inv-delete-confirm">حذف المورد</button>
+                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    List<SupplierModel> SuppliersList = new()
+    {
+        new() { Name = "شركة بلاستك تيك", Phone = "0910000000", Location = "طرابلس - المنطقة الصناعية", Email = "info@plastic.ly" },
+        new() { Name = "مورد الورق الخام", Phone = "0920000000", Location = "بنغازي", Email = "sales@paper.ly" }
+    };
+
+    bool ShowAddDialog, ShowEditDialog, ShowDeleteDialog;
+    SupplierModel SupplierForm = new();
+
+    void OpenAddDialog() { SupplierForm = new(); ShowAddDialog = true; }
+    void OpenEditDialog(SupplierModel s)
+    {
+        SupplierForm = new SupplierModel { Name = s.Name, Phone = s.Phone, Email = s.Email, Location = s.Location };
+        ShowEditDialog = true;
+    }
+    void OpenDeleteDialog(SupplierModel s) { SupplierForm = s; ShowDeleteDialog = true; }
+    void CloseDialogs() => ShowAddDialog = ShowEditDialog = ShowDeleteDialog = false;
+
+    public class SupplierModel
+    {
+        public string Name { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Location { get; set; } = "";
+    }
+}

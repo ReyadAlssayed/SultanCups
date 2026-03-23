@@ -4,10 +4,8 @@
 <div class="inv-page">
 
     <div class="inv-topbar">
-        <button class="inv-btn inv-btn-add">إضافة بضاعة راجعة</button>
-
+        <button class="inv-btn inv-btn-add" @onclick="OpenAddDialog">إضافة بضاعة راجعة</button>
         <h2 class="inv-title">البضاعة الراجعة</h2>
-
         <div></div>
     </div>
 
@@ -25,9 +23,8 @@
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
-
                 <tbody>
-                    @foreach (var r in Return)
+                    @foreach (var r in ReturnList)
                     {
                         <tr>
                             <td class="inv-code">@r.orderNumber</td>
@@ -38,28 +35,117 @@
                             <td class="inv-muted">@r.notes</td>
 
                             <td class="inv-actions-cell">
-                                <button class="inv-small inv-view">تفاصيل</button>
-                                <button class="inv-small inv-edit">تعديل</button>
-                                <button class="inv-small inv-del">حذف</button>
+                                <button class="inv-small inv-edit" @onclick="() => OpenEditDialog(r)">تعديل</button>
+                                <button class="inv-small inv-del" @onclick="() => OpenDeleteDialog(r)">حذف</button>
                             </td>
                         </tr>
                     }
                 </tbody>
-
             </table>
         </div>
     </div>
-
 </div>
 
-@code {
+@if (ShowAddDialog || ShowEditDialog)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box">
+            <div class="inv-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+            <div class="inv-dialog-body">
+                <h3>@(ShowAddDialog ? "إضافة إرجاع جديد" : "تعديل بيانات الإرجاع")</h3>
+                
+                <div class="inv-fields-grid">
+                    <div class="inv-field">
+                        <label class="inv-label">رقم الفاتورة</label>
+                        <input class="inv-input-dialog" @bind="ReturnForm.orderNumber" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">المنتج</label>
+                        <input class="inv-input-dialog" @bind="ReturnForm.product" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">عدد الكراتين</label>
+                        <input class="inv-input-dialog" type="number" @bind="ReturnForm.boxCount" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">سبب الإرجاع</label>
+                        <input class="inv-input-dialog" @bind="ReturnForm.reason" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">التاريخ</label>
+                        <input class="inv-input-dialog" type="date" @bind="ReturnForm.returnDate" />
+                    </div>
+                    <div class="inv-field full-width">
+                        <label class="inv-label">ملاحظات</label>
+                        <textarea class="inv-input-dialog" @bind="ReturnForm.notes"></textarea>
+                    </div>
+                </div>
 
-    // بيانات تدريبية فقط
-    List<(string orderNumber, string product, int boxCount, string reason, DateTime returnDate, string notes)> Return = new()
+                <div class="inv-dialog-actions">
+                    <button type="button" class="inv-save">حفظ</button>
+                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowDeleteDialog)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box inv-delete-dialog-box">
+            <div class="inv-dialog-top-image inv-delete-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+            <div class="inv-dialog-body inv-delete-dialog-body">
+                <div class="inv-delete-icon-wrap"><div class="inv-delete-icon">!</div></div>
+                <h3 class="inv-delete-title">تأكيد الحذف</h3>
+                <p class="inv-delete-text">هل تريد حذف سجل إرجاع الفاتورة "@ReturnForm.orderNumber"؟</p>
+                <div class="inv-dialog-actions">
+                    <button type="button" class="inv-delete-confirm">حذف</button>
+                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    List<ReturnRow> ReturnList = new()
     {
-        ("INV-1001","أكواب 200ml",2,"تلف في الكراتين",new DateTime(2026,3,6),"استبدال"),
-        ("INV-1002","أكواب 300ml",1,"كسر أثناء النقل",new DateTime(2026,3,5),""),
-        ("INV-1003","أكواب 200ml",3,"خطأ في الكمية",new DateTime(2026,3,4),"إرجاع كامل"),
+        new() { orderNumber = "INV-1001", product = "أكواب 200ml", boxCount = 2, reason = "تلف في الكراتين", returnDate = new DateTime(2026,3,6), notes = "استبدال" },
+        new() { orderNumber = "INV-1002", product = "أكواب 300ml", boxCount = 1, reason = "كسر أثناء النقل", returnDate = new DateTime(2026,3,5), notes = "" }
     };
 
+    bool ShowAddDialog, ShowEditDialog, ShowDeleteDialog;
+    ReturnRow ReturnForm = new();
+
+    void OpenAddDialog() { ReturnForm = new ReturnRow { returnDate = DateTime.Now }; ShowAddDialog = true; }
+    void OpenEditDialog(ReturnRow r)
+    {
+        ReturnForm = new ReturnRow
+        {
+            orderNumber = r.orderNumber,
+            product = r.product,
+            boxCount = r.boxCount,
+            reason = r.reason,
+            returnDate = r.returnDate,
+            notes = r.notes
+        };
+        ShowEditDialog = true;
+    }
+    void OpenDeleteDialog(ReturnRow r) { ReturnForm = r; ShowDeleteDialog = true; }
+    void CloseDialogs() => ShowAddDialog = ShowEditDialog = ShowDeleteDialog = false;
+
+    public class ReturnRow
+    {
+        public string orderNumber { get; set; } = "";
+        public string product { get; set; } = "";
+        public int boxCount { get; set; }
+        public string reason { get; set; } = "";
+        public DateTime returnDate { get; set; }
+        public string notes { get; set; } = "";
+    }
 }

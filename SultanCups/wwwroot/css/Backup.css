@@ -1,0 +1,106 @@
+﻿/* الحاوية الرئيسية مع المسافات الجانبية (يمين ويسار) */
+.bk-page {
+    padding: 40px 10%; /* ترك مسافة 10% من العرض يميناً ويساراً ليدخل المحتوى للداخل */
+    direction: rtl;
+    min-height: 100vh;
+}
+
+/* --- إضافات التوسيط واللون الأزرق --- */
+.bk-header-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 40px;
+    gap: 12px;
+}
+
+.bk-main-icon-circle {
+    width: 80px;
+    height: 80px;
+    background: #eff6ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.1);
+}
+
+.excel-icon-text {
+    font-size: 40px;
+}
+
+.bk-title-blue {
+    font-size: 30px;
+    font-weight: 950;
+    color: #2563eb; /* اللون الأزرق المطلوب */
+    margin: 0;
+}
+
+/* --- توزيع الكروت --- */
+.bk-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 10px;
+}
+
+.bk-export-card {
+    background: white; /* تأكد من وجود الخلفية البيضاء */
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    border: 1px solid #f1f5f9;
+}
+
+    .bk-export-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(37, 99, 235, 0.1);
+        border-color: #dbeafe;
+    }
+
+/* الأيقونات داخل الكروت */
+.bk-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+.bk-export-card h3 {
+    font-weight: 950;
+    color: #1e293b;
+    margin-bottom: 10px;
+}
+
+.bk-export-card p {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+/* زر التحميل */
+.bk-btn-download {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+}
+
+    .bk-btn-download:hover {
+        background: #059669;
+    }
+
+/* تحسين المظهر للموبايل */
+@media (max-width: 768px) {
+    .bk-page {
+        padding: 20px 15px;
+    }
+}

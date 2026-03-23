@@ -1,0 +1,325 @@
+﻿/* ================= Root & Global Styles ================= */
+:root {
+    --primary: #2563eb;
+    --primary-hover: #1e40af;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --info: #0ea5e9;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --bg-card: rgba(255, 255, 255, 0.75);
+    --border-color: rgba(226, 232, 240, 0.85);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* ================= Page Layout ================= */
+.inv-page, .pro-page, .sp-page {
+    padding: 26px;
+    direction: rtl;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.inv-topbar, .pro-topbar, .sp-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.inv-title, .pro-title, .sp-title {
+    font-size: 28px;
+    font-weight: 950;
+    color: var(--text-main);
+    margin: 0;
+}
+
+/* ================= Buttons ================= */
+.inv-btn, .pro-btn, .sp-btn {
+    border: 0;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.inv-btn-add, .pro-btn-add, .sp-btn-add {
+    background: var(--primary);
+    color: #fff;
+}
+
+    .inv-btn-add:hover, .pro-btn-add:hover, .sp-btn-add:hover {
+        background: var(--primary-hover);
+    }
+
+/* ================= Table Card ================= */
+.inv-card, .pro-card, .sp-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 22px;
+    box-shadow: 0 28px 70px rgba(2,6,23,.10);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.inv-table-wrap, .pro-table-wrap, .sp-table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 14px;
+}
+
+.inv-table, .pro-table, .sp-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 900px;
+}
+
+    .inv-table thead th, .pro-table thead th, .sp-table thead th {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 950;
+        padding: 12px 16px;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .inv-table tbody td, .pro-table tbody td, .sp-table tbody td {
+        background: #fff;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+        padding: 14px 16px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+        .inv-table tbody td + td, .pro-table tbody td + td, .sp-table tbody td + td {
+            border-right: 1px solid rgba(226,232,240,.6);
+        }
+
+/* ================= Column Colors & Types ================= */
+.inv-code, .pro-code, .sp-code {
+    color: #0b2a66;
+    font-weight: 950;
+}
+
+.inv-money, .pro-money, .sp-money {
+    font-family: ui-monospace, monospace;
+}
+
+.inv-amount, .pro-total, .sp-amount {
+    color: var(--success);
+    font-weight: 950;
+}
+
+.debt-amount {
+    color: var(--danger);
+    font-weight: 950;
+}
+
+.inv-muted, .pro-muted, .sp-muted {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.inv-return-reason {
+    color: #6366f1;
+    font-weight: 900;
+}
+
+/* ================= Action Buttons ================= */
+.inv-actions-cell, .pro-actions-cell, .sp-actions-cell {
+    display: flex;
+    gap: 8px;
+}
+
+.inv-small, .pro-small, .sp-small {
+    border: 0;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.inv-edit, .pro-edit, .sp-edit {
+    background: var(--info);
+    color: #fff;
+}
+
+.inv-del, .pro-del, .sp-del {
+    background: var(--danger);
+    color: #fff;
+}
+
+/* ================= Dialogs (Modals) ================= */
+.inv-dialog-overlay, .pro-dialog-overlay, .sp-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(2px);
+}
+
+.inv-dialog-box, .pro-dialog-box, .sp-dialog-box {
+    background: #fff;
+    border-radius: 24px;
+    width: 92%;
+    max-width: 550px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+    overflow: hidden;
+}
+
+.inv-dialog-top-image, .pro-dialog-top-image, .sp-dialog-top-image {
+    width: 100%;
+    height: 110px;
+    overflow: hidden;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+    .inv-dialog-top-image img, .pro-dialog-top-image img, .sp-dialog-top-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.inv-dialog-body, .pro-dialog-body, .sp-dialog-body {
+    padding: 22px;
+    text-align: right;
+}
+
+    .inv-dialog-body h3, .pro-dialog-body h3, .sp-dialog-body h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 950;
+        color: var(--text-main);
+    }
+
+/* التعديل الجديد لتقسيم الحقول لعمودين */
+.inv-fields-grid, .pro-fields-grid, .sp-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* حقلين في السطر */
+    gap: 14px;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+/* لجعل الحقل يأخذ السطر كاملاً */
+
+.inv-label, .pro-label, .sp-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.inv-input-dialog, .pro-input, .sp-input-dialog {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    font-weight: 800;
+    direction: rtl;
+    background: #f8fafc;
+}
+
+    .inv-input-dialog:focus {
+        border-color: var(--primary);
+        outline: none;
+        background: #fff;
+    }
+
+.inv-dialog-actions, .pro-dialog-actions, .sp-dialog-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 25px;
+}
+
+.inv-save, .pro-save, .sp-save {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+    background: var(--primary);
+    color: #fff;
+}
+
+.inv-cancel, .pro-cancel, .sp-cancel {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+    background: var(--text-muted);
+    color: #fff;
+}
+
+/* ================= Delete Confirmation ================= */
+.inv-delete-icon-wrap {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.inv-delete-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin: 0 auto;
+}
+
+.inv-delete-title {
+    text-align: center;
+    font-weight: 950;
+}
+
+.inv-delete-text {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.inv-delete-confirm {
+    flex: 1;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+}
+
+/* ================= Media Queries ================= */
+@media (max-width: 768px) {
+    .inv-fields-grid, .pro-fields-grid, .sp-fields-grid {
+        grid-template-columns: 1fr; /* حقل واحد في السطر للجوال */
+    }
+
+    .inv-page, .pro-page {
+        padding: 16px;
+    }
+
+    .inv-title {
+        font-size: 22px;
+    }
+
+    .inv-dialog-box {
+        width: 95%;
+    }
+}

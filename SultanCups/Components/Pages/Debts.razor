@@ -4,10 +4,8 @@
 <div class="inv-page">
 
     <div class="inv-topbar">
-        <button class="inv-btn inv-btn-add">إضافة دين</button>
-
+        <button class="inv-btn inv-btn-add" @onclick="OpenAddDialog">إضافة دين</button>
         <h2 class="inv-title">الديون</h2>
-
         <div></div>
     </div>
 
@@ -23,40 +21,117 @@
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
-
                 <tbody>
-                    @foreach (var d in Debt)
+                    @foreach (var d in DebtList)
                     {
                         <tr>
                             <td class="inv-code">@d.orderNumber</td>
                             <td class="inv-muted">@d.debtDate.ToString("yyyy-MM-dd")</td>
-                            <td class="inv-money debt-amount">دين: @Fmt(d.amount)</td>
+                            <td class="inv-money debt-amount">@Fmt(d.amount)</td>
                             <td class="inv-muted">@d.notes</td>
 
                             <td class="inv-actions-cell">
-                                <button class="inv-small inv-view">تفاصيل</button>
-                                <button class="inv-small inv-edit">تعديل</button>
-                                <button class="inv-small inv-del">حذف</button>
+                                <button class="inv-small inv-edit" @onclick="() => OpenEditDialog(d)">تعديل</button>
+                                <button class="inv-small inv-del" @onclick="() => OpenDeleteDialog(d)">حذف</button>
                             </td>
                         </tr>
                     }
                 </tbody>
-
             </table>
         </div>
     </div>
-
 </div>
 
-@code {
+@if (ShowAddDialog || ShowEditDialog)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box">
+            <div class="inv-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+            <div class="inv-dialog-body">
+                <h3>@(ShowAddDialog ? "إضافة دين جديد" : "تعديل بيانات الدين")</h3>
+                
+                <div class="inv-fields-grid">
+                    <div class="inv-field">
+                        <label class="inv-label">رقم الفاتورة</label>
+                        <input class="inv-input-dialog" @bind="DebtForm.orderNumber" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">المبلغ</label>
+                        <input class="inv-input-dialog" type="number" step="0.01" @bind="DebtForm.amount" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">تاريخ الدين</label>
+                        <input class="inv-input-dialog" type="date" @bind="DebtForm.debtDate" />
+                    </div>
+                    <div class="inv-field full-width">
+                        <label class="inv-label">ملاحظات</label>
+                        <textarea class="inv-input-dialog" @bind="DebtForm.notes"></textarea>
+                    </div>
+                </div>
 
-    // بيانات تدريبية فقط
-    List<(string orderNumber, DateTime debtDate, decimal amount, string notes)> Debt = new()
+                <div class="inv-dialog-actions">
+                    <button type="button" class="inv-save">حفظ</button>
+                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowDeleteDialog)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box inv-delete-dialog-box">
+            <div class="inv-dialog-top-image inv-delete-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+            <div class="inv-dialog-body inv-delete-dialog-body">
+                <div class="inv-delete-icon-wrap"><div class="inv-delete-icon">!</div></div>
+                <h3 class="inv-delete-title">تأكيد الحذف</h3>
+                <p class="inv-delete-text">هل تريد حذف سجل الدين الخاص بالفاتورة "@DebtForm.orderNumber"؟</p>
+                <div class="inv-dialog-actions">
+                    <button type="button" class="inv-delete-confirm">حذف</button>
+                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    List<DebtRow> DebtList = new()
     {
-        ("INV-1001", new DateTime(2026,3,5), 200m, "دين جزئي"),
-        ("INV-1002", new DateTime(2026,3,6), 150m, "تأجيل الدفع"),
-        ("INV-1003", new DateTime(2026,3,7), 300m, "دين كامل"),
+        new() { orderNumber = "INV-1001", debtDate = new DateTime(2026,3,5), amount = 200m, notes = "دين جزئي" },
+        new() { orderNumber = "INV-1002", debtDate = new DateTime(2026,3,6), amount = 150m, notes = "تأجيل الدفع" }
     };
 
+    bool ShowAddDialog, ShowEditDialog, ShowDeleteDialog;
+    DebtRow DebtForm = new();
+
     string Fmt(decimal v) => $"{v:0.00} د.ل";
+
+    void OpenAddDialog() { DebtForm = new DebtRow { debtDate = DateTime.Now }; ShowAddDialog = true; }
+    void OpenEditDialog(DebtRow d)
+    {
+        DebtForm = new DebtRow
+        {
+            orderNumber = d.orderNumber,
+            debtDate = d.debtDate,
+            amount = d.amount,
+            notes = d.notes
+        };
+        ShowEditDialog = true;
+    }
+    void OpenDeleteDialog(DebtRow d) { DebtForm = d; ShowDeleteDialog = true; }
+    void CloseDialogs() => ShowAddDialog = ShowEditDialog = ShowDeleteDialog = false;
+
+    public class DebtRow
+    {
+        public string orderNumber { get; set; } = "";
+        public DateTime debtDate { get; set; }
+        public decimal amount { get; set; }
+        public string notes { get; set; } = "";
+    }
 }

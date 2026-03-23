@@ -1,0 +1,44 @@
+﻿@page "/Backup"
+@layout Layout.MainLayout
+
+<div class="bk-page">
+    
+    <div class="bk-header-center">
+        <div class="bk-main-icon-circle">
+            @* أيقونة إكسيل - يمكنك استبدالها بـ img إذا أردت *@
+            <span class="excel-icon-text">📄</span>
+        </div>
+        <h2 class="bk-title-blue">تصدير بيانات المصنع</h2>
+    </div>
+
+    <div class="bk-card-grid">
+        <div class="bk-export-card">
+            <div class="bk-icon">📊</div>
+            <h3>سجل المبيعات</h3>
+            <p>تصدير كافة الفواتير والديون والطلبيات إلى ملف Excel</p>
+            <button class="bk-btn-download" @onclick='() => ExportToExcel("sales")'>تحميل ملف الإكسيل</button>
+        </div>
+
+        <div class="bk-export-card">
+            <div class="bk-icon">📦</div>
+            <h3>المشتريات والمخزون</h3>
+            <p>تصدير سجل المشتريات الخام والموردين وحالة المخزن</p>
+            <button class="bk-btn-download" @onclick='() => ExportToExcel("stock")'>تحميل ملف الإكسيل</button>
+        </div>
+
+        <div class="bk-export-card">
+            <div class="bk-icon">👥</div>
+            <h3>الموظفين والمالية</h3>
+            <p>تصدير بيانات الموظفين، الرواتب، والخزنات إلى اكسل</p>
+            <button class="bk-btn-download" @onclick='() => ExportToExcel("hr")'>تحميل ملف الإكسيل</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void ExportToExcel(string type)
+    {
+        // هنا سيتم ربط الكود البرمجي لاحقاً
+        Console.WriteLine($"جاري استخراج بيانات {type}...");
+    }
+}
