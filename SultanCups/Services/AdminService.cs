@@ -87,5 +87,24 @@ namespace SultanCups.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        // جلب حالة التخزين (حجم قاعدة البيانات + مساحة القرص المتبقية)
+        public async Task<(double usedMb, double freeGb)> GetStorageStatus()
+        {
+            // استعلام لجلب حجم القاعدة بالبايت وتحويله لميجابايت
+            var sql = "SELECT pg_database_size(current_database());";
+            using var conn = new Npgsql.NpgsqlConnection(_context.Database.GetConnectionString());
+            await conn.OpenAsync();
+            using var cmd = new Npgsql.NpgsqlCommand(sql, conn);
+
+            var sizeBytes = Convert.ToDouble(await cmd.ExecuteScalarAsync());
+            double usedDbMb = sizeBytes / 1024.0 / 1024.0;
+
+            // مساحة الهارد ديسك الحقيقية
+            var drive = new System.IO.DriveInfo("C");
+            double freeGb = drive.AvailableFreeSpace / 1024.0 / 1024.0 / 1024.0;
+
+            return (Math.Round(usedDbMb, 2), Math.Round(freeGb, 2));
+        }
     }
 }
