@@ -1,8 +1,6 @@
 ﻿/* =======================================================
-   RawMaterials.css
-   All classes prefixed with rm-
+   RawMaterials.css 
    ======================================================= */
-
 .rm-page {
     padding: 26px;
     direction: rtl;
@@ -54,7 +52,7 @@
 .rm-table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 10px;
+    border-spacing: 0;
     min-width: 900px;
 }
 
@@ -68,13 +66,11 @@
     }
 
     .rm-table tbody tr {
-        filter: drop-shadow(0 10px 22px rgba(2,6,23,.06));
-        transition: transform .16s ease, filter .16s ease;
+        transition: background .16s ease;
     }
 
         .rm-table tbody tr:hover {
-            transform: translateY(-2px);
-            filter: drop-shadow(0 16px 30px rgba(2,6,23,.10));
+            background: #f8fafc;
         }
 
     .rm-table tbody td {
@@ -82,35 +78,15 @@
         border-top: 1px solid rgba(226,232,240,.85);
         border-bottom: 1px solid rgba(226,232,240,.85);
         padding: 14px 16px;
-        font-weight: 900;
+        font-weight: 800;
         color: #0f172a;
         white-space: nowrap;
         vertical-align: middle;
     }
 
-        .rm-table tbody td:first-child {
-            border-right: 1px solid rgba(226,232,240,.85);
-            border-radius: 0;
-        }
-
-        .rm-table tbody td:last-child {
-            border-left: 1px solid rgba(226,232,240,.85);
-            border-radius: 0;
-        }
-
         .rm-table tbody td + td {
-            position: relative;
+            border-right: 1px solid rgba(226,232,240,.6);
         }
-
-            .rm-table tbody td + td::before {
-                content: "";
-                position: absolute;
-                right: 0;
-                top: 12%;
-                bottom: 12%;
-                width: 2px;
-                background: rgba(100,116,139,.35);
-            }
 
 .rm-name {
     color: #0b2a66;
@@ -126,28 +102,25 @@
     gap: 8px;
 }
 
-.rm-edit {
-    background: #3b82f6;
-    color: #fff;
+.rm-edit, .rm-delete {
     border: 0;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 800;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: 900;
     cursor: pointer;
+}
+
+.rm-edit {
+    background: #0ea5e9;
+    color: #fff;
 }
 
 .rm-delete {
     background: #ef4444;
     color: #fff;
-    border: 0;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 800;
-    cursor: pointer;
 }
 
 /* ================= Dialogs ================= */
-
 .rm-dialog-overlay {
     position: fixed;
     inset: 0;
@@ -161,7 +134,6 @@
 .rm-dialog-box {
     background: #fff;
     border-radius: 24px;
-    padding: 0;
     width: 92%;
     max-width: 460px;
     box-shadow: 0 20px 40px rgba(0,0,0,.2);
@@ -179,19 +151,19 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
     }
 
 .rm-dialog-body {
     padding: 22px;
+    text-align: right;
 }
 
-.rm-dialog-box h3 {
-    font-size: 18px;
-    font-weight: 900;
-    text-align: center;
-    margin-bottom: 18px;
-}
+    .rm-dialog-body h3 {
+        text-align: center;
+        font-size: 18px;
+        font-weight: 900;
+        margin-bottom: 18px;
+    }
 
 .rm-input {
     width: 100%;
@@ -199,95 +171,6 @@
     border-radius: 12px;
     border: 1px solid #e2e8f0;
     margin-bottom: 10px;
-    direction: rtl;
-}
-
-.rm-dialog-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 6px;
-}
-
-.rm-save {
-    flex: 1;
-    background: #2563eb;
-    color: #fff;
-    border: none;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 900;
-    cursor: pointer;
-}
-
-.rm-cancel {
-    flex: 1;
-    background: #64748b;
-    color: #fff;
-    border: none;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 900;
-    cursor: pointer;
-}
-
-.rm-delete-dialog-box {
-    max-width: 430px;
-    overflow: hidden;
-}
-
-.rm-delete-top-image {
-    height: 95px;
-}
-
-.rm-delete-dialog-body {
-    text-align: center;
-    padding-top: 18px;
-}
-
-.rm-delete-icon-wrap {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
-}
-
-.rm-delete-icon {
-    width: 62px;
-    height: 62px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
-    color: #dc2626;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    font-weight: 900;
-    box-shadow: 0 10px 24px rgba(220,38,38,.18);
-}
-
-.rm-delete-title {
-    margin: 0 0 8px;
-    font-size: 24px;
-    font-weight: 950;
-    color: #0f172a;
-}
-
-.rm-delete-text {
-    margin: 0 0 18px;
-    font-size: 14px;
-    font-weight: 700;
-    color: #64748b;
-}
-
-.rm-delete-confirm {
-    flex: 1;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
-    border: none;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 900;
-    box-shadow: 0 10px 20px rgba(239,68,68,.18);
-    cursor: pointer;
 }
 
 .rm-field {
@@ -300,18 +183,75 @@
     font-weight: 900;
     color: #64748b;
     margin-bottom: 4px;
+    text-align: right;
 }
 
-@media (max-width:900px) {
+.rm-dialog-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.rm-save, .rm-cancel {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+}
+
+.rm-save {
+    background: #2563eb;
+    color: #fff;
+}
+
+.rm-cancel {
+    background: #64748b;
+    color: #fff;
+}
+
+/* ===== Delete Dialog ===== */
+.rm-delete-icon-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.rm-delete-icon {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin: 0 auto 10px;
+}
+
+.rm-delete-confirm {
+    flex: 1;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+@media (max-width: 900px) {
     .rm-page {
         padding: 16px;
     }
 
     .rm-title-center {
-        font-size: 24px;
+        font-size: 22px;
     }
 
-    .rm-table-wrap {
-        padding: 10px;
+    .rm-table {
+        min-width: 700px;
     }
 }

@@ -1,10 +1,13 @@
-﻿/* ================= Production Page ================= */
-.pro-page {
+﻿/* ================= Page ================= */
+
+.cb-page {
     padding: 26px;
     direction: rtl;
 }
 
-.pro-topbar {
+/* ===== Topbar ===== */
+
+.cb-topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -12,33 +15,32 @@
     margin-bottom: 16px;
 }
 
-.pro-title {
+.cb-title-center {
     font-size: 28px;
     font-weight: 950;
     color: #0f172a;
     margin: 0;
 }
 
-/* ===== Buttons ===== */
-.pro-btn {
+/* ===== Button ===== */
+
+.cb-add-btn {
     border: 0;
     padding: 10px 16px;
     border-radius: 10px;
     font-weight: 900;
     cursor: pointer;
-}
-
-.pro-btn-add {
     background: #2563eb;
     color: #fff;
 }
 
-    .pro-btn-add:hover {
+    .cb-add-btn:hover {
         background: #1e40af;
     }
 
 /* ===== Card ===== */
-.pro-card {
+
+.cb-card {
     background: rgba(255,255,255,.75);
     border: 1px solid rgba(255,255,255,.55);
     border-radius: 22px;
@@ -48,74 +50,77 @@
 }
 
 /* ===== Table ===== */
-.pro-table-wrap {
+
+.cb-table-wrap {
     width: 100%;
     overflow: auto;
     padding: 14px;
 }
 
-.pro-table {
+.cb-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     min-width: 900px;
 }
 
-    .pro-table thead th {
+    .cb-table thead th {
         color: #64748b;
         font-size: 12px;
         font-weight: 950;
         padding: 10px 16px;
         text-align: right;
-        white-space: nowrap;
     }
 
-    .pro-table tbody td {
+    .cb-table tbody td {
         background: #fff;
         border-top: 1px solid rgba(226,232,240,.85);
         border-bottom: 1px solid rgba(226,232,240,.85);
         padding: 14px 16px;
-        font-weight: 800; /* تخفيف الخط */
-        white-space: nowrap;
+        font-weight: 900;
     }
 
-        .pro-table tbody td + td {
+        .cb-table tbody td + td {
             border-right: 1px solid rgba(226,232,240,.6);
         }
 
 /* ===== Columns ===== */
-.pro-code {
+
+.cb-id {
     color: #0b2a66;
     font-weight: 950;
-    width: 110px;
+    width: 100px;
 }
 
-.pro-name {
+.cb-name {
     color: #0f172a;
-    font-weight: 950;
 }
 
-.pro-muted {
-    color: #64748b;
-    font-weight: 800;
+.cb-balance {
+    font-family: monospace;
 }
 
-.pro-money {
-    font-family: ui-monospace, monospace;
+.cb-status {
+    font-weight: 900;
 }
 
-.pro-total {
+.cb-active {
     color: #16a34a;
-    font-weight: 950;
+}
+
+.cb-inactive {
+    color: #ef4444;
 }
 
 /* ===== Actions ===== */
-.pro-actions-cell {
+
+.cb-actions {
     display: flex;
     gap: 8px;
 }
 
-.pro-small {
+.cb-edit,
+.cb-delete {
     border: 0;
     padding: 7px 12px;
     border-radius: 10px;
@@ -123,18 +128,19 @@
     cursor: pointer;
 }
 
-.pro-edit {
+.cb-edit {
     background: #0ea5e9;
     color: #fff;
 }
 
-.pro-del {
+.cb-delete {
     background: #ef4444;
     color: #fff;
 }
 
-/* ===== Dialogs ===== */
-.pro-dialog-overlay {
+/* ===== Dialog ===== */
+
+.cb-dialog-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,.45);
@@ -144,96 +150,70 @@
     z-index: 2000;
 }
 
-.pro-dialog-box {
+.cb-dialog-box {
     background: #fff;
     border-radius: 24px;
     width: 92%;
-    max-width: 480px;
+    max-width: 460px;
     box-shadow: 0 20px 40px rgba(0,0,0,.2);
     overflow: hidden;
 }
 
-.pro-dialog-top-image {
+.cb-dialog-top-image {
     width: 100%;
     height: 110px;
     overflow: hidden;
     border-bottom: 1px solid #e2e8f0;
 }
 
-    .pro-dialog-top-image img {
+    .cb-dialog-top-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
 
-.pro-dialog-body {
+.cb-dialog-body {
     padding: 22px;
     text-align: right;
 }
 
-    .pro-dialog-body h3 {
-        text-align: center;
-        margin-bottom: 20px;
-        font-weight: 900;
-    }
-
-.pro-fields-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.pro-field {
-    margin-bottom: 10px;
-}
-
-.pro-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 900;
-    color: #64748b;
-    margin-bottom: 4px;
-}
-
-.pro-input {
+.cb-input {
     width: 100%;
     padding: 12px;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
-}
-
-.pro-dialog-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 15px;
-}
-
-.pro-save, .pro-cancel {
-    flex: 1;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 900;
-    border: none;
-    cursor: pointer;
-}
-
-.pro-save {
-    background: #2563eb;
-    color: #fff;
-}
-
-.pro-cancel {
-    background: #64748b;
-    color: #fff;
-}
-
-/* ===== Delete Dialog ===== */
-.pro-delete-icon-wrap {
-    text-align: center;
     margin-bottom: 10px;
 }
 
-.pro-delete-icon {
+.cb-dialog-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.cb-save {
+    flex: 1;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+}
+
+.cb-cancel {
+    flex: 1;
+    background: #64748b;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+}
+
+/* ===== Delete Dialog ===== */
+
+.cb-delete-icon {
     width: 62px;
     height: 62px;
     border-radius: 50%;
@@ -243,32 +223,48 @@
     align-items: center;
     justify-content: center;
     font-size: 30px;
-    margin: 0 auto;
+    margin: 0 auto 10px;
 }
 
-.pro-delete-title {
-    text-align: center;
-    font-weight: 950;
-}
-
-.pro-delete-text {
-    text-align: center;
-    color: #64748b;
-    margin-bottom: 20px;
-}
-
-.pro-delete-confirm {
+.cb-delete-confirm {
     flex: 1;
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: #fff;
+    border: none;
     padding: 12px;
     border-radius: 12px;
     font-weight: 900;
-    border: none;
+    cursor: pointer;
 }
 
+.cb-cancel {
+    flex: 1;
+}
+
+.cb-field {
+    margin-bottom: 10px;
+}
+
+.cb-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 900;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+/* ===== Responsive ===== */
+
 @media (max-width: 768px) {
-    .pro-fields-grid {
-        grid-template-columns: 1fr;
+    .cb-page {
+        padding: 16px;
+    }
+
+    .cb-title-center {
+        font-size: 22px;
+    }
+
+    .cb-table {
+        min-width: 700px;
     }
 }

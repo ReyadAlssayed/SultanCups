@@ -1,17 +1,15 @@
-﻿/* ================= Page ================= */
-
+﻿/* ================= Sales Payments Page ================= */
 .sp-page {
     padding: 26px;
     direction: rtl;
 }
 
-/* ===== Topbar ===== */
-
 .sp-topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    gap: 14px;
+    margin-bottom: 16px;
 }
 
 .sp-title {
@@ -21,11 +19,9 @@
     margin: 0;
 }
 
-/* زر إضافة */
-
-.sp-btn {
+.sp-btn-add {
     background: #2563eb;
-    color: white;
+    color: #fff;
     border: 0;
     padding: 10px 18px;
     border-radius: 10px;
@@ -33,12 +29,7 @@
     cursor: pointer;
 }
 
-    .sp-btn:hover {
-        background: #1e40af;
-    }
-
-/* ===== Card ===== */
-
+/* ===== Card & Table ===== */
 .sp-card {
     background: rgba(255,255,255,.75);
     border: 1px solid rgba(255,255,255,.55);
@@ -48,8 +39,6 @@
     backdrop-filter: blur(10px);
 }
 
-/* ===== Table ===== */
-
 .sp-table-wrap {
     width: 100%;
     overflow: auto;
@@ -58,7 +47,9 @@
 
 .sp-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 900px;
 }
 
     .sp-table thead th {
@@ -67,75 +58,192 @@
         font-weight: 950;
         padding: 12px 16px;
         text-align: right;
+        white-space: nowrap;
     }
-
-    /* صفوف الجدول */
 
     .sp-table tbody td {
-        background: white;
+        background: #fff;
+        border-top: 1px solid rgba(226,232,240,.85);
+        border-bottom: 1px solid rgba(226,232,240,.85);
         padding: 14px 16px;
-        font-weight: 900;
+        font-weight: 800; /* خط خفيف مثل باقي الصفحات */
+        white-space: nowrap;
     }
 
-    /* فاصل بين السجلات */
-
-    .sp-table tbody tr {
-        border-bottom: 1px solid #dbe3ec;
-    }
-
-    /* تعطيل أي فواصل أعمدة (احتياط) */
-
-    .sp-table td,
-    .sp-table th {
-        border-right: none;
-    }
-
-/* الأعمدة */
+        .sp-table tbody td + td {
+            border-right: 1px solid rgba(226,232,240,.6);
+        }
 
 .sp-code {
-    font-weight: 950;
     color: #0b2a66;
+    font-weight: 950;
+}
+
+.sp-money {
+    font-family: ui-monospace, monospace;
+}
+
+.sp-amount {
+    color: #22c55e;
+    font-weight: 950;
 }
 
 .sp-muted {
     color: #64748b;
+    font-weight: 800;
 }
 
-.sp-money {
-    font-family: monospace;
-}
-
-/* الإجراءات */
-
-.sp-actions {
+/* ===== Actions ===== */
+.sp-actions-cell {
     display: flex;
     gap: 8px;
 }
 
 .sp-small {
     border: 0;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 800;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: 900;
     cursor: pointer;
-}
-
-.sp-view {
-    background: #3b82f6;
-    color: white;
 }
 
 .sp-edit {
     background: #0ea5e9;
-    color: white;
+    color: #fff;
 }
 
 .sp-del {
     background: #ef4444;
-    color: white;
+    color: #fff;
 }
 
-.inv-amount {
-    color: #22c55e;
-    font-weight: 950;
+/* ===== Dialogs ===== */
+.sp-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.sp-dialog-box {
+    background: #fff;
+    border-radius: 24px;
+    width: 92%;
+    max-width: 480px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+    overflow: hidden;
+}
+
+.sp-dialog-top-image {
+    width: 100%;
+    height: 110px;
+    overflow: hidden;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+    .sp-dialog-top-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.sp-dialog-body {
+    padding: 22px;
+    text-align: right;
+}
+
+    .sp-dialog-body h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 950;
+    }
+
+.sp-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.sp-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 900;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.sp-input-dialog {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    font-weight: 800;
+    direction: rtl;
+}
+
+.sp-dialog-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.sp-save, .sp-cancel {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+}
+
+.sp-save {
+    background: #2563eb;
+    color: #fff;
+}
+
+.sp-cancel {
+    background: #64748b;
+    color: #fff;
+}
+
+/* ===== Delete Dialog ===== */
+.sp-delete-icon-wrap {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.sp-delete-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin: 0 auto;
+}
+
+.sp-delete-confirm {
+    flex: 1;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+}
+
+@media (max-width: 768px) {
+    .sp-fields-grid {
+        grid-template-columns: 1fr;
+    }
 }

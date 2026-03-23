@@ -9,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
+// الأفضل Pool بدل AddDbContext العادي
+builder.Services.AddDbContextPool<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<AdminService>();
@@ -20,18 +21,31 @@ builder.Services.AddScoped<HrService>();
 
 var app = builder.Build();
 
+// ✅ Warm-up مبكر لـ EF Core وفتح أول اتصال بقاعدة البيانات
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        await db.Database.ExecuteSqlRawAsync("SELECT 1");
+    }
+    catch (Exception ex)
+    {
+        logger.LogWarning(ex, "EF Core warm-up failed during startup.");
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
-
-
-
 app.UseAntiforgery();
 
 app.MapStaticAssets();

@@ -1,0 +1,238 @@
+﻿@page "/CashBoxes"
+@layout Layout.MainLayout
+@inject NavigationManager Nav
+
+<div class="cb-page">
+
+    <div class="cb-topbar">
+        <button class="cb-add-btn" @onclick="OpenAddDialog">إضافة خزنة</button>
+        <h2 class="cb-title-center">الخزنات</h2>
+        <div></div>
+    </div>
+
+    <div class="cb-card">
+
+        <div class="cb-table-wrap">
+            <table class="cb-table">
+
+                <thead>
+                    <tr>
+                        <th>رقم الخزنة</th>
+                        <th>اسم الخزنة</th>
+                        <th>الرصيد الافتتاحي</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var c in CashBoxes)
+                    {
+                        <tr>
+                            <td class="cb-id">@c.Id</td>
+                            <td class="cb-name">@c.Name</td>
+                            <td class="cb-balance">@c.OpeningBalance د.ل</td>
+                            <td class="cb-status">
+                                <span class="@(c.IsActive ? "cb-active" : "cb-inactive")">
+                                    @(c.IsActive ? "نشطة" : "غير نشطة")
+                                </span>
+                            </td>
+
+                            <td class="cb-actions">
+                                <button class="cb-edit" @onclick="() => OpenEditDialog(c)">تعديل</button>
+                                <button class="cb-delete" @onclick="() => OpenDeleteDialog(c)">حذف</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+@if (ShowAddDialog)
+{
+    <div class="cb-dialog-overlay">
+        <div class="cb-dialog-box">
+
+            <div class="cb-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="cb-dialog-body">
+                <h3>إضافة خزنة</h3>
+
+                <div class="cb-field">
+                    <label class="cb-label">اسم الخزنة</label>
+                    <input class="cb-input" @bind="Form.Name" />
+                </div>
+
+                <div class="cb-field">
+                    <label class="cb-label">الرصيد الافتتاحي</label>
+                    <input class="cb-input" type="number" @bind="Form.OpeningBalance" />
+                </div>
+
+                <div class="cb-field">
+                    <label class="cb-label">الحالة</label>
+                    <select class="cb-input" @bind="Form.IsActive">
+                        <option value="true">نشطة</option>
+                        <option value="false">غير نشطة</option>
+                    </select>
+                </div>
+
+                <div class="cb-dialog-actions">
+                    <button type="button" class="cb-save">حفظ</button>
+                    <button type="button" class="cb-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+@if (ShowEditDialog)
+{
+    <div class="cb-dialog-overlay">
+        <div class="cb-dialog-box">
+
+            <div class="cb-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="cb-dialog-body">
+                <h3>تعديل الخزنة</h3>
+
+                <div class="cb-field">
+                    <label class="cb-label">اسم الخزنة</label>
+                    <input class="cb-input" @bind="Form.Name" />
+                </div>
+
+                <div class="cb-field">
+                    <label class="cb-label">الرصيد الافتتاحي</label>
+                    <input class="cb-input" type="number" @bind="Form.OpeningBalance" />
+                </div>
+
+                <div class="cb-field">
+                    <label class="cb-label">الحالة</label>
+                    <select class="cb-input" @bind="Form.IsActive">
+                        <option value="true">نشطة</option>
+                        <option value="false">غير نشطة</option>
+                    </select>
+                </div>
+
+                <div class="cb-dialog-actions">
+                    <button type="button" class="cb-save">حفظ</button>
+                    <button type="button" class="cb-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+@if (ShowDeleteDialog)
+{
+    <div class="cb-dialog-overlay">
+        <div class="cb-dialog-box cb-delete-dialog-box">
+
+            <div class="cb-dialog-top-image cb-delete-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="cb-dialog-body cb-delete-dialog-body">
+
+                <div class="cb-delete-icon-wrap">
+                    <div class="cb-delete-icon">!</div>
+                </div>
+
+                <h3 class="cb-delete-title">تأكيد الحذف</h3>
+                <p class="cb-delete-text">هل تريد حذف الخزنة؟</p>
+
+                <div class="cb-dialog-actions">
+                    <button class="cb-delete-confirm">حذف</button>
+                    <button class="cb-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+@code {
+
+    List<CashBoxRow> CashBoxes = new()
+    {
+        new CashBoxRow { Id = 1, Name = "الخزنة الرئيسية", OpeningBalance = 20000, IsActive = true },
+        new CashBoxRow { Id = 2, Name = "خزنة الرواتب", OpeningBalance = 5000, IsActive = true },
+        new CashBoxRow { Id = 3, Name = "خزنة احتياطية", OpeningBalance = 3000, IsActive = false }
+    };
+
+    CashBoxRow Form = new CashBoxRow();
+
+    bool ShowAddDialog = false;
+    bool ShowEditDialog = false;
+    bool ShowDeleteDialog = false;
+
+    void OpenAddDialog()
+    {
+        Form = new CashBoxRow
+        {
+            Id = 0,
+            Name = "",
+            OpeningBalance = 0,
+            IsActive = true
+        };
+
+        ShowAddDialog = true;
+        ShowEditDialog = false;
+        ShowDeleteDialog = false;
+    }
+
+    void OpenEditDialog(CashBoxRow c)
+    {
+        Form = new CashBoxRow
+        {
+            Id = c.Id,
+            Name = c.Name,
+            OpeningBalance = c.OpeningBalance,
+            IsActive = c.IsActive
+        };
+
+        ShowAddDialog = false;
+        ShowEditDialog = true;
+        ShowDeleteDialog = false;
+    }
+
+    void OpenDeleteDialog(CashBoxRow c)
+    {
+        Form = new CashBoxRow
+        {
+            Id = c.Id,
+            Name = c.Name,
+            OpeningBalance = c.OpeningBalance,
+            IsActive = c.IsActive
+        };
+
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowDeleteDialog = true;
+    }
+
+    void CloseDialogs()
+    {
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowDeleteDialog = false;
+    }
+
+    public class CashBoxRow
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+        public decimal OpeningBalance { get; set; }
+        public bool IsActive { get; set; }
+    }
+}
