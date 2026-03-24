@@ -430,3 +430,111 @@
         padding: 10px;
     }
 }
+/* update actvite */
+
+.emp-active {
+    text-align: right;
+}
+
+.emp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 950;
+    border: 1px solid transparent;
+    background: rgba(241,245,249,.9);
+    color: #0f172a;
+}
+
+    .emp-badge::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #94a3b8;
+    }
+
+.emp-on {
+    background: rgba(16,185,129,.10);
+    border-color: rgba(16,185,129,.22);
+    color: #065f46;
+}
+
+    .emp-on::before {
+        background: #22c55e;
+    }
+
+.emp-off {
+    background: rgba(239,68,68,.10);
+    border-color: rgba(239,68,68,.20);
+    color: #991b1b;
+}
+
+    .emp-off::before {
+        background: #ef4444;
+    }
+
+.emp-switch-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 14px 0 6px;
+}
+
+.emp-switch-label {
+    font-weight: 900;
+    color: #334155;
+}
+
+.emp-switch {
+    width: 74px;
+    height: 40px;
+    border: 0;
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+    .emp-switch.is-on {
+        background: #22c55e;
+    }
+
+    .emp-switch.is-off {
+        background: #cbd5e1;
+    }
+
+.emp-switch-thumb {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 32px;
+    height: 32px;
+    background: #fff;
+    border-radius: 50%;
+    transition: .2s ease;
+}
+
+.emp-switch.is-on .emp-switch-thumb {
+    right: 38px;
+}
+
+.emp-msg {
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    font-weight: 800;
+}
+
+    .emp-msg.success {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .emp-msg.error {
+        background: #fee2e2;
+        color: #991b1b;
+    }

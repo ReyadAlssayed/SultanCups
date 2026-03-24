@@ -16,5 +16,6 @@ namespace SultanCups.Models
         public decimal base_salary { get; set; }
 
         public List<Salary> Salaries { get; set; } = new();
+        public bool is_active { get; set; }
     }
 }

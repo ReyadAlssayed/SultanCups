@@ -5,10 +5,10 @@
 
 <div class="emp-page">
 
-    <!-- Header -->
     <div class="emp-topbar">
-
-        <button class="emp-add-btn" @onclick="OpenAddDialog">
+        <button type="button"
+                class="emp-add-btn"
+                @onclick="OpenAddDialog">
             إضافة موظف
         </button>
 
@@ -17,11 +17,16 @@
         </h2>
 
         <div></div>
-
     </div>
 
-    <div class="emp-card">
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <div class="emp-msg @MessageType">
+            @Message
+        </div>
+    }
 
+    <div class="emp-card">
         <div class="emp-table-wrap">
             <table class="emp-table">
 
@@ -31,30 +36,60 @@
                         <th>رقم الهاتف</th>
                         <th>الدور</th>
                         <th>الراتب الأساسي</th>
+                        <th>الحالة</th>
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @foreach (var e in Employee)
+                    @if (EmployeeList is null)
                     {
                         <tr>
-                            <td class="emp-name">@e.full_name</td>
-                            <td class="emp-phone">@e.phone</td>
-                            <td class="emp-rank">@e.rank</td>
-                            <td class="emp-salary">@e.base_salary د.ل</td>
-
-                            <td class="emp-actions">
-                                <button class="emp-edit" @onclick="() => OpenEditDialog(e)">تعديل</button>
-                                <button class="emp-delete" @onclick="() => OpenDeleteDialog(e)">حذف</button>
-                            </td>
+                            <td colspan="6">جاري التحميل...</td>
                         </tr>
+                    }
+                    else if (EmployeeList.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6">لا توجد بيانات</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var e in EmployeeList)
+                        {
+                            <tr>
+                                <td class="emp-name">@e.full_name</td>
+                                <td class="emp-phone">@e.phone</td>
+                                <td class="emp-rank">@e.rank</td>
+                                <td class="emp-salary">@e.base_salary د.ل</td>
+
+                                <td class="emp-active">
+                                    <span class="emp-badge @(e.is_active ? "emp-on" : "emp-off")">
+                                        @(e.is_active ? "نشط" : "معطل")
+                                    </span>
+                                </td>
+
+                                <td class="emp-actions">
+                                    <button type="button"
+                                            class="emp-edit"
+                                            @onclick="() => OpenEditDialog(e)">
+                                        تعديل
+                                    </button>
+
+                                    <button type="button"
+                                            class="emp-delete"
+                                            @onclick="() => OpenDeleteDialog(e)">
+                                        حذف
+                                    </button>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
 
             </table>
         </div>
-
     </div>
 
 </div>
@@ -65,26 +100,33 @@
         <div class="emp-dialog-box">
 
             <div class="emp-dialog-top-image">
-                <img src="images/Background.jpg" />
+                <img src="images/background.jpg" />
             </div>
 
             <div class="emp-dialog-body">
+
                 <h3>إضافة موظف</h3>
 
                 <input class="emp-input" placeholder="الاسم" @bind="EmployeeForm.full_name" />
                 <input class="emp-input" placeholder="رقم الهاتف" @bind="EmployeeForm.phone" />
 
                 <select class="emp-input" @bind="EmployeeForm.rank">
+                    <option value="">اختر الدور</option>
                     <option value="فني">فني</option>
                     <option value="مهندس">مهندس</option>
                 </select>
 
-                <input class="emp-input" type="number" placeholder="الراتب الأساسي" @bind="EmployeeForm.base_salary" />
+                <input class="emp-input"
+                       type="number"
+                       step="0.01"
+                       placeholder="الراتب الأساسي"
+                       @bind="EmployeeForm.base_salary" />
 
                 <div class="emp-dialog-actions">
-                    <button type="button" class="emp-save">حفظ</button>
+                    <button type="button" class="emp-save" @onclick="SaveAddEmployee">حفظ</button>
                     <button type="button" class="emp-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
+
             </div>
 
         </div>
@@ -97,10 +139,11 @@
         <div class="emp-dialog-box">
 
             <div class="emp-dialog-top-image">
-                <img src="images/Background.jpg" />
+                <img src="images/background.jpg" />
             </div>
 
             <div class="emp-dialog-body">
+
                 <h3>تعديل الموظف</h3>
 
                 <input class="emp-input" placeholder="الاسم" @bind="EmployeeForm.full_name" />
@@ -111,12 +154,27 @@
                     <option value="مهندس">مهندس</option>
                 </select>
 
-                <input class="emp-input" type="number" placeholder="الراتب الأساسي" @bind="EmployeeForm.base_salary" />
+                <input class="emp-input"
+                       type="number"
+                       step="0.01"
+                       placeholder="الراتب الأساسي"
+                       @bind="EmployeeForm.base_salary" />
+
+                <div class="emp-switch-row">
+                    <span class="emp-switch-label">الحالة</span>
+
+                    <button type="button"
+                            class="emp-switch @(EmployeeForm.is_active ? "is-on" : "is-off")"
+                            @onclick="ToggleEditActive">
+                        <span class="emp-switch-thumb"></span>
+                    </button>
+                </div>
 
                 <div class="emp-dialog-actions">
-                    <button type="button" class="emp-save">حفظ</button>
+                    <button type="button" class="emp-save" @onclick="SaveEditEmployee">حفظ</button>
                     <button type="button" class="emp-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
+
             </div>
 
         </div>
@@ -139,11 +197,25 @@
                 </div>
 
                 <h3 class="emp-delete-title">تأكيد الحذف</h3>
-                <p class="emp-delete-text">هل تريد حذف الموظف نهائيًا؟</p>
+
+                <p class="emp-delete-text">
+                    هل تريد حذف الموظف
+                    <strong>@EmployeeForm.full_name</strong>
+                    نهائيًا؟
+                </p>
 
                 <div class="emp-dialog-actions">
-                    <button type="button" class="emp-delete-confirm">حذف</button>
-                    <button type="button" class="emp-cancel" @onclick="CloseDialogs">إلغاء</button>
+                    <button type="button"
+                            class="emp-delete-confirm"
+                            @onclick="ConfirmDeleteEmployee">
+                        حذف
+                    </button>
+
+                    <button type="button"
+                            class="emp-cancel"
+                            @onclick="CloseDialogs">
+                        إلغاء
+                    </button>
                 </div>
 
             </div>
@@ -153,36 +225,44 @@
 }
 
 @code {
-
-    List<SultanCups.Models.Employee> Employee = new();
+    List<SultanCups.Models.Employee>? EmployeeList;
 
     bool ShowAddDialog = false;
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
 
-    SultanCups.Models.Employee EmployeeForm = new();
+    string? Message;
+    string MessageType = "";
 
+    SultanCups.Models.Employee EmployeeForm = new();
 
     protected override async Task OnInitializedAsync()
     {
-        Employee = await HrService.GetEmployees();
+        EmployeeList = await HrService.GetEmployees();
     }
 
     void OpenAddDialog()
     {
-        EmployeeForm = new SultanCups.Models.Employee();
+        CloseDialogs();
+        EmployeeForm = new SultanCups.Models.Employee
+        {
+            is_active = true
+        };
         ShowAddDialog = true;
     }
 
     void OpenEditDialog(SultanCups.Models.Employee e)
     {
+        CloseDialogs();
+
         EmployeeForm = new SultanCups.Models.Employee
         {
             employee_id = e.employee_id,
             full_name = e.full_name,
             phone = e.phone,
             rank = e.rank,
-            base_salary = e.base_salary
+            base_salary = e.base_salary,
+            is_active = e.is_active
         };
 
         ShowEditDialog = true;
@@ -190,8 +270,66 @@
 
     void OpenDeleteDialog(SultanCups.Models.Employee e)
     {
-        EmployeeForm = e;
+        CloseDialogs();
+
+        EmployeeForm = new SultanCups.Models.Employee
+        {
+            employee_id = e.employee_id,
+            full_name = e.full_name,
+            phone = e.phone,
+            rank = e.rank,
+            base_salary = e.base_salary,
+            is_active = e.is_active
+        };
+
         ShowDeleteDialog = true;
+    }
+
+    void ToggleEditActive()
+    {
+        EmployeeForm.is_active = !EmployeeForm.is_active;
+    }
+
+    async Task SaveAddEmployee()
+    {
+        await HrService.AddEmployee(EmployeeForm);
+        EmployeeList = await HrService.GetEmployees();
+        Message = "تمت إضافة الموظف بنجاح";
+        MessageType = "success";
+        CloseDialogs();
+    }
+
+    async Task SaveEditEmployee()
+    {
+        await HrService.UpdateEmployee(EmployeeForm);
+        EmployeeList = await HrService.GetEmployees();
+        Message = "تم تعديل الموظف بنجاح";
+        MessageType = "success";
+        CloseDialogs();
+    }
+
+    async Task ConfirmDeleteEmployee()
+    {
+        var result = await HrService.DeleteOrDisableEmployee(EmployeeForm.employee_id);
+
+        if (result == "deleted")
+        {
+            Message = "تم حذف الموظف بنجاح";
+            MessageType = "success";
+        }
+        else if (result == "disabled")
+        {
+            Message = "الموظف مرتبط بسجلات، لذلك تم تعطيله بدل حذفه";
+            MessageType = "error";
+        }
+        else
+        {
+            Message = "حدث خطأ";
+            MessageType = "error";
+        }
+
+        EmployeeList = await HrService.GetEmployees();
+        CloseDialogs();
     }
 
     void CloseDialogs()
@@ -199,6 +337,6 @@
         ShowAddDialog = false;
         ShowEditDialog = false;
         ShowDeleteDialog = false;
+        EmployeeForm = new SultanCups.Models.Employee();
     }
-
 }
