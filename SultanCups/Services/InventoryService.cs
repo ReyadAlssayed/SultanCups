@@ -17,20 +17,17 @@ namespace SultanCups.Services
         // 🔹 هذا الجزء خاص بجدول products
         // ================================
 
-        // جلب جميع المنتجات من قاعدة البيانات
         public async Task<List<Product>> GetProducts()
         {
             return await _context.products.ToListAsync();
         }
 
-        // إضافة منتج جديد
         public async Task AddProduct(Product product)
         {
             _context.products.Add(product);
             await _context.SaveChangesAsync();
         }
 
-        // تعديل منتج موجود حسب product_id
         public async Task<bool> UpdateProduct(Product updatedProduct)
         {
             var product = await _context.products
@@ -45,7 +42,6 @@ namespace SultanCups.Services
             return true;
         }
 
-        // حذف منتج حسب product_id
         public async Task<bool> DeleteProduct(int productId)
         {
             var product = await _context.products
@@ -64,25 +60,23 @@ namespace SultanCups.Services
         // 🔹 هذا الجزء خاص بجدول production (الإنتاج)
         // =========================================
 
-        // جلب جميع عمليات الإنتاج مع اسم المنتج
         public async Task<List<Production>> GetProduction()
         {
             return await _context.production
-                .Include(p => p.Product) // ربط مع جدول المنتجات لجلب الاسم
+                .Include(p => p.Product)
                 .ToListAsync();
         }
 
-        // إضافة عملية إنتاج جديدة
-        // إضافة عملية إنتاج جديدة
         public async Task AddProduction(Production production)
         {
-            production.production_date = DateTime.SpecifyKind(production.production_date, DateTimeKind.Unspecified);
+            production.production_date = DateTime.SpecifyKind(
+                production.production_date,
+                DateTimeKind.Unspecified);
 
             _context.production.Add(production);
             await _context.SaveChangesAsync();
         }
 
-        // تعديل عملية إنتاج حسب production_id
         public async Task<bool> UpdateProduction(Production updated)
         {
             var prod = await _context.production
@@ -94,13 +88,14 @@ namespace SultanCups.Services
             prod.product_id = updated.product_id;
             prod.box_cost = updated.box_cost;
             prod.box_count = updated.box_count;
-            prod.production_date = DateTime.SpecifyKind(updated.production_date, DateTimeKind.Unspecified);
+            prod.production_date = DateTime.SpecifyKind(
+                updated.production_date,
+                DateTimeKind.Unspecified);
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-        // حذف عملية إنتاج
         public async Task<bool> DeleteProduction(int id)
         {
             var prod = await _context.production
@@ -110,6 +105,58 @@ namespace SultanCups.Services
                 return false;
 
             _context.production.Remove(prod);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        // =========================================
+        // 🔹 هذا الجزء خاص بجدول suppliers (الموردين)
+        // =========================================
+
+        // جلب جميع الموردين
+        public async Task<List<Supplier>> GetSuppliers()
+        {
+            return await _context.suppliers.ToListAsync();
+        }
+
+        // إضافة مورد جديد
+        public async Task AddSupplier(Supplier supplier)
+        {
+            _context.suppliers.Add(supplier);
+            await _context.SaveChangesAsync();
+        }
+
+        // تعديل مورد
+        public async Task<bool> UpdateSupplier(Supplier updated)
+        {
+            var supplier = await _context.suppliers
+                .FirstOrDefaultAsync(s => s.supplier_id == updated.supplier_id);
+
+            // لو غير موجود
+            if (supplier == null)
+                return false;
+
+            // تحديث البيانات
+            supplier.name = updated.name;
+            supplier.phone = updated.phone;
+            supplier.email = updated.email;
+            supplier.location = updated.location;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // حذف مورد
+        public async Task<bool> DeleteSupplier(int id)
+        {
+            var supplier = await _context.suppliers
+                .FirstOrDefaultAsync(s => s.supplier_id == id);
+
+            if (supplier == null)
+                return false;
+
+            _context.suppliers.Remove(supplier);
             await _context.SaveChangesAsync();
 
             return true;

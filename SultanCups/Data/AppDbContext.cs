@@ -13,5 +13,6 @@ namespace SultanCups.Data
         public DbSet<CashBox> cash_boxes { get; set; } = null!;
         public DbSet<Product> products { get; set; } = null!;
         public DbSet<Production> production { get; set; } = null!;
+        public DbSet<Supplier> suppliers { get; set; } = null!;
     }
 }
