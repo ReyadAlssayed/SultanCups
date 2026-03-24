@@ -76,41 +76,82 @@
         <div class="ad-dialog-box">
 
             <div class="ad-dialog-top-image">
-                <img src="images/Background.jpg" />
+                <img src="images/Background.png" />
             </div>
 
             <div class="ad-dialog-body">
+                <h3>تعديل بيانات المسؤول</h3>
 
-                <h3>تعديل المسؤول</h3>
+                <div class="ad-fields-grid">
+                    <div class="full-width">
+                        <label class="ad-label">الاسم الكامل</label>
+                        <input class="ad-input @(FullNameError != null ? "ad-input-error" : "")"
+                               @bind="EditAdmin.full_name"
+                               maxlength="50" />
+                        @if (!string.IsNullOrWhiteSpace(FullNameError))
+                        {
+                            <div class="ad-error">@FullNameError</div>
+                        }
+                    </div>
 
-                <input class="ad-input" placeholder="الاسم" @bind="EditAdmin.full_name" />
-                <input class="ad-input" placeholder="اسم المستخدم" @bind="EditAdmin.username" />
-                <input class="ad-input" placeholder="رقم الهاتف" @bind="EditAdmin.phone" />
+                    <div>
+                        <label class="ad-label">اسم المستخدم</label>
+                        <input class="ad-input @(UsernameError != null ? "ad-input-error" : "")"
+                               @bind="EditAdmin.username"
+                               maxlength="50" />
+                        @if (!string.IsNullOrWhiteSpace(UsernameError))
+                        {
+                            <div class="ad-error">@UsernameError</div>
+                        }
+                    </div>
 
-                <select class="ad-input" @bind="EditAdmin.role">
-                    <option value="Admin1">Admin1</option>
-                    <option value="Admin2">Admin2</option>
-                </select>
+                    <div>
+                        <label class="ad-label">رقم الهاتف</label>
+                        <input class="ad-input @(PhoneError != null ? "ad-input-error" : "")"
+                               @bind="EditAdmin.phone"
+                               maxlength="10" />
+                        @if (!string.IsNullOrWhiteSpace(PhoneError))
+                        {
+                            <div class="ad-error">@PhoneError</div>
+                        }
+                    </div>
 
-                <div class="ad-switch-row">
+                    <div class="full-width">
+                        <label class="ad-label">الدور الوظيفي</label>
+                        <select class="ad-input @(RoleError != null ? "ad-input-error" : "")" @bind="EditAdmin.role">
+                            <option value="Admin1">Admin1</option>
+                            <option value="Admin2">Admin2</option>
+                        </select>
 
-                    <span class="ad-switch-label">الحالة</span>
+                        @if (!string.IsNullOrWhiteSpace(RoleError))
+                        {
+                            <div class="ad-error">@RoleError</div>
+                        }
+                    </div>
+                </div>
+                <div class="ad-status-wrapper">
+                    <label class="ad-label">حالة الحساب</label>
+                    <div class="ad-status-btns">
+        
+                        <button type="button"
+                                class="status-btn @(EditAdmin.is_active ? "active-selected" : "")"
+                                @onclick="() => EditAdmin.is_active = true">
+                            نشط
+                        </button>
 
-                    <button type="button"
-                            class="ad-switch @(EditAdmin.is_active ? "is-on" : "is-off")"
-                            @onclick="ToggleEditActive">
+                        <button type="button"
+                                class="status-btn @(!EditAdmin.is_active ? "inactive-selected" : "")"
+                                @onclick="() => EditAdmin.is_active = false">
+                            معطل
+                        </button>
 
-                        <span class="ad-switch-thumb"></span>
-
-                    </button>
-
+                    </div>
                 </div>
 
                 <div class="ad-dialog-actions">
-                    <button type="button" class="ad-save" @onclick="SaveEditAdmin">حفظ</button>
+                    <button type="button" class="ad-save" @onclick="SaveEditAdmin">حفظ التعديلات</button>
                     <button type="button" class="ad-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
-
             </div>
 
         </div>
@@ -122,39 +163,41 @@
         <div class="ad-dialog-box ad-delete-dialog-box">
 
             <div class="ad-dialog-top-image ad-delete-top-image">
-                <img src="images/background.jpg" />
+                <img src="images/background.png" />
             </div>
 
             <div class="ad-dialog-body ad-delete-dialog-body">
-
                 <div class="ad-delete-icon-wrap">
                     <div class="ad-delete-icon">!</div>
                 </div>
 
                 <h3 class="ad-delete-title">تأكيد الحذف</h3>
                 <p class="ad-delete-text">
-                    هل تريد حذف المسؤول
-                    <strong>@DeleteAdminItem.full_name</strong>
-                    نهائيًا؟
+                    أنت على وشك حذف المسؤول <strong>@DeleteAdminItem.full_name</strong> نهائياً.
+                    <br /> لا يمكن التراجع عن هذا الإجراء.
                 </p>
 
                 <div class="ad-dialog-actions">
-                    <button type="button" class="ad-delete-confirm" @onclick="ConfirmDeleteAdmin">حذف</button>
+                    <button type="button" class="ad-delete-confirm" @onclick="ConfirmDeleteAdmin">تأكيد الحذف</button>
                     <button type="button" class="ad-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
-
             </div>
 
         </div>
     </div>
 }
-}
+
 
 @code {
     List<SultanCups.Models.Admain>? Admins;
 
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
+
+    string? FullNameError;
+    string? UsernameError;
+    string? PhoneError;
+    string? RoleError;
 
     SultanCups.Models.Admain? EditAdmin;
     SultanCups.Models.Admain? DeleteAdminItem;
@@ -182,15 +225,83 @@
         ShowDeleteDialog = true;
     }
 
-    void ToggleEditActive()
-    {
-        if (EditAdmin is null) return;
-        EditAdmin.is_active = !EditAdmin.is_active;
-    }
-
     async Task SaveEditAdmin()
     {
         if (EditAdmin is null)
+            return;
+
+        // تصفير الأخطاء
+        FullNameError = null;
+        UsernameError = null;
+        PhoneError = null;
+        RoleError = null;
+
+        var name = EditAdmin.full_name?.Trim();
+        var username = EditAdmin.username?.Trim();
+        var phone = EditAdmin.phone?.Trim();
+        var role = EditAdmin.role?.Trim();
+
+        bool hasError = false;
+
+        // الاسم
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            FullNameError = "الاسم الكامل مطلوب";
+            hasError = true;
+        }
+        else if (!name.All(c => char.IsLetter(c) || c == ' '))
+        {
+            FullNameError = "الاسم يجب أن يحتوي على حروف فقط";
+            hasError = true;
+        }
+
+        // username
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            UsernameError = "اسم المستخدم مطلوب";
+            hasError = true;
+        }
+        else if (!username.Any(char.IsLetter))
+        {
+            UsernameError = "يجب أن يحتوي على حرف واحد على الأقل";
+            hasError = true;
+        }
+        else if (!username.All(char.IsLetterOrDigit))
+        {
+            UsernameError = "مسموح فقط حروف وأرقام";
+            hasError = true;
+        }
+
+        // phone
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            PhoneError = "رقم الهاتف مطلوب";
+            hasError = true;
+        }
+        else if (phone.Length != 10)
+        {
+            PhoneError = "رقم الهاتف يجب أن يكون 10 أرقام";
+            hasError = true;
+        }
+        else if (!phone.StartsWith("09"))
+        {
+            PhoneError = "رقم الهاتف يجب أن يبدأ بـ 09";
+            hasError = true;
+        }
+        else if (!phone.All(char.IsDigit))
+        {
+            PhoneError = "رقم الهاتف يجب أن يحتوي أرقام فقط";
+            hasError = true;
+        }
+
+        // role
+        if (string.IsNullOrWhiteSpace(role))
+        {
+            RoleError = "الدور مطلوب";
+            hasError = true;
+        }
+
+        if (hasError)
             return;
 
         var updated = await AdminService.UpdateAdmin(EditAdmin);
@@ -224,6 +335,11 @@
         ShowDeleteDialog = false;
         EditAdmin = null;
         DeleteAdminItem = null;
+
+        FullNameError = null;
+        UsernameError = null;
+        PhoneError = null;
+        RoleError = null;
     }
 
     protected override async Task OnInitializedAsync()

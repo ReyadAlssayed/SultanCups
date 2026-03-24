@@ -1,47 +1,102 @@
 ﻿@page "/Stats"
 @layout Layout.MainLayout
 
-<div class="dashboard">
+<div class="stats-container">
 
-    <div class="dash-header">
-        <h1>لوحة التحكم</h1>
-        <p>مرحباً بك في نظام مصنع أكواب السلطان</p>
+    @if (!isDataVisible)
+    {
+        <div class="privacy-blanket">
+            <div class="upper-shield-card">
+                <div class="shield-icon">
+                    <i class="bi bi-shield-lock"></i>
+                </div>
+                <h3>إحصائيات الإدارة</h3>
+                <p>هذه الصفحة تحتوي على بيانات مالية وحساسة خاصة بمصنع السلطان.</p>
+                <button class="reveal-btn-main" @onclick="() => isDataVisible = true">
+                    <i class="bi bi-eye"></i> كشف البيانات المالية
+                </button>
+            </div>
+        </div>
+    }
+
+    <div class="stats-content-main @(isDataVisible ? "show-content-smooth" : "hide-content")">
+        
+        <div class="stats-header">
+            <h1>إحصائيات مصنع السلطان</h1>
+            <p>نظرة شاملة على الأداء المالي والإنتاجي للمصنع</p>
+        </div>
+
+        <div class="summary-row">
+            <div class="summary-card net-profit">
+                <div class="summary-info">
+                    <span class="label">إجمالي الصافي (الأرباح)</span>
+                    <span class="value-large">0 <small>د.ل</small></span>
+                </div>
+                <div class="summary-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            </div>
+
+            <div class="summary-card cash-box">
+                <div class="summary-info">
+                    <span class="label">السيولة النقدية (الخزائن)</span>
+                    <span class="value-large">0 <small>د.ل</small></span>
+                </div>
+                <div class="summary-icon"><i class="bi bi-safe2"></i></div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <section class="stats-section">
+                <div class="section-head">
+                    <h3>المبيعات والديون</h3>
+                    <i class="bi bi-cart-check"></i>
+                </div>
+                <div class="section-body">
+                    <div class="stat-item"><span>إجمالي المبيعات</span><strong>0 د.ل</strong></div>
+                    <div class="stat-item"><span>المبالغ المحصلة</span><strong>0 د.ل</strong></div>
+                    <div class="stat-item"><span>ديون الزبائن</span><strong class="text-danger">0 د.ل</strong></div>
+                    <div class="stat-item"><span>عمولات المسوقين</span><strong>0 د.ل</strong></div>
+                </div>
+            </section>
+
+            <section class="stats-section">
+                <div class="section-head">
+                    <h3>المخزن والمواد الخام</h3>
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="section-body">
+                    <div class="stat-item"><span>قيمة المخزون الحالية</span><strong>0 د.ل</strong></div>
+                    <div class="stat-item"><span>مشتريات مواد خام</span><strong>0 د.ل</strong></div>
+                    <div class="stat-item"><span>عدد الموردين النشطين</span><strong>0</strong></div>
+                </div>
+            </section>
+
+            <section class="stats-section">
+                <div class="section-head">
+                    <h3>الإنتاج والتشغيل</h3>
+                    <i class="bi bi-gear-wide-connected"></i>
+                </div>
+                <div class="section-body">
+                    <div class="stat-item"><span>إجمالي الصناديق المنتجة</span><strong>0</strong></div>
+                    <div class="stat-item"><span>تكلفة الإنتاج الإجمالية</span><strong>0 د.ل</strong></div>
+                    <div class="stat-item"><span>الراجع (توالف)</span><strong class="text-danger">0</strong></div>
+                </div>
+            </section>
+
+            <section class="stats-section">
+                <div class="section-head">
+                    <h3>الموارد البشرية والرواتب</h3>
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="section-body">
+                    <div class="stat-item"><span>الرواتب المستحقة</span><strong>0 د.ل</strong></div>
+                    <div class="stat-item"><span>السلف والمكافآت</span><strong>0 د.ل</strong></div>
+                    <div class="stat-item"><span>إجمالي الموظفين</span><strong>0</strong></div>
+                </div>
+            </section>
+        </div>
     </div>
-
-    <div class="dash-cards">
-
-        <div class="dash-card">
-            <div class="card-icon">
-               
-            </div>
-            <h3>الطلبات</h3>
-            <p>0</p>
-        </div>
-
-        <div class="dash-card">
-            <div class="card-icon sales">
-               
-            </div>
-            <h3>المبيعات اليوم</h3>
-            <p>0 د.ل</p>
-        </div>
-
-        <div class="dash-card">
-            <div class="card-icon expenses">
-               
-            </div>
-            <h3>المصروفات</h3>
-            <p>0 د.ل</p>
-        </div>
-
-        <div class="dash-card">
-            <div class="card-icon employees">
-               
-            </div>
-            <h3>الموظفين</h3>
-            <p>0</p>
-        </div>
-
-    </div>
-
 </div>
+
+@code {
+    private bool isDataVisible = false;
+}

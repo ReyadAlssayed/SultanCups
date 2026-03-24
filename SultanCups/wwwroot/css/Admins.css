@@ -1,458 +1,466 @@
 ﻿/* =======================================================
-   Admins.css  (Premium Table like reference UI)
-   All classes prefixed with ad-
+   Admins.css - Vigor Line Edition (النسخة الكاملة المعدلة)
+   الهدف: ثبات المربعات، تنسيق جداول أدكن، وتنبيهات احترافية
    ======================================================= */
 
 :root {
     --ad-bg: #f3f6fb;
-    --ad-card: rgba(255,255,255,.75);
     --ad-card-solid: #ffffff;
-    --ad-line: rgba(148,163,184,.28);
+    --ad-line: #e2e8f0;
     --ad-text: #0f172a;
     --ad-muted: #64748b;
-    --ad-primary: #2563eb;
-    --ad-primary2: #1e40af;
-    --ad-shadow: 0 28px 70px rgba(2,6,23,.10);
-    --ad-shadow2: 0 14px 32px rgba(2,6,23,.08);
+    --ad-primary: #2563eb; /* Royal Blue */
+    --ad-shadow: 0 10px 30px rgba(2,6,23,0.08);
 }
 
-/* ================= Page ================= */
-
+/* ================= تخطيط الصفحة (Layout) ================= */
 .ad-page {
     padding: 26px;
     direction: rtl;
+    background: var(--ad-bg);
+    min-height: 100vh;
 }
-
-.ad-header {
-    margin-bottom: 14px;
-}
-
-.ad-title {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 950;
-    color: var(--ad-text);
-    letter-spacing: .2px;
-}
-
-.ad-sub {
-    margin-top: 6px;
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--ad-muted);
-}
-
-/* ================= Card / Container ================= */
-
-.ad-card {
-    background: var(--ad-card);
-    border: 1px solid rgba(255,255,255,.55);
-    border-radius: 22px;
-    box-shadow: var(--ad-shadow);
-    overflow: hidden;
-    backdrop-filter: blur(10px);
-}
-
-/* Table wrapper */
-.ad-table-wrap {
-    width: 100%;
-    overflow: auto;
-    padding: 14px;
-}
-
-    /* Scrollbar */
-    .ad-table-wrap::-webkit-scrollbar {
-        height: 10px;
-        width: 10px;
-    }
-
-    .ad-table-wrap::-webkit-scrollbar-thumb {
-        background: rgba(37,99,235,.25);
-        border-radius: 999px;
-    }
-
-    .ad-table-wrap::-webkit-scrollbar-track {
-        background: rgba(148,163,184,.15);
-        border-radius: 999px;
-    }
-
-/* ================= Table ================= */
-
-.ad-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    min-width: 860px;
-}
-
-    /* Header row */
-    .ad-table thead th {
-        background: transparent;
-        color: var(--ad-muted);
-        font-size: 12px;
-        font-weight: 950;
-        padding: 10px 16px;
-        text-align: right;
-        white-space: nowrap;
-    }
-
-    /* Body rows as rounded cards */
-    .ad-table tbody tr {
-        filter: drop-shadow(0 10px 22px rgba(2,6,23,.06));
-        transition: transform .16s ease, filter .16s ease;
-    }
-
-        .ad-table tbody tr:hover {
-            transform: translateY(-2px);
-            filter: drop-shadow(0 16px 30px rgba(2,6,23,.10));
-        }
-
-    /* Cells */
-    .ad-table tbody td {
-        background: var(--ad-card-solid);
-        border-top: 1px solid rgba(226,232,240,.85);
-        border-bottom: 1px solid rgba(226,232,240,.85);
-        padding: 14px 16px;
-        font-weight: 900;
-        color: var(--ad-text);
-        white-space: nowrap;
-        vertical-align: middle;
-    }
-
-        .ad-table tbody td:first-child {
-            border-right: 1px solid rgba(226,232,240,.85);
-            border-radius: 0;
-        }
-
-        .ad-table tbody td:last-child {
-            border-left: 1px solid rgba(226,232,240,.85);
-            border-radius: 0;
-        }
-
-        /* Subtle separators inside row */
-        .ad-table tbody td + td {
-            position: relative;
-        }
-
-            .ad-table tbody td + td::before {
-                content: "";
-                position: absolute;
-                right: 0;
-                top: 12%;
-                bottom: 12%;
-                width: 2px;
-                background: rgba(100,116,139,.45);
-            }
-/* ================= Column Styles ================= */
-
-.ad-name {
-    font-weight: 950;
-    color: #0b2a66;
-}
-
-.ad-phone {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    letter-spacing: .4px;
-    color: #111827;
-}
-
-.ad-role {
-    color: #1f2937;
-}
-
-/* ================= Active Badge (minimal like reference) ================= */
-
-.ad-active {
-    text-align: right;
-}
-
-.ad-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 950;
-    border: 1px solid transparent;
-    background: rgba(241,245,249,.9);
-    color: #0f172a;
-}
-
-    /* Small dot */
-    .ad-badge::before {
-        content: "";
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        background: #94a3b8;
-    }
-
-/* Active */
-.ad-on {
-    background: rgba(16,185,129,.10);
-    border-color: rgba(16,185,129,.22);
-    color: #065f46;
-}
-
-    .ad-on::before {
-        background: #22c55e;
-    }
-
-/* Inactive */
-.ad-off {
-    background: rgba(239,68,68,.10);
-    border-color: rgba(239,68,68,.20);
-    color: #991b1b;
-}
-
-    .ad-off::before {
-        background: #ef4444;
-    }
-
-/* ===== عنوان الصفحة ===== */
 
 .ad-header-center {
     display: flex;
+    align-items: center;
     justify-content: center;
-    margin-bottom: 18px;
+    margin-bottom: 25px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 16px;
+    box-shadow: var(--ad-shadow);
 }
 
 .ad-title-center {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 950;
-    color: #0f172a;
+    color: var(--ad-text);
     margin: 0;
 }
 
-/* ===== أزرار الإجراءات ===== */
+/* ================= تنسيق الجدول (أدكن وأوضح) ================= */
+.ad-card {
+    background: var(--ad-card-solid);
+    border-radius: 16px;
+    box-shadow: var(--ad-shadow);
+    overflow: hidden;
+    border: 1px solid var(--ad-line);
+}
+
+.ad-table-wrap {
+    width: 100%;
+    overflow: auto;
+}
+
+.ad-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 860px;
+}
+
+    .ad-table thead th {
+        background: #f8fafc;
+        color: var(--ad-muted);
+        font-size: 13px;
+        font-weight: 950;
+        padding: 18px 20px;
+        text-align: right;
+        border-bottom: 2px solid var(--ad-line);
+    }
+
+    .ad-table tbody tr {
+        border-bottom: 1px solid var(--ad-line);
+        transition: background 0.2s ease;
+    }
+
+        .ad-table tbody tr:nth-child(even) {
+            background: #f8fafc; /* رصاصي خفيف */
+        }
+
+        .ad-table tbody tr:nth-child(odd) {
+            background: #ffffff; /* أبيض */
+        }
+
+        .ad-table tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+    .ad-table tbody td {
+        padding: 16px 20px;
+        font-weight: 800;
+        color: var(--ad-text);
+        vertical-align: middle;
+    }
+
+/* تمييز اسم المسؤول */
+.ad-name {
+    color: #1e40af;
+    font-weight: 950 !important;
+}
 
 .ad-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .ad-edit {
-    background: #3b82f6;
+    background: #2563eb;
     color: white;
     border: 0;
-    padding: 6px 12px;
+    padding: 8px 16px;
     border-radius: 8px;
     font-weight: 800;
     cursor: pointer;
 }
 
 .ad-delete {
-    background: #ef4444;
+    background: #dc2626;
     color: white;
     border: 0;
-    padding: 6px 12px;
+    padding: 8px 16px;
     border-radius: 8px;
     font-weight: 800;
     cursor: pointer;
 }
 
-/* ================= DIALOG ================= */
+/* ================= الحالات (Badges) ================= */
+.ad-badge {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+}
 
+.ad-on {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.ad-off {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ================= الديالوج (مربعات الحوار الثابتة) ================= */
 .ad-dialog-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.45);
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
-}
-
-    .ad-dialog-box h3 {
-        font-size: 18px;
-        font-weight: 900;
-        text-align: center;
-        margin-bottom: 18px;
-    }
-
-.ad-input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    margin-bottom: 10px;
-    direction: rtl;
-}
-
-.ad-dialog-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.ad-save {
-    flex: 1;
-    background: #2563eb;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 10px;
-}
-
-.ad-cancel {
-    flex: 1;
-    background: #64748b;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 10px;
+    z-index: 9999;
+    padding: 20px;
 }
 
 .ad-dialog-box {
     background: #fff;
     border-radius: 24px;
-    padding: 0;
-    width: 92%;
-    max-width: 460px;
-    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     overflow: hidden;
+    position: relative;
+    animation: adPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes adPop {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .ad-dialog-top-image {
     width: 100%;
-    height: 110px;
-    overflow: hidden;
-    border-bottom: 1px solid #e2e8f0;
+    height: 120px;
+    background: #f1f5f9;
 }
 
     .ad-dialog-top-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
     }
 
 .ad-dialog-body {
-    padding: 22px;
+    padding: 25px;
 }
 
-.ad-switch-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 12px 0 14px;
-    padding: 10px 4px 0;
-}
-
-.ad-switch-label {
-    font-size: 14px;
-    font-weight: 900;
-    color: #334155;
-}
-
-.ad-switch {
-    width: 58px;
-    height: 32px;
-    border: none;
-    border-radius: 999px;
-    position: relative;
-    cursor: pointer;
-    transition: .22s ease;
-    padding: 0;
-}
-
-    .ad-switch.is-on {
-        background: #22c55e;
+    .ad-dialog-body h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 950;
+        color: var(--ad-text);
     }
 
-    .ad-switch.is-off {
-        background: #cbd5e1;
-    }
+/* ================= المدخلات (Labels أصغر ورصاصية) ================= */
+.ad-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #94a3b8;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    display: block;
+    text-transform: uppercase;
+}
 
-.ad-switch-thumb {
-    position: absolute;
-    top: 4px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
+.ad-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-weight: 700;
     background: #fff;
-    box-shadow: 0 3px 8px rgba(0,0,0,.18);
-    transition: .22s ease;
+    margin-bottom: 15px;
 }
 
-.ad-switch.is-on .ad-switch-thumb {
-    left: 30px;
+    .ad-input:focus {
+        border-color: var(--ad-primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+.ad-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
-.ad-switch.is-off .ad-switch-thumb {
-    left: 4px;
+/* ================= أزرار الحفظ والإلغاء ================= */
+.ad-dialog-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
 }
 
-.ad-delete-dialog-box {
-    max-width: 430px;
-    overflow: hidden;
+.ad-save {
+    flex: 2;
+    background: var(--ad-primary);
+    color: white;
+    border: 0;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
 }
 
-.ad-delete-top-image {
-    height: 95px;
+.ad-cancel {
+    flex: 1;
+    background: #f1f5f9;
+    color: #475569;
+    border: 0;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
 }
 
+/* ================= مربع حوار الحذف (Delete Dialog) ================= */
 .ad-delete-dialog-body {
     text-align: center;
-    padding-top: 18px;
+    padding: 30px 25px;
 }
 
 .ad-delete-icon-wrap {
     display: flex;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .ad-delete-icon {
-    width: 62px;
-    height: 62px;
+    width: 70px;
+    height: 70px;
+    background: #fee2e2;
+    color: #ef4444;
     border-radius: 50%;
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
-    color: #dc2626;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30px;
-    font-weight: 900;
-    box-shadow: 0 10px 24px rgba(220,38,38,.18);
+    font-size: 35px;
+    font-weight: 950;
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.15);
 }
 
 .ad-delete-title {
-    margin: 0 0 8px;
     font-size: 24px;
     font-weight: 950;
-    color: #0f172a;
+    color: #991b1b;
+    margin-bottom: 10px;
 }
 
 .ad-delete-text {
-    margin: 0 0 18px;
-    font-size: 14px;
-    font-weight: 700;
     color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 25px;
 }
 
 .ad-delete-confirm {
-    flex: 1;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
-    border: none;
+    flex: 2;
+    background: #dc2626;
+    color: white;
+    border: 0;
     padding: 12px;
     border-radius: 12px;
     font-weight: 900;
-    box-shadow: 0 10px 20px rgba(239,68,68,.18);
+    cursor: pointer;
 }
-/* ================= Responsive ================= */
 
-@media (max-width: 900px) {
-    .ad-page {
-        padding: 16px;
+/* ================= أزرار الحالة (Switch Style) ================= */
+.ad-status-container {
+    background: #f8fafc;
+    padding: 12px 18px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0;
+    border: 1px solid #e2e8f0;
+}
+
+.status-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    background: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    color: #64748b;
+}
+
+    .status-btn.selected.btn-active {
+        border-color: #22c55e;
+        background: #f0fdf4;
+        color: #166534;
     }
 
-    .ad-title {
-        font-size: 24px;
+    .status-btn.selected.btn-inactive {
+        border-color: #ef4444;
+        background: #fef2f2;
+        color: #991b1b;
     }
 
-    .ad-table-wrap {
-        padding: 10px;
+/* ================= التنبيهات (Toasts) ================= */
+.ad-toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+    pointer-events: none;
+}
+
+.ad-toast {
+    min-width: 320px;
+    padding: 16px 25px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 950;
+    border: 1px solid var(--ad-line);
+    animation: toastIn 0.4s ease;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ad-toast.success {
+    border-right: 6px solid #22c55e;
+    color: #166534;
+}
+
+.ad-toast.error {
+    border-right: 6px solid #ef4444;
+    color: #991b1b;
+}
+
+/* ================= الأخطاء (Validation) ================= */
+.ad-error {
+    font-size: 11px;
+    color: #dc2626;
+    font-weight: 800;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.ad-input-error {
+    border: 1px solid #ef4444 !important;
+    background: #fff5f5;
+}
+
+/* حاوية الحالة */
+.ad-status-wrapper {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin: 15px 0;
+}
+
+/* توزيع الأزرار */
+.ad-status-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+/* التصميم العام للزر */
+.status-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s;
+    color: #64748b;
+}
+
+    /* الزر عند الاختيار (نشط) */
+    .status-btn.active-selected {
+        border-color: #22c55e;
+        background: #f0fdf4;
+        color: #166534;
+    }
+
+    /* الزر عند الاختيار (معطل) */
+    .status-btn.inactive-selected {
+        border-color: #ef4444;
+        background: #fef2f2;
+        color: #991b1b;
+    }
+/* ================= استجابة الجوال ================= */
+@media (max-width: 600px) {
+    .ad-fields-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ad-dialog-box {
+        width: 95%;
     }
 }

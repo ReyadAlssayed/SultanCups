@@ -1,540 +1,434 @@
 ﻿/* =======================================================
-   Employees.css (Premium Table like Admins UI)
-   All classes prefixed with emp-
+   Vigor Line - Employees.css
+   التعديلات: نظام أزرار الحالة (نشط/معطل)، ثبات المربع، 
+   عناوين صغيرة، وألوان أدكن للجدول.
    ======================================================= */
-
 :root {
     --emp-bg: #f3f6fb;
-    --emp-card: rgba(255,255,255,.75);
     --emp-card-solid: #ffffff;
-    --emp-line: rgba(148,163,184,.28);
+    --emp-line: #e2e8f0;
     --emp-text: #0f172a;
     --emp-muted: #64748b;
-    --emp-primary: #2563eb;
-    --emp-shadow: 0 28px 70px rgba(2,6,23,.10);
-    --emp-shadow2: 0 14px 32px rgba(2,6,23,.08);
+    --emp-primary: #2563eb; /* Royal Blue */
+    --emp-shadow: 0 10px 30px rgba(2,6,23,0.08);
 }
 
-/* ================= Page ================= */
-
+/* ================= Page Layout ================= */
 .emp-page {
     padding: 26px;
     direction: rtl;
+    background: var(--emp-bg);
+    min-height: 100vh;
 }
-
-.emp-header {
-    margin-bottom: 14px;
-}
-
-.emp-title {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 950;
-    color: var(--emp-text);
-    letter-spacing: .2px;
-}
-
-.emp-sub {
-    margin-top: 6px;
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--emp-muted);
-}
-
-/* ================= Card / Container ================= */
-
-.emp-card {
-    background: var(--emp-card);
-    border: 1px solid rgba(255,255,255,.55);
-    border-radius: 22px;
-    box-shadow: var(--emp-shadow);
-    overflow: hidden;
-    backdrop-filter: blur(10px);
-}
-
-/* Table wrapper */
-.emp-table-wrap {
-    width: 100%;
-    overflow: auto;
-    padding: 14px;
-}
-
-    .emp-table-wrap::-webkit-scrollbar {
-        height: 10px;
-        width: 10px;
-    }
-
-    .emp-table-wrap::-webkit-scrollbar-thumb {
-        background: rgba(37,99,235,.25);
-        border-radius: 999px;
-    }
-
-    .emp-table-wrap::-webkit-scrollbar-track {
-        background: rgba(148,163,184,.15);
-        border-radius: 999px;
-    }
-
-/* ================= Table ================= */
-
-.emp-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    min-width: 860px;
-}
-
-    /* Header row */
-    .emp-table thead th {
-        background: transparent;
-        color: var(--emp-muted);
-        font-size: 12px;
-        font-weight: 950;
-        padding: 10px 16px;
-        text-align: right;
-        white-space: nowrap;
-    }
-
-    /* Body rows as rounded cards */
-    .emp-table tbody tr {
-        filter: drop-shadow(0 10px 22px rgba(2,6,23,.06));
-        transition: transform .16s ease, filter .16s ease;
-    }
-
-        .emp-table tbody tr:hover {
-            transform: translateY(-2px);
-            filter: drop-shadow(0 16px 30px rgba(2,6,23,.10));
-        }
-
-    /* Cells */
-    .emp-table tbody td {
-        background: var(--emp-card-solid);
-        border-top: 1px solid rgba(226,232,240,.85);
-        border-bottom: 1px solid rgba(226,232,240,.85);
-        padding: 14px 16px;
-        font-weight: 900;
-        color: var(--emp-text);
-        white-space: nowrap;
-        vertical-align: middle;
-    }
-
-        .emp-table tbody td:first-child {
-            border-right: 1px solid rgba(226,232,240,.85);
-            border-radius: 0;
-        }
-
-        .emp-table tbody td:last-child {
-            border-left: 1px solid rgba(226,232,240,.85);
-            border-radius: 0;
-        }
-
-
-        /* Subtle separators inside row */
-        .emp-table tbody td + td {
-            position: relative;
-        }
-
-            .emp-table tbody td + td::before {
-                content: "";
-                position: absolute;
-                right: 0;
-                top: 12%;
-                bottom: 12%;
-                width: 2px;
-                background: rgba(100,116,139,.45);
-            }
-
-/* ================= Column Styles ================= */
-
-.emp-name {
-    font-weight: 950;
-    color: #0b2a66;
-}
-
-.emp-phone {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    letter-spacing: .4px;
-    color: #111827;
-}
-
-.emp-job {
-    color: #1f2937;
-}
-
-/* ================= Active Badge ================= */
-
-.emp-active {
-    text-align: right;
-}
-
-.emp-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 950;
-    border: 1px solid transparent;
-    background: rgba(241,245,249,.9);
-    color: #0f172a;
-}
-
-    .emp-badge::before {
-        content: "";
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        background: #94a3b8;
-    }
-
-.emp-on {
-    background: rgba(16,185,129,.10);
-    border-color: rgba(16,185,129,.22);
-    color: #065f46;
-}
-
-    .emp-on::before {
-        background: #22c55e;
-    }
-
-.emp-off {
-    background: rgba(239,68,68,.10);
-    border-color: rgba(239,68,68,.20);
-    color: #991b1b;
-}
-
-    .emp-off::before {
-        background: #ef4444;
-    }
-
-.emp-rank {
-    font-weight: 900;
-    color: #1e293b;
-}
-
-.emp-salary {
-    font-weight: 900;
-    color: #065f46;
-}
-
-/* ===== Top bar ===== */
 
 .emp-topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 16px;
+    box-shadow: var(--emp-shadow);
 }
 
 .emp-title-center {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 950;
-    color: #0f172a;
+    color: var(--emp-text);
     margin: 0;
 }
 
-/* زر إضافة */
-
 .emp-add-btn {
-    background: #2563eb;
+    background: var(--emp-primary);
     color: white;
     border: 0;
-    padding: 10px 18px;
+    padding: 10px 22px;
     border-radius: 10px;
     font-weight: 900;
     cursor: pointer;
+    transition: 0.3s ease;
 }
 
     .emp-add-btn:hover {
         background: #1e40af;
+        transform: translateY(-2px);
     }
 
-/* ===== Actions ===== */
+/* ================= Table Styling ================= */
+.emp-card {
+    background: var(--emp-card-solid);
+    border-radius: 16px;
+    box-shadow: var(--emp-shadow);
+    overflow: hidden;
+    border: 1px solid var(--emp-line);
+}
+
+.emp-table-wrap {
+    width: 100%;
+    overflow: auto;
+}
+
+.emp-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 860px;
+}
+
+    .emp-table thead th {
+        background: #f8fafc;
+        color: var(--emp-muted);
+        font-size: 13px;
+        font-weight: 950;
+        padding: 18px 20px;
+        text-align: right;
+        border-bottom: 2px solid var(--emp-line);
+    }
+
+    .emp-table tbody tr {
+        border-bottom: 1px solid var(--emp-line);
+        transition: background 0.2s ease;
+    }
+
+        .emp-table tbody tr:nth-child(even) {
+            background: #f8fafc; /* رصاصي خفيف */
+        }
+
+        .emp-table tbody tr:nth-child(odd) {
+            background: #ffffff; /* أبيض */
+        }
+
+        .emp-table tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+    .emp-table tbody td {
+        padding: 16px 20px;
+        font-weight: 800;
+        color: var(--emp-text);
+        vertical-align: middle;
+    }
+
+.emp-name {
+    color: #1e40af;
+    font-weight: 950 !important;
+}
+
+.emp-phone {
+    font-family: monospace;
+    color: #475569;
+}
+
+.emp-salary {
+    color: #059669;
+    font-weight: 950 !important;
+}
 
 .emp-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .emp-edit {
-    background: #3b82f6;
+    background: #2563eb;
     color: white;
     border: 0;
-    padding: 6px 12px;
+    padding: 8px 16px;
     border-radius: 8px;
     font-weight: 800;
     cursor: pointer;
 }
 
 .emp-delete {
-    background: #ef4444;
+    background: #dc2626;
     color: white;
     border: 0;
-    padding: 6px 12px;
+    padding: 8px 16px;
     border-radius: 8px;
     font-weight: 800;
     cursor: pointer;
 }
 
+/* ================= Badges ================= */
+.emp-badge {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.emp-on {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.emp-off {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ================= Overlay & Dialog Box ================= */
 .emp-dialog-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.45);
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 9999;
+    padding: 20px;
 }
 
 .emp-dialog-box {
     background: #fff;
     border-radius: 24px;
-    padding: 0;
-    width: 92%;
-    max-width: 460px;
-    box-shadow: 0 20px 40px rgba(0,0,0,.2);
-    overflow: hidden;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: empPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes empPop {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .emp-dialog-top-image {
     width: 100%;
-    height: 110px;
-    overflow: hidden;
-    border-bottom: 1px solid #e2e8f0;
+    height: 120px;
+    background: #f1f5f9;
 }
 
     .emp-dialog-top-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
     }
 
 .emp-dialog-body {
-    padding: 22px;
+    padding: 25px;
 }
 
-.emp-dialog-box h3 {
-    font-size: 18px;
-    font-weight: 900;
-    text-align: center;
-    margin-bottom: 18px;
+/* ================= Inputs & Labels ================= */
+.emp-field {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.emp-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.emp-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #94a3b8;
+    margin-right: 5px;
+    text-transform: uppercase;
 }
 
 .emp-input {
     width: 100%;
     padding: 12px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid #e2e8f0;
-    margin-bottom: 10px;
-    direction: rtl;
+    font-weight: 700;
+    background: #fff;
+    color: #1e293b;
 }
 
-.emp-dialog-actions {
+    .emp-input:focus {
+        border-color: var(--emp-primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+/* ================= التعديل: نظام أزرار الحالة (بديل السويتش) ================= */
+.emp-status-container {
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.emp-status-buttons {
     display: flex;
-    gap: 8px;
-    margin-top: 6px;
+    gap: 12px;
 }
 
-.emp-save {
+.status-btn {
     flex: 1;
-    background: #2563eb;
-    color: #fff;
-    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s;
+    color: #64748b;
+}
+
+    .status-btn.active-selected {
+        border-color: #22c55e;
+        background: #f0fdf4;
+        color: #166534;
+    }
+
+    .status-btn.inactive-selected {
+        border-color: #ef4444;
+        background: #fef2f2;
+        color: #991b1b;
+    }
+
+/* ================= Dialog Actions ================= */
+.emp-dialog-actions, .emp-dialog-actions-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.emp-save, .btn-save-edit {
+    flex: 2;
+    background: var(--emp-primary);
+    color: white;
+    border: 0;
     padding: 12px;
     border-radius: 12px;
     font-weight: 900;
+    cursor: pointer;
 }
 
-.emp-cancel {
+.emp-cancel, .btn-cancel-edit {
     flex: 1;
-    background: #64748b;
-    color: #fff;
-    border: none;
+    background: #f1f5f9;
+    color: #475569;
+    border: 0;
     padding: 12px;
     border-radius: 12px;
     font-weight: 900;
+    cursor: pointer;
 }
 
-.emp-delete-dialog-box {
-    max-width: 430px;
-    overflow: hidden;
-}
-
-.emp-delete-top-image {
-    height: 95px;
-}
-
-.emp-delete-dialog-body {
-    text-align: center;
-    padding-top: 18px;
-}
-
+/* ================= Delete Dialog Specific ================= */
 .emp-delete-icon-wrap {
     display: flex;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .emp-delete-icon {
-    width: 62px;
-    height: 62px;
+    width: 60px;
+    height: 60px;
+    background: #fee2e2;
+    color: #ef4444;
     border-radius: 50%;
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
-    color: #dc2626;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 30px;
-    font-weight: 900;
-    box-shadow: 0 10px 24px rgba(220,38,38,.18);
+    font-weight: bold;
 }
 
 .emp-delete-title {
-    margin: 0 0 8px;
-    font-size: 24px;
+    text-align: center;
+    color: #991b1b;
     font-weight: 950;
-    color: #0f172a;
+    font-size: 22px;
 }
 
 .emp-delete-text {
-    margin: 0 0 18px;
-    font-size: 14px;
-    font-weight: 700;
+    text-align: center;
     color: #64748b;
+    font-size: 14px;
+    margin-bottom: 20px;
 }
 
 .emp-delete-confirm {
-    flex: 1;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
-    border: none;
+    flex: 2;
+    background: #dc2626;
+    color: white;
+    border: 0;
     padding: 12px;
     border-radius: 12px;
     font-weight: 900;
-    box-shadow: 0 10px 20px rgba(239,68,68,.18);
+    cursor: pointer;
 }
 
-/* ================= Responsive ================= */
-
-@media (max-width: 900px) {
-    .emp-page {
-        padding: 16px;
-    }
-
-    .emp-title {
-        font-size: 24px;
-    }
-
-    .emp-table-wrap {
-        padding: 10px;
-    }
-}
-/* update actvite */
-
-.emp-active {
-    text-align: right;
+/* ================= Toast Notification ================= */
+.emp-toast-container {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
 }
 
-.emp-badge {
-    display: inline-flex;
+.emp-toast {
+    min-width: 320px;
+    padding: 16px 25px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 7px 12px;
-    border-radius: 999px;
-    font-size: 12px;
+    gap: 15px;
     font-weight: 950;
-    border: 1px solid transparent;
-    background: rgba(241,245,249,.9);
-    color: #0f172a;
+    border: 1px solid var(--emp-line);
+    animation: toastIn 0.4s ease;
 }
 
-    .emp-badge::before {
-        content: "";
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        background: #94a3b8;
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
     }
 
-.emp-on {
-    background: rgba(16,185,129,.10);
-    border-color: rgba(16,185,129,.22);
-    color: #065f46;
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-    .emp-on::before {
-        background: #22c55e;
-    }
+.emp-toast.success {
+    border-right: 6px solid #22c55e;
+    color: #166534;
+}
 
-.emp-off {
-    background: rgba(239,68,68,.10);
-    border-color: rgba(239,68,68,.20);
+.emp-toast.error {
+    border-right: 6px solid #ef4444;
     color: #991b1b;
 }
 
-    .emp-off::before {
-        background: #ef4444;
-    }
-
-.emp-switch-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 14px 0 6px;
-}
-
-.emp-switch-label {
-    font-weight: 900;
-    color: #334155;
-}
-
-.emp-switch {
-    width: 74px;
-    height: 40px;
-    border: 0;
-    border-radius: 999px;
-    position: relative;
-    cursor: pointer;
-    transition: .2s ease;
-}
-
-    .emp-switch.is-on {
-        background: #22c55e;
-    }
-
-    .emp-switch.is-off {
-        background: #cbd5e1;
-    }
-
-.emp-switch-thumb {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 32px;
-    height: 32px;
-    background: #fff;
-    border-radius: 50%;
-    transition: .2s ease;
-}
-
-.emp-switch.is-on .emp-switch-thumb {
-    right: 38px;
-}
-
-.emp-msg {
-    padding: 10px 14px;
-    border-radius: 12px;
-    margin-bottom: 14px;
+/* ================= Messages & Errors ================= */
+.emp-error {
+    font-size: 11px;
+    color: #dc2626;
     font-weight: 800;
+    margin-top: 2px;
 }
 
-    .emp-msg.success {
-        background: #dcfce7;
-        color: #166534;
-    }
+.emp-input-error {
+    border-color: #ef4444 !important;
+}
 
-    .emp-msg.error {
-        background: #fee2e2;
-        color: #991b1b;
+@media (max-width: 600px) {
+    .emp-field-row {
+        grid-template-columns: 1fr;
     }
+}
