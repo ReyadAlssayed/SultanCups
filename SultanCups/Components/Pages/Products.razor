@@ -4,10 +4,8 @@
 <div class="prod-page">
 
     <div class="prod-topbar">
-        <button class="prod-btn prod-btn-add">إضافة منتج</button>
-
+        <button class="prod-btn prod-btn-add" @onclick="OpenAddDialog">إضافة منتج</button>
         <h2 class="prod-title">المنتجات</h2>
-
         <div></div>
     </div>
 
@@ -22,16 +20,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var p in Product)
+                    @foreach (var p in ProductList)
                     {
                         <tr>
                             <td class="prod-code">@p.productId</td>
                             <td class="prod-name">@p.name</td>
 
                             <td class="prod-actions-cell">
-                                <button class="prod-small prod-view">عرض</button>
-                                <button class="prod-small prod-edit">تعديل</button>
-                                <button class="prod-small prod-del">حذف</button>
+                                <button class="prod-small prod-edit" @onclick="() => OpenEditDialog(p)">تعديل</button>
+                                <button class="prod-small prod-del" @onclick="() => OpenDeleteDialog(p)">حذف</button>
                             </td>
                         </tr>
                     }
@@ -39,15 +36,101 @@
             </table>
         </div>
     </div>
-
 </div>
 
+@if (ShowAddDialog || ShowEditDialog)
+{
+    <div class="prod-dialog-overlay">
+        <div class="prod-dialog-box">
+            <div class="prod-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="prod-dialog-body">
+                <h3>@(ShowAddDialog ? "إضافة منتج جديد" : "تعديل المنتج")</h3>
+
+                <div class="prod-field">
+                    <label class="prod-label">اسم المنتج</label>
+                    <input class="prod-input" @bind="ProductForm.name" />
+                </div>
+
+                <div class="prod-dialog-actions">
+                    <button type="button" class="prod-save">حفظ</button>
+                    <button type="button" class="prod-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowDeleteDialog)
+{
+    <div class="prod-dialog-overlay">
+        <div class="prod-dialog-box prod-delete-dialog-box">
+            <div class="prod-dialog-top-image prod-delete-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+
+            <div class="prod-dialog-body prod-delete-dialog-body">
+                <div class="prod-delete-icon-wrap">
+                    <div class="prod-delete-icon">!</div>
+                </div>
+
+                <h3 class="prod-delete-title">تأكيد الحذف</h3>
+                <p class="prod-delete-text">هل تريد حذف المنتج "@ProductForm.name" نهائيًا؟</p>
+
+                <div class="prod-dialog-actions">
+                    <button type="button" class="prod-delete-confirm">حذف</button>
+                    <button type="button" class="prod-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
-    List<(int productId, string name)> Product = new()
+    List<ProductRow> ProductList = new()
     {
-        (1, "كوب كبير 6"),
-        (2, "كوب صغير 2.5"),
-        (3, "أكواب 200ml"),
-        (4, "أكواب 300ml")
+        new() { productId = 1, name = "كوب كبير 6" },
+        new() { productId = 2, name = "كوب صغير 2.5" },
+        new() { productId = 3, name = "أكواب 200ml" },
+        new() { productId = 4, name = "أكواب 300ml" }
     };
+
+    bool ShowAddDialog = false;
+    bool ShowEditDialog = false;
+    bool ShowDeleteDialog = false;
+
+    ProductRow ProductForm = new();
+
+    void OpenAddDialog()
+    {
+        ProductForm = new ProductRow();
+        ShowAddDialog = true;
+    }
+
+    void OpenEditDialog(ProductRow p)
+    {
+        ProductForm = new ProductRow { productId = p.productId, name = p.name };
+        ShowEditDialog = true;
+    }
+
+    void OpenDeleteDialog(ProductRow p)
+    {
+        ProductForm = new ProductRow { productId = p.productId, name = p.name };
+        ShowDeleteDialog = true;
+    }
+
+    void CloseDialogs()
+    {
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowDeleteDialog = false;
+    }
+
+    public class ProductRow
+    {
+        public int productId { get; set; }
+        public string name { get; set; } = "";
+    }
 }

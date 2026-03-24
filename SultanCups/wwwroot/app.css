@@ -294,64 +294,62 @@ body {
 .app-topbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    padding: 14px 16px;
-    background: rgba(255,255,255,.92);
+    justify-content: space-between; /* هذا يضع الاسم في طرف والساعة في طرف */
+    padding: 15px 25px;
+    background: rgba(255, 255, 255, 0.95);
     border-bottom: 1px solid var(--line);
 }
 
 .top-user {
     display: flex;
     align-items: center;
-    gap: 7px; 
-    font-weight: 900;
-    color: #18335c;
-    font-size: 30px;
+    min-width: 150px;
 }
 
-.top-user-name {
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-name {
+    font-size: 19px;
+    font-weight: 900;
+    color: #1e293b;
+}
+
+.user-status {
+    font-size: 11px;
+    font-weight: 800;
+    color: #10b981;
+    background: #ecfdf5;
+    padding: 2px 10px;
+    border-radius: 8px;
+    border: 1px solid #d1fae5;
+}
+
+.top-datetime {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* يجعل الساعة محاذية لجهة اليسار */
+    text-align: left;
+}
+
+.time-display {
+    font-size: 21px;
+    font-weight: 900;
+    color: #2563eb;
+    font-variant-numeric: tabular-nums;
     line-height: 1;
 }
 
-.user-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #22c55e;
+.date-display {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    margin-top: 4px;
 }
 
-.top-search {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-}
-
-    .top-search input {
-        width: 100%;
-        max-width: 640px;
-        padding: 11px 16px;
-        border-radius: 14px;
-        border: 1px solid #dbe6ff;
-        background: #ffffff;
-        outline: none;
-        box-shadow: 0 10px 18px rgba(2,6,23,.06);
-    }
-
-.top-logo {
-    min-width: 300px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    overflow: visible;
-}
-
-    .top-logo svg {
-        width: 260px;
-        height: 52px;
-        display: block;
-        overflow: visible;
-    }
 /* ================== Responsive ================== */
 
 @media (max-width: 740px) {

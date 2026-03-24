@@ -1,0 +1,183 @@
+﻿/* ================= CSS الموحد للنظام ================= */
+
+/* 1. الحاوية والتنسيق العام */
+.rm-page, .inv-page {
+    padding: 26px;
+    direction: rtl;
+}
+
+.rm-topbar, .inv-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.rm-title-center, .inv-title {
+    font-size: 28px;
+    font-weight: 950;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* 2. الجدول والبطاقة */
+.rm-card, .inv-card {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 22px;
+    box-shadow: 0 28px 70px rgba(2, 6, 23, 0.1);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+}
+
+.rm-table-wrap, .inv-table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 14px;
+}
+
+.rm-table, .inv-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+    .rm-table thead th, .inv-table thead th {
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 950;
+        padding: 12px 16px;
+        text-align: right;
+    }
+
+    .rm-table tbody td, .inv-table tbody td {
+        background: white;
+        border-top: 1px solid rgba(226, 232, 240, 0.85);
+        padding: 14px 16px;
+        font-weight: 800;
+    }
+
+/* 3. الحقول داخل المربعات الحوارية (نظام الشبكة) */
+.rm-dialog-body, .inv-dialog-body {
+    padding: 20px;
+}
+
+/* هنا السر في جعل الحقول حقلين في كل سطر */
+.rm-fields-grid, .inv-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* إذا أردت حقلاً يأخذ السطر كاملاً */
+.full-width {
+    grid-column: span 2;
+}
+
+.rm-field, .inv-field {
+    margin-bottom: 5px;
+}
+
+.rm-label, .inv-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 900;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.rm-input, .inv-input-dialog {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    font-weight: 800;
+    background: #f8fafc;
+    outline: none;
+}
+
+/* 4. نوافذ الحوار (Overlay & Box) */
+.rm-dialog-overlay, .inv-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(2px);
+}
+
+.rm-dialog-box, .inv-dialog-box {
+    background: white;
+    border-radius: 24px;
+    width: 92%;
+    max-width: 600px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+/* 5. تنسيق نافذة الحذف */
+.rm-delete-top-image, .inv-delete-top-image {
+    background: #fee2e2;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rm-delete-icon, .inv-delete-icon {
+    width: 70px;
+    height: 70px;
+    background: white;
+    color: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
+    border: 4px solid #fca5a5;
+}
+
+.rm-delete-confirm, .inv-delete-confirm {
+    flex: 1;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+/* 6. الأزرار العامة */
+.rm-save, .inv-save {
+    flex: 1;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.rm-cancel, .inv-cancel {
+    flex: 1;
+    background: #64748b;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+/* استجابة الجوال */
+@media (max-width: 600px) {
+    .rm-fields-grid, .inv-fields-grid {
+        grid-template-columns: 1fr;
+    }
+}

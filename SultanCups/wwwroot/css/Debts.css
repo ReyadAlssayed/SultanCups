@@ -1,15 +1,239 @@
-﻿/* 
-ملاحظة:
-هذا الكلاس خاص بعرض مبلغ الدين في صفحة الديون.
-تم استخدام اللون الأحمر (#ef4444) لتمييز الديون بصريًا عن الأموال المحصلة
-التي تظهر باللون الأخضر في النظام.
+﻿/* ================= Debts Page ================= */
+.inv-page {
+    padding: 26px;
+    direction: rtl;
+}
 
-تم الحفاظ على نفس نمط الكلاسات في النظام (inv-*)
-حتى يبقى التصميم موحد مع صفحات:
-الفواتير – تحصيل المبيعات – المالية.
-*/
+.inv-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
 
+.inv-title {
+    font-size: 28px;
+    font-weight: 950;
+    color: #0f172a;
+    margin: 0;
+}
+
+.inv-btn-add {
+    background: #2563eb;
+    color: #fff;
+    border: 0;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+/* ===== Card & Table ===== */
+.inv-card {
+    background: rgba(255,255,255,.75);
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 22px;
+    box-shadow: 0 28px 70px rgba(2,6,23,.10);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.inv-table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 14px;
+}
+
+.inv-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 800px;
+}
+
+    .inv-table thead th {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 950;
+        padding: 10px 16px;
+        text-align: right;
+    }
+
+    .inv-table tbody td {
+        background: #fff;
+        border-top: 1px solid rgba(226,232,240,.85);
+        border-bottom: 1px solid rgba(226,232,240,.85);
+        padding: 14px 16px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+        .inv-table tbody td + td {
+            border-right: 1px solid rgba(226,232,240,.6);
+        }
+
+.inv-code {
+    color: #0b2a66;
+    font-weight: 950;
+}
+
+.inv-money {
+    font-family: ui-monospace, monospace;
+}
+
+/* تمييز مبلغ الدين باللون الأحمر */
 .debt-amount {
     color: #ef4444;
     font-weight: 950;
+}
+
+.inv-muted {
+    color: #64748b;
+    font-weight: 800;
+}
+
+/* ===== Actions ===== */
+.inv-actions-cell {
+    display: flex;
+    gap: 8px;
+}
+
+.inv-small {
+    border: 0;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.inv-edit {
+    background: #0ea5e9;
+    color: #fff;
+}
+
+.inv-del {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* ===== Dialogs ===== */
+.inv-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.inv-dialog-box {
+    background: #fff;
+    border-radius: 24px;
+    width: 92%;
+    max-width: 480px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+    overflow: hidden;
+}
+
+.inv-dialog-top-image {
+    width: 100%;
+    height: 110px;
+    overflow: hidden;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+    .inv-dialog-top-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.inv-dialog-body {
+    padding: 22px;
+    text-align: right;
+}
+
+    .inv-dialog-body h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 950;
+    }
+
+.inv-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.inv-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 900;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.inv-input-dialog {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    font-weight: 800;
+    direction: rtl;
+}
+
+.inv-dialog-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.inv-save, .inv-cancel {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+}
+
+.inv-save {
+    background: #2563eb;
+    color: #fff;
+}
+
+.inv-cancel {
+    background: #64748b;
+    color: #fff;
+}
+
+/* ===== Delete Dialog ===== */
+.inv-delete-icon-wrap {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.inv-delete-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin: 0 auto;
+}
+
+.inv-delete-confirm {
+    flex: 1;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
 }

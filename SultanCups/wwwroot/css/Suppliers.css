@@ -1,0 +1,285 @@
+﻿/* ================= CSS الموحد للنظام (التنسيق النهائي) ================= */
+
+/* ----- التنسيق العام للصفحة ----- */
+.inv-page {
+    padding: 26px;
+    direction: rtl;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.inv-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.inv-title {
+    font-size: 28px;
+    font-weight: 950;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* ----- الزر الرئيسي لإضافة سجل ----- */
+.inv-btn-add {
+    background: #2563eb;
+    color: white;
+    border: 0;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+    .inv-btn-add:hover {
+        background: #1e40af;
+        transform: translateY(-1px);
+    }
+
+/* ----- البطاقة والجدول ----- */
+.inv-card {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 22px;
+    box-shadow: 0 28px 70px rgba(2, 6, 23, 0.1);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+}
+
+.inv-table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 14px;
+}
+
+.inv-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+    .inv-table thead th {
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 950;
+        padding: 12px 16px;
+        text-align: right;
+    }
+
+    .inv-table tbody td {
+        background: white;
+        border-top: 1px solid rgba(226, 232, 240, 0.85);
+        padding: 14px 16px;
+        font-weight: 800;
+    }
+
+.inv-code {
+    color: #0b2a66;
+    font-weight: 950;
+}
+
+.inv-money {
+    font-family: ui-monospace, monospace;
+}
+
+.inv-amount {
+    color: #22c55e;
+    font-weight: 950;
+}
+
+.inv-muted {
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* ----- أزرار الإجراءات داخل الجدول ----- */
+.inv-actions-cell {
+    display: flex;
+    gap: 8px;
+}
+
+.inv-small {
+    border: 0;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.inv-edit {
+    background: #0ea5e9;
+    color: white;
+}
+
+.inv-del {
+    background: #ef4444;
+    color: white;
+}
+
+/* ================= مربعات الحوار (Dialogs) ================= */
+
+.inv-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(2px);
+}
+
+.inv-dialog-box {
+    background: white;
+    border-radius: 24px;
+    width: 92%;
+    max-width: 600px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.inv-dialog-top-image {
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+    .inv-dialog-top-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.inv-dialog-body {
+    padding: 20px;
+}
+
+    .inv-dialog-body h3 {
+        text-align: center;
+        font-weight: 950;
+        margin-bottom: 20px;
+    }
+
+/* شبكة الحقول (حقلين في السطر) */
+.inv-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+.inv-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 900;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.inv-input-dialog {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    font-weight: 800;
+    background: #f8fafc;
+}
+
+/* أزرار التحكم في الحوار */
+.inv-dialog-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.inv-save {
+    flex: 1;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.inv-cancel {
+    flex: 1;
+    background: #64748b;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+/* ================= تنسيق خاص بمربع الحذف ================= */
+
+.inv-delete-top-image {
+    background: #fee2e2; /* أحمر خفيف خلف الأيقونة */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+}
+
+.inv-delete-icon {
+    width: 70px;
+    height: 70px;
+    background: white;
+    color: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
+    border: 4px solid #fca5a5;
+}
+
+.inv-delete-title {
+    text-align: center;
+    color: #b91c1c;
+    font-weight: 950;
+}
+
+.inv-delete-text {
+    text-align: center;
+    color: #475569;
+    font-weight: 800;
+    padding: 0 10px;
+}
+
+.inv-delete-confirm {
+    flex: 1;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+/* استجابة الجوال */
+@media (max-width: 600px) {
+    .inv-fields-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full-width {
+        grid-column: span 1;
+    }
+
+    .inv-dialog-box {
+        width: 95%;
+    }
+}

@@ -4,10 +4,8 @@
 <div class="inv-page">
 
     <div class="inv-topbar">
-        <button class="inv-btn inv-btn-add">إضافة فاتورة</button>
-
+        <button class="inv-btn inv-btn-add" @onclick="OpenAddDialog">إضافة فاتورة</button>
         <h2 class="inv-title">الطلبيات</h2>
-
         <div></div>
     </div>
 
@@ -23,14 +21,14 @@
                         <th>سعر الكرتونة</th>
                         <th>السعر الكلي</th>
                         <th>عمولة/كرتونة</th>
-                        <th>عمولة المسوق الكلية</th>
+                        <th>عمولة المسوق</th>
                         <th>التاريخ</th>
                         <th>ملاحظات</th>
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var o in Order)
+                    @foreach (var o in OrderList)
                     {
                         <tr>
                             <td class="inv-code">@o.orderNumber</td>
@@ -38,39 +36,137 @@
                             <td>@o.product</td>
                             <td class="inv-money">@o.boxCount</td>
                             <td class="inv-money">@Fmt(o.unitPrice)</td>
-
-                            <td class="inv-money inv-amount">540.00 د.ل</td>
-
+                            <td class="inv-money inv-amount">@Fmt(o.boxCount * o.unitPrice)</td>
                             <td class="inv-money">@Fmt(o.commPerBox)</td>
-
-                            <td class="inv-money inv-amount">60.00 د.ل</td>
-
+                            <td class="inv-money inv-amount">@Fmt(o.boxCount * o.commPerBox)</td>
                             <td class="inv-muted">@o.orderDate.ToString("yyyy-MM-dd")</td>
                             <td class="inv-muted">@o.notes</td>
-
                             <td class="inv-actions-cell">
-                                <button class="inv-small inv-view">تفاصيل</button>
-                                <button class="inv-small inv-edit">تعديل</button>
-                                <button class="inv-small inv-del">حذف</button>
+                                <button class="inv-small inv-edit" @onclick="() => OpenEditDialog(o)">تعديل</button>
+                                <button class="inv-small inv-del" @onclick="() => OpenDeleteDialog(o)">حذف</button>
                             </td>
                         </tr>
                     }
                 </tbody>
-
             </table>
         </div>
     </div>
-
 </div>
 
+@if (ShowAddDialog || ShowEditDialog)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box">
+            <div class="inv-dialog-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+            <div class="inv-dialog-body">
+                <h3>@(ShowAddDialog ? "إضافة طلبية جديدة" : "تعديل الطلبية")</h3>
+                
+                <div class="inv-fields-grid">
+                    <div class="inv-field">
+                        <label class="inv-label">رقم الفاتورة</label>
+                        <input class="inv-input-dialog" @bind="OrderForm.orderNumber" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">المسوق</label>
+                        <input class="inv-input-dialog" @bind="OrderForm.marketer" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">المنتج</label>
+                        <input class="inv-input-dialog" @bind="OrderForm.product" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">عدد الكراتين</label>
+                        <input class="inv-input-dialog" type="number" @bind="OrderForm.boxCount" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">سعر الكرتونة</label>
+                        <input class="inv-input-dialog" type="number" step="0.01" @bind="OrderForm.unitPrice" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">عمولة الكرتونة</label>
+                        <input class="inv-input-dialog" type="number" step="0.01" @bind="OrderForm.commPerBox" />
+                    </div>
+                    <div class="inv-field">
+                        <label class="inv-label">التاريخ</label>
+                        <input class="inv-input-dialog" type="date" @bind="OrderForm.orderDate" />
+                    </div>
+                    <div class="inv-field full-width">
+                        <label class="inv-label">ملاحظات</label>
+                        <textarea class="inv-input-dialog" @bind="OrderForm.notes"></textarea>
+                    </div>
+                </div>
+
+                <div class="inv-dialog-actions">
+                    <button type="button" class="inv-save">حفظ</button>
+                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowDeleteDialog)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box inv-delete-dialog-box">
+            <div class="inv-dialog-top-image inv-delete-top-image">
+                <img src="images/Background.jpg" />
+            </div>
+            <div class="inv-dialog-body inv-delete-dialog-body">
+                <div class="inv-delete-icon-wrap"><div class="inv-delete-icon">!</div></div>
+                <h3 class="inv-delete-title">تأكيد الحذف</h3>
+                <p class="inv-delete-text">هل تريد حذف الفاتورة "@OrderForm.orderNumber" نهائيًا؟</p>
+                <div class="inv-dialog-actions">
+                    <button type="button" class="inv-delete-confirm">حذف</button>
+                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
-    // بيانات تدريبية فقط (Tuples) - بدون كلاس
-    List<(string orderNumber, string marketer, string product, int boxCount, decimal unitPrice, decimal commPerBox, DateTime orderDate, string notes)> Order = new()
+    List<OrderRow> OrderList = new()
     {
-        ("INV-1001","محمد سالم","أكواب 200ml",30,18m,2m,new DateTime(2026,3,5),"طلبية زليتن"),
-        ("INV-1002","علي مفتاح","أكواب 300ml",20,20m,3m,new DateTime(2026,3,4),"توصيل مصراتة"),
-        ("INV-1003","سالم رمضان","أكواب 200ml",15,18m,2.5m,new DateTime(2026,3,3),"مستعجل"),
+        new() { orderNumber = "INV-1001", marketer = "محمد سالم", product = "أكواب 200ml", boxCount = 30, unitPrice = 18m, commPerBox = 2m, orderDate = new DateTime(2026,3,5), notes = "طلبية زليتن" },
+        new() { orderNumber = "INV-1002", marketer = "علي مفتاح", product = "أكواب 300ml", boxCount = 20, unitPrice = 20m, commPerBox = 3m, orderDate = new DateTime(2026,3,4), notes = "توصيل مصراتة" }
     };
 
+    bool ShowAddDialog, ShowEditDialog, ShowDeleteDialog;
+    OrderRow OrderForm = new();
+
     string Fmt(decimal v) => $"{v:0.00} د.ل";
+
+    void OpenAddDialog() { OrderForm = new OrderRow { orderDate = DateTime.Now }; ShowAddDialog = true; }
+    void OpenEditDialog(OrderRow o)
+    {
+        OrderForm = new OrderRow
+        {
+            orderNumber = o.orderNumber,
+            marketer = o.marketer,
+            product = o.product,
+            boxCount = o.boxCount,
+            unitPrice = o.unitPrice,
+            commPerBox = o.commPerBox,
+            orderDate = o.orderDate,
+            notes = o.notes
+        };
+        ShowEditDialog = true;
+    }
+    void OpenDeleteDialog(OrderRow o) { OrderForm = o; ShowDeleteDialog = true; }
+    void CloseDialogs() => ShowAddDialog = ShowEditDialog = ShowDeleteDialog = false;
+
+    public class OrderRow
+    {
+        public string orderNumber { get; set; } = "";
+        public string marketer { get; set; } = "";
+        public string product { get; set; } = "";
+        public int boxCount { get; set; }
+        public decimal unitPrice { get; set; }
+        public decimal commPerBox { get; set; }
+        public DateTime orderDate { get; set; }
+        public string notes { get; set; } = "";
+    }
 }

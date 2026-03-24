@@ -1,11 +1,8 @@
 ﻿/* ================= Page ================= */
-
 .prod-page {
     padding: 26px;
     direction: rtl;
 }
-
-/* ===== Topbar ===== */
 
 .prod-topbar {
     display: flex;
@@ -23,7 +20,6 @@
 }
 
 /* ===== Buttons ===== */
-
 .prod-btn {
     border: 0;
     padding: 10px 16px;
@@ -42,7 +38,6 @@
     }
 
 /* ===== Card ===== */
-
 .prod-card {
     background: rgba(255,255,255,.75);
     border: 1px solid rgba(255,255,255,.55);
@@ -53,7 +48,6 @@
 }
 
 /* ===== Table ===== */
-
 .prod-table-wrap {
     width: 100%;
     overflow: auto;
@@ -63,7 +57,7 @@
 .prod-table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 10px;
+    border-spacing: 0; /* تم إزالة الفراغ 10px */
     min-width: 700px;
 }
 
@@ -81,7 +75,7 @@
         border-top: 1px solid rgba(226,232,240,.85);
         border-bottom: 1px solid rgba(226,232,240,.85);
         padding: 14px 16px;
-        font-weight: 900;
+        font-weight: 800; /* تخفيف الخط قليلاً */
         white-space: nowrap;
     }
 
@@ -90,7 +84,6 @@
         }
 
 /* ===== Columns ===== */
-
 .prod-code {
     color: #0b2a66;
     font-weight: 950;
@@ -99,15 +92,13 @@
 
 .prod-name {
     color: #0f172a;
-    font-weight: 950;
+    font-weight: 800;
 }
 
 /* ===== Actions ===== */
-
 .prod-actions-cell {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
 }
 
 .prod-small {
@@ -116,11 +107,6 @@
     border-radius: 10px;
     font-weight: 900;
     cursor: pointer;
-}
-
-.prod-view {
-    background: #3b82f6;
-    color: #fff;
 }
 
 .prod-edit {
@@ -133,22 +119,133 @@
     color: #fff;
 }
 
-/* ===== Responsive ===== */
+/* ===== Dialogs ===== */
+.prod-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
 
-@media (max-width: 768px) {
-    .prod-page {
-        padding: 16px;
+.prod-dialog-box {
+    background: #fff;
+    border-radius: 24px;
+    width: 92%;
+    max-width: 460px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+    overflow: hidden;
+}
+
+.prod-dialog-top-image {
+    width: 100%;
+    height: 110px;
+    overflow: hidden;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+    .prod-dialog-top-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
     }
 
+.prod-dialog-body {
+    padding: 22px;
+    text-align: right; /* العناوين لليمين */
+}
+
+    .prod-dialog-body h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 900;
+    }
+
+.prod-field {
+    margin-bottom: 15px;
+}
+
+.prod-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 900;
+    color: #64748b;
+    margin-bottom: 5px;
+}
+
+.prod-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    direction: rtl;
+}
+
+.prod-dialog-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.prod-save, .prod-cancel {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+}
+
+.prod-save {
+    background: #2563eb;
+    color: #fff;
+}
+
+.prod-cancel {
+    background: #64748b;
+    color: #fff;
+}
+
+/* ===== Delete Dialog ===== */
+.prod-delete-icon-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.prod-delete-icon {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin: 0 auto;
+}
+
+.prod-delete-confirm {
+    flex: 1;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
     .prod-title {
         font-size: 22px;
     }
 
-    .prod-btn {
-        padding: 9px 14px;
-    }
-
     .prod-table {
-        min-width: 620px;
+        min-width: 500px;
     }
 }
