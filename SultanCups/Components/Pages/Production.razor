@@ -1,10 +1,11 @@
 ﻿@page "/production"
 @layout Layout.MainLayout
+@inject SultanCups.Services.InventoryService InventoryService
 
 <div class="pro-page">
 
     <div class="pro-topbar">
-        <button class="pro-btn pro-btn-add" @onclick="OpenAddDialog">إضافة إنتاج</button>
+        <button type="button" class="pro-btn pro-btn-add" @onclick="OpenAddDialog">إضافة إنتاج</button>
         <h2 class="pro-title">الإنتاج</h2>
         <div></div>
     </div>
@@ -24,21 +25,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var p in ProductionList)
+                    @if (ProductionList is null)
                     {
                         <tr>
-                            <td class="pro-code">@p.productionId</td>
-                            <td class="pro-name">@p.productName</td>
-                            <td class="pro-money">@p.boxCount</td>
-                            <td class="pro-money">@Fmt(p.boxCost)</td>
-                            <td class="pro-money pro-total">@Fmt(p.boxCount * p.boxCost)</td>
-                            <td class="pro-muted">@p.productionDate.ToString("yyyy-MM-dd")</td>
-
-                            <td class="pro-actions-cell">
-                                <button class="pro-small pro-edit" @onclick="() => OpenEditDialog(p)">تعديل</button>
-                                <button class="pro-small pro-del" @onclick="() => OpenDeleteDialog(p)">حذف</button>
-                            </td>
+                            <td colspan="7">جاري التحميل...</td>
                         </tr>
+                    }
+                    else if (ProductionList.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7">لا توجد بيانات</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var p in ProductionList)
+                        {
+                            <tr>
+                                <td class="pro-code">@p.production_id</td>
+                                <td class="pro-name">@p.Product.name</td>
+                                <td class="pro-money">@p.box_count</td>
+                                <td class="pro-money">@Fmt(p.box_cost)</td>
+                                <td class="pro-money pro-total">@Fmt(p.total_cost)</td>
+                                <td class="pro-muted">@p.production_date.ToString("yyyy-MM-dd")</td>
+
+                                <td class="pro-actions-cell">
+                                    <button type="button" class="pro-small pro-edit" @onclick="() => OpenEditDialog(p)">تعديل</button>
+                                    <button type="button" class="pro-small pro-del" @onclick="() => OpenDeleteDialog(p)">حذف</button>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
@@ -60,27 +76,33 @@
                 <div class="pro-fields-grid">
                     <div class="pro-field">
                         <label class="pro-label">المنتج</label>
-                        <input class="pro-input" @bind="ProForm.productName" />
+                        <select class="pro-input" @bind="ProForm.product_id">
+                            <option value="0">اختر المنتج</option>
+                            @foreach (var product in ProductList)
+                            {
+                                <option value="@product.product_id">@product.name</option>
+                            }
+                        </select>
                     </div>
 
                     <div class="pro-field">
                         <label class="pro-label">عدد الكراتين</label>
-                        <input class="pro-input" type="number" @bind="ProForm.boxCount" />
+                        <input class="pro-input" type="number" @bind="ProForm.box_count" />
                     </div>
 
                     <div class="pro-field">
                         <label class="pro-label">تكلفة الكرتونة (د.ل)</label>
-                        <input class="pro-input" type="number" step="0.01" @bind="ProForm.boxCost" />
+                        <input class="pro-input" type="number" step="0.01" @bind="ProForm.box_cost" />
                     </div>
 
                     <div class="pro-field">
                         <label class="pro-label">التاريخ</label>
-                        <input class="pro-input" type="date" @bind="ProForm.productionDate" />
+                        <input class="pro-input" type="date" @bind="ProForm.production_date" />
                     </div>
                 </div>
 
                 <div class="pro-dialog-actions">
-                    <button type="button" class="pro-save">حفظ</button>
+                    <button type="button" class="pro-save" @onclick="SaveProduction">حفظ</button>
                     <button type="button" class="pro-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
             </div>
@@ -102,10 +124,10 @@
                 </div>
 
                 <h3 class="pro-delete-title">تأكيد الحذف</h3>
-                <p class="pro-delete-text">هل تريد حذف سجل إنتاج "@ProForm.productName"؟</p>
+                <p class="pro-delete-text">هل تريد حذف سجل إنتاج "@DeleteProductName"؟</p>
 
                 <div class="pro-dialog-actions">
-                    <button type="button" class="pro-delete-confirm">حذف</button>
+                    <button type="button" class="pro-delete-confirm" @onclick="ConfirmDelete">حذف</button>
                     <button type="button" class="pro-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
             </div>
@@ -114,57 +136,95 @@
 }
 
 @code {
-    List<ProductionRow> ProductionList = new()
-    {
-        new() { productionId = 1, productName = "كوب كبير 6", boxCount = 50, boxCost = 3.00m, productionDate = new DateTime(2026, 3, 7) },
-        new() { productionId = 2, productName = "كوب صغير 2.5", boxCount = 40, boxCost = 2.20m, productionDate = new DateTime(2026, 3, 6) },
-        new() { productionId = 3, productName = "أكواب 200ml", boxCount = 30, boxCost = 2.80m, productionDate = new DateTime(2026, 3, 5) }
-    };
+    List<SultanCups.Models.Production>? ProductionList;
+    List<SultanCups.Models.Product> ProductList = new();
 
     bool ShowAddDialog = false;
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
 
-    ProductionRow ProForm = new();
+    SultanCups.Models.Production ProForm = new();
+    string DeleteProductName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductionList = await InventoryService.GetProduction();
+        ProductList = await InventoryService.GetProducts();
+    }
 
     string Fmt(decimal v) => $"{v:0.00} د.ل";
 
     void OpenAddDialog()
     {
-        ProForm = new ProductionRow { productionDate = DateTime.Now };
+        CloseDialogs();
+        ProForm = new SultanCups.Models.Production
+        {
+            production_date = DateTime.Today
+        };
         ShowAddDialog = true;
     }
 
-    void OpenEditDialog(ProductionRow p)
+    void OpenEditDialog(SultanCups.Models.Production p)
     {
-        ProForm = new ProductionRow
+        CloseDialogs();
+
+        ProForm = new SultanCups.Models.Production
         {
-            productionId = p.productionId,
-            productName = p.productName,
-            boxCount = p.boxCount,
-            boxCost = p.boxCost,
-            productionDate = p.productionDate
+            production_id = p.production_id,
+            product_id = p.product_id,
+            box_count = p.box_count,
+            box_cost = p.box_cost,
+            production_date = p.production_date
         };
+
         ShowEditDialog = true;
     }
 
-    void OpenDeleteDialog(ProductionRow p)
+    void OpenDeleteDialog(SultanCups.Models.Production p)
     {
-        ProForm = p;
+        CloseDialogs();
+
+        ProForm = new SultanCups.Models.Production
+        {
+            production_id = p.production_id,
+            product_id = p.product_id,
+            box_count = p.box_count,
+            box_cost = p.box_cost,
+            production_date = p.production_date
+        };
+
+        DeleteProductName = p.Product.name;
         ShowDeleteDialog = true;
+    }
+
+    async Task SaveProduction()
+    {
+        if (ShowAddDialog)
+        {
+            await InventoryService.AddProduction(ProForm);
+        }
+        else
+        {
+            await InventoryService.UpdateProduction(ProForm);
+        }
+
+        ProductionList = await InventoryService.GetProduction();
+        CloseDialogs();
+    }
+
+    async Task ConfirmDelete()
+    {
+        await InventoryService.DeleteProduction(ProForm.production_id);
+        ProductionList = await InventoryService.GetProduction();
+        CloseDialogs();
     }
 
     void CloseDialogs()
     {
-        ShowAddDialog = ShowEditDialog = ShowDeleteDialog = false;
-    }
-
-    public class ProductionRow
-    {
-        public int productionId { get; set; }
-        public string productName { get; set; } = "";
-        public int boxCount { get; set; }
-        public decimal boxCost { get; set; }
-        public DateTime productionDate { get; set; }
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowDeleteDialog = false;
+        ProForm = new SultanCups.Models.Production();
+        DeleteProductName = "";
     }
 }
