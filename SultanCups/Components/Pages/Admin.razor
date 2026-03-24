@@ -76,7 +76,7 @@
         <div class="ad-dialog-box">
 
             <div class="ad-dialog-top-image">
-                <img src="images/Background.jpg" />
+                <img src="images/Background.png" />
             </div>
 
             <div class="ad-dialog-body">
@@ -163,7 +163,7 @@
         <div class="ad-dialog-box ad-delete-dialog-box">
 
             <div class="ad-dialog-top-image ad-delete-top-image">
-                <img src="images/background.jpg" />
+                <img src="images/background.png" />
             </div>
 
             <div class="ad-dialog-body ad-delete-dialog-body">
@@ -249,7 +249,11 @@
             FullNameError = "الاسم الكامل مطلوب";
             hasError = true;
         }
-      
+        else if (!name.All(c => char.IsLetter(c) || c == ' '))
+        {
+            FullNameError = "الاسم يجب أن يحتوي على حروف فقط";
+            hasError = true;
+        }
 
         // username
         if (string.IsNullOrWhiteSpace(username))
@@ -257,7 +261,16 @@
             UsernameError = "اسم المستخدم مطلوب";
             hasError = true;
         }
-
+        else if (!username.Any(char.IsLetter))
+        {
+            UsernameError = "يجب أن يحتوي على حرف واحد على الأقل";
+            hasError = true;
+        }
+        else if (!username.All(char.IsLetterOrDigit))
+        {
+            UsernameError = "مسموح فقط حروف وأرقام";
+            hasError = true;
+        }
 
         // phone
         if (string.IsNullOrWhiteSpace(phone))

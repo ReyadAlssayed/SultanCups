@@ -74,6 +74,14 @@
         transition: background 0.2s ease;
     }
 
+        .ad-table tbody tr:nth-child(even) {
+            background: #f8fafc; /* رصاصي خفيف */
+        }
+
+        .ad-table tbody tr:nth-child(odd) {
+            background: #ffffff; /* أبيض */
+        }
+
         .ad-table tbody tr:hover {
             background: #f1f5f9;
         }
