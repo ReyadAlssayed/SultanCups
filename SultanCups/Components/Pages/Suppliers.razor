@@ -1,9 +1,10 @@
 ﻿@page "/Suppliers"
 @layout Layout.MainLayout
+@inject SultanCups.Services.InventoryService InventoryService
 
 <div class="inv-page">
     <div class="inv-topbar">
-        <button class="inv-btn inv-btn-add" @onclick="OpenAddDialog">إضافة مورد</button>
+        <button type="button" class="inv-btn inv-btn-add" @onclick="OpenAddDialog">إضافة مورد</button>
         <h2 class="inv-title">إدارة الموردين</h2>
         <div></div>
     </div>
@@ -21,18 +22,33 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var s in SuppliersList)
+                    @if (SuppliersList is null)
                     {
                         <tr>
-                            <td class="inv-code">@s.Name</td>
-                            <td>@s.Phone</td>
-                            <td>@s.Location</td>
-                            <td class="inv-muted">@s.Email</td>
-                            <td class="inv-actions-cell">
-                                <button class="inv-small inv-edit" @onclick="() => OpenEditDialog(s)">تعديل</button>
-                                <button class="inv-small inv-del" @onclick="() => OpenDeleteDialog(s)">حذف</button>
-                            </td>
+                            <td colspan="5">جاري التحميل...</td>
                         </tr>
+                    }
+                    else if (SuppliersList.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="5">لا توجد بيانات</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var s in SuppliersList)
+                        {
+                            <tr>
+                                <td class="inv-code">@s.name</td>
+                                <td>@s.phone</td>
+                                <td>@s.location</td>
+                                <td class="inv-muted">@s.email</td>
+                                <td class="inv-actions-cell">
+                                    <button type="button" class="inv-small inv-edit" @onclick="() => OpenEditDialog(s)">تعديل</button>
+                                    <button type="button" class="inv-small inv-del" @onclick="() => OpenDeleteDialog(s)">حذف</button>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
@@ -40,7 +56,6 @@
     </div>
 </div>
 
-@* --- نافذة الإضافة والتعديل --- *@
 @if (ShowAddDialog || ShowEditDialog)
 {
     <div class="inv-dialog-overlay">
@@ -53,23 +68,23 @@
                 <div class="inv-fields-grid">
                     <div class="inv-field">
                         <label class="inv-label">اسم المورد</label>
-                        <input class="inv-input-dialog" @bind="SupplierForm.Name" />
+                        <input class="inv-input-dialog" @bind="SupplierForm.name" />
                     </div>
                     <div class="inv-field">
                         <label class="inv-label">رقم الهاتف</label>
-                        <input class="inv-input-dialog" @bind="SupplierForm.Phone" />
+                        <input class="inv-input-dialog" @bind="SupplierForm.phone" />
                     </div>
                     <div class="inv-field">
                         <label class="inv-label">البريد الإلكتروني</label>
-                        <input class="inv-input-dialog" @bind="SupplierForm.Email" />
+                        <input class="inv-input-dialog" @bind="SupplierForm.email" />
                     </div>
                     <div class="inv-field full-width">
                         <label class="inv-label">الموقع / العنوان</label>
-                        <input class="inv-input-dialog" @bind="SupplierForm.Location" />
+                        <input class="inv-input-dialog" @bind="SupplierForm.location" />
                     </div>
                 </div>
                 <div class="inv-dialog-actions">
-                    <button type="button" class="inv-save">حفظ</button>
+                    <button type="button" class="inv-save" @onclick="SaveSupplier">حفظ</button>
                     <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
             </div>
@@ -77,7 +92,6 @@
     </div>
 }
 
-@* --- نافذة تأكيد الحذف --- *@
 @if (ShowDeleteDialog)
 {
     <div class="inv-dialog-overlay">
@@ -88,9 +102,9 @@
             <div class="inv-dialog-body inv-delete-dialog-body">
                 <div class="inv-delete-icon-wrap"><div class="inv-delete-icon">!</div></div>
                 <h3 class="inv-delete-title">تأكيد الحذف</h3>
-                <p class="inv-delete-text">هل أنت متأكد من حذف المورد "@SupplierForm.Name"؟</p>
+                <p class="inv-delete-text">هل أنت متأكد من حذف المورد "@SupplierForm.name"؟</p>
                 <div class="inv-dialog-actions">
-                    <button type="button" class="inv-delete-confirm">حذف المورد</button>
+                    <button type="button" class="inv-delete-confirm" @onclick="ConfirmDelete">حذف المورد</button>
                     <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
             </div>
@@ -99,29 +113,85 @@
 }
 
 @code {
-    List<SupplierModel> SuppliersList = new()
-    {
-        new() { Name = "شركة بلاستك تيك", Phone = "0910000000", Location = "طرابلس - المنطقة الصناعية", Email = "info@plastic.ly" },
-        new() { Name = "مورد الورق الخام", Phone = "0920000000", Location = "بنغازي", Email = "sales@paper.ly" }
-    };
+    List<SultanCups.Models.Supplier>? SuppliersList;
 
-    bool ShowAddDialog, ShowEditDialog, ShowDeleteDialog;
-    SupplierModel SupplierForm = new();
+    bool ShowAddDialog = false;
+    bool ShowEditDialog = false;
+    bool ShowDeleteDialog = false;
 
-    void OpenAddDialog() { SupplierForm = new(); ShowAddDialog = true; }
-    void OpenEditDialog(SupplierModel s)
+    SultanCups.Models.Supplier SupplierForm = new();
+
+    protected override async Task OnInitializedAsync()
     {
-        SupplierForm = new SupplierModel { Name = s.Name, Phone = s.Phone, Email = s.Email, Location = s.Location };
+        SuppliersList = await InventoryService.GetSuppliers();
+    }
+
+    void OpenAddDialog()
+    {
+        CloseDialogs();
+        SupplierForm = new SultanCups.Models.Supplier();
+        ShowAddDialog = true;
+    }
+
+    void OpenEditDialog(SultanCups.Models.Supplier s)
+    {
+        CloseDialogs();
+
+        SupplierForm = new SultanCups.Models.Supplier
+        {
+            supplier_id = s.supplier_id,
+            name = s.name,
+            phone = s.phone,
+            email = s.email,
+            location = s.location
+        };
+
         ShowEditDialog = true;
     }
-    void OpenDeleteDialog(SupplierModel s) { SupplierForm = s; ShowDeleteDialog = true; }
-    void CloseDialogs() => ShowAddDialog = ShowEditDialog = ShowDeleteDialog = false;
 
-    public class SupplierModel
+    void OpenDeleteDialog(SultanCups.Models.Supplier s)
     {
-        public string Name { get; set; } = "";
-        public string Phone { get; set; } = "";
-        public string Email { get; set; } = "";
-        public string Location { get; set; } = "";
+        CloseDialogs();
+
+        SupplierForm = new SultanCups.Models.Supplier
+        {
+            supplier_id = s.supplier_id,
+            name = s.name,
+            phone = s.phone,
+            email = s.email,
+            location = s.location
+        };
+
+        ShowDeleteDialog = true;
+    }
+
+    async Task SaveSupplier()
+    {
+        if (ShowAddDialog)
+        {
+            await InventoryService.AddSupplier(SupplierForm);
+        }
+        else
+        {
+            await InventoryService.UpdateSupplier(SupplierForm);
+        }
+
+        SuppliersList = await InventoryService.GetSuppliers();
+        CloseDialogs();
+    }
+
+    async Task ConfirmDelete()
+    {
+        await InventoryService.DeleteSupplier(SupplierForm.supplier_id);
+        SuppliersList = await InventoryService.GetSuppliers();
+        CloseDialogs();
+    }
+
+    void CloseDialogs()
+    {
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowDeleteDialog = false;
+        SupplierForm = new SultanCups.Models.Supplier();
     }
 }

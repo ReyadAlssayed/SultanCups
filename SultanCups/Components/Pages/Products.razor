@@ -1,5 +1,6 @@
 ﻿@page "/Products"
 @layout Layout.MainLayout
+@inject SultanCups.Services.InventoryService InventoryService
 
 <div class="prod-page">
 
@@ -20,17 +21,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var p in ProductList)
+                    @if (ProductList is null)
                     {
-                        <tr>
-                            <td class="prod-code">@p.productId</td>
-                            <td class="prod-name">@p.name</td>
+                        <tr><td colspan="3">جاري التحميل...</td></tr>
+                    }
+                    else if (ProductList.Count == 0)
+                    {
+                        <tr><td colspan="3">لا توجد بيانات</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var p in ProductList)
+                        {
+                            <tr>
+                                <td class="prod-code">@p.product_id</td>
+                                <td class="prod-name">@p.name</td>
 
-                            <td class="prod-actions-cell">
-                                <button class="prod-small prod-edit" @onclick="() => OpenEditDialog(p)">تعديل</button>
-                                <button class="prod-small prod-del" @onclick="() => OpenDeleteDialog(p)">حذف</button>
-                            </td>
-                        </tr>
+                                <td class="prod-actions-cell">
+                                    <button class="prod-small prod-edit" @onclick="() => OpenEditDialog(p)">تعديل</button>
+                                    <button class="prod-small prod-del" @onclick="() => OpenDeleteDialog(p)">حذف</button>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
@@ -55,7 +67,7 @@
                 </div>
 
                 <div class="prod-dialog-actions">
-                    <button type="button" class="prod-save">حفظ</button>
+                    <button type="button" class="prod-save" @onclick="SaveProduct">حفظ</button>
                     <button type="button" class="prod-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
             </div>
@@ -80,7 +92,7 @@
                 <p class="prod-delete-text">هل تريد حذف المنتج "@ProductForm.name" نهائيًا؟</p>
 
                 <div class="prod-dialog-actions">
-                    <button type="button" class="prod-delete-confirm">حذف</button>
+                    <button type="button" class="prod-delete-confirm" @onclick="ConfirmDelete">حذف</button>
                     <button type="button" class="prod-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
             </div>
@@ -89,36 +101,73 @@
 }
 
 @code {
-    List<ProductRow> ProductList = new()
-    {
-        new() { productId = 1, name = "كوب كبير 6" },
-        new() { productId = 2, name = "كوب صغير 2.5" },
-        new() { productId = 3, name = "أكواب 200ml" },
-        new() { productId = 4, name = "أكواب 300ml" }
-    };
+
+    List<SultanCups.Models.Product>? ProductList;
 
     bool ShowAddDialog = false;
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
 
-    ProductRow ProductForm = new();
+    SultanCups.Models.Product ProductForm = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductList = await InventoryService.GetProducts();
+    }
 
     void OpenAddDialog()
     {
-        ProductForm = new ProductRow();
+        CloseDialogs();
+        ProductForm = new SultanCups.Models.Product();
         ShowAddDialog = true;
     }
 
-    void OpenEditDialog(ProductRow p)
+    void OpenEditDialog(SultanCups.Models.Product p)
     {
-        ProductForm = new ProductRow { productId = p.productId, name = p.name };
+        CloseDialogs();
+
+        ProductForm = new SultanCups.Models.Product
+        {
+            product_id = p.product_id,
+            name = p.name
+        };
+
         ShowEditDialog = true;
     }
 
-    void OpenDeleteDialog(ProductRow p)
+    void OpenDeleteDialog(SultanCups.Models.Product p)
     {
-        ProductForm = new ProductRow { productId = p.productId, name = p.name };
+        CloseDialogs();
+
+        ProductForm = new SultanCups.Models.Product
+        {
+            product_id = p.product_id,
+            name = p.name
+        };
+
         ShowDeleteDialog = true;
+    }
+
+    async Task SaveProduct()
+    {
+        if (ShowAddDialog)
+        {
+            await InventoryService.AddProduct(ProductForm);
+        }
+        else
+        {
+            await InventoryService.UpdateProduct(ProductForm);
+        }
+
+        ProductList = await InventoryService.GetProducts();
+        CloseDialogs();
+    }
+
+    async Task ConfirmDelete()
+    {
+        await InventoryService.DeleteProduct(ProductForm.product_id);
+        ProductList = await InventoryService.GetProducts();
+        CloseDialogs();
     }
 
     void CloseDialogs()
@@ -126,11 +175,6 @@
         ShowAddDialog = false;
         ShowEditDialog = false;
         ShowDeleteDialog = false;
-    }
-
-    public class ProductRow
-    {
-        public int productId { get; set; }
-        public string name { get; set; } = "";
+        ProductForm = new SultanCups.Models.Product();
     }
 }
