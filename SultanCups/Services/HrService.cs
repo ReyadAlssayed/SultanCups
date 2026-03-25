@@ -20,6 +20,30 @@ namespace SultanCups.Services
             return await _context.employees.ToListAsync();
         }
 
+
+        //هدا خاص بالبحث عن موظف
+        public async Task<List<Employee>> SearchEmployees(string? searchText, bool? isActive = null)
+        {
+            var query = _context.employees.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                searchText = searchText.Trim();
+
+                query = query.Where(e =>
+                    e.full_name.Contains(searchText) ||
+                    (e.phone != null && e.phone.Contains(searchText)));
+            }
+
+            if (isActive.HasValue)
+            {
+                query = query.Where(e => e.is_active == isActive.Value);
+            }
+
+            return await query.ToListAsync();
+        }
+
+
         // هذا الجزء خاص بجدول employees
         // إضافة موظف جديد
         public async Task AddEmployee(Employee employee)

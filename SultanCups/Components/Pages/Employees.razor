@@ -1,4 +1,5 @@
-﻿@page "/Employees"
+﻿
+@page "/Employees"
 @layout Layout.MainLayout
 @inject NavigationManager Nav
 @inject SultanCups.Services.HrService HrService
@@ -17,6 +18,36 @@
         </h2>
 
         <div></div>
+    </div>
+
+    <div class="emp-search-bar">
+        <input class="emp-search-input"
+               placeholder="ابحث باسم الموظف أو رقم الهاتف"
+               @bind="SearchText" />
+
+        <button type="button"
+                class="emp-search-btn"
+                @onclick="SearchEmployees"
+                disabled="@IsSearching">
+            @(IsSearching ? "جاري البحث..." : "بحث")
+        </button>
+
+
+        <select class="emp-filter-select" value="@EmployeeStatusFilter" @onchange="OnFilterChanged">
+            <option value="all">الكل</option>
+            <option value="active">النشط</option>
+            <option value="inactive">المعطل</option>
+        </select>
+
+
+        <button type="button"
+                class="emp-reset-btn"
+                @onclick="ResetSearch"
+                disabled="@IsSearching">
+            عرض الكل
+        </button>
+
+       
     </div>
 
 
@@ -233,13 +264,13 @@
 
                         <div class="emp-status-buttons">
                             <button type="button"
-                                    class="status-btn @(EmployeeForm.is_active ? "active-selected" : "")"
+                                    class="emp-status-btn @(EmployeeForm.is_active ? "emp-active-selected" : "")"
                                     @onclick="() => EmployeeForm.is_active = true">
                                 نشط
                             </button>
 
                             <button type="button"
-                                    class="status-btn @(!EmployeeForm.is_active ? "inactive-selected" : "")"
+                                    class="emp-status-btn @(!EmployeeForm.is_active ? "emp-inactive-selected" : "")"
                                     @onclick="() => EmployeeForm.is_active = false">
                                 معطل
                             </button>
@@ -316,10 +347,45 @@
     string? RankError;
     string? SalaryError;
 
+    bool IsSearching = false;
+    string EmployeeStatusFilter = "all";
+
+    private string SearchText = "";
+
     SultanCups.Models.Employee EmployeeForm = new();
 
     protected override async Task OnInitializedAsync()
     {
+        EmployeeList = await HrService.GetEmployees();
+    }
+
+    async Task SearchEmployees()
+    {
+        if (IsSearching) return;
+
+        IsSearching = true;
+
+        try
+        {
+            bool? isActive = EmployeeStatusFilter switch
+            {
+                "active" => true,
+                "inactive" => false,
+                _ => null
+            };
+
+            EmployeeList = await HrService.SearchEmployees(SearchText, isActive);
+        }
+        finally
+        {
+            IsSearching = false;
+        }
+    }
+
+    async Task ResetSearch()
+    {
+        SearchText = "";
+        EmployeeStatusFilter = "all";
         EmployeeList = await HrService.GetEmployees();
     }
 
@@ -374,6 +440,14 @@
 
         ShowDeleteDialog = true;
     }
+
+
+    async Task OnFilterChanged(ChangeEventArgs e)
+{
+    EmployeeStatusFilter = e.Value?.ToString() ?? "all";
+    await SearchEmployees();
+}
+
 
     async Task ShowToast(string msg, string type)
     {

@@ -1,8 +1,7 @@
-﻿/* =======================================================
+﻿﻿ /* =======================================================
    Admins.css - Vigor Line Edition (النسخة الكاملة المعدلة)
    الهدف: ثبات المربعات، تنسيق جداول أدكن، وتنبيهات احترافية
    ======================================================= */
-
 :root {
     --ad-bg: #f3f6fb;
     --ad-card-solid: #ffffff;
@@ -148,8 +147,8 @@
 .ad-dialog-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(4px);
+    background: rgba(15, 23, 42, 0.5); /* تقليل التعتيم قليلاً */
+    /* تم حذف backdrop-filter من هنا */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -244,15 +243,30 @@
 }
 
 .ad-save {
-    flex: 2;
-    background: var(--ad-primary);
-    color: white;
-    border: 0;
-    padding: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 12px 22px;
+    border: none;
     border-radius: 12px;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    font-size: 16px;
     font-weight: 900;
     cursor: pointer;
+    opacity: 1 !important;
+    visibility: visible !important;
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-text-fill-color: #ffffff !important;
 }
+
+    .ad-save:hover {
+        background: #1e40af !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
 
 .ad-cancel {
     flex: 1;

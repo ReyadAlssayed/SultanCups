@@ -6,13 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <ResourcePreloader />
+
+    <link rel="stylesheet" href="@Assets["css/Employees.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["css/auth.css"]" />
     <link rel="stylesheet" href="@Assets["css/Home.css"]" />
     <link rel="stylesheet" href="@Assets["css/Settings.css"]" />
     <link rel="stylesheet" href="@Assets["SultanCups.styles.css"]" />
     <link rel="stylesheet" href="@Assets["css/Admins.css"]" />
-    <link rel="stylesheet" href="@Assets["css/Employees.css"]" />
+   
     <link rel="stylesheet" href="@Assets["css/Salaries.css"]" />
     <link rel="stylesheet" href="@Assets["css/Marketers.css"]" />
     <link rel="stylesheet" href="@Assets["css/RawMaterials.css"]" />
@@ -35,6 +37,7 @@
     <Routes @rendermode="@(new InteractiveServerRenderMode(prerender: false))" />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+
 </body>
 
 </html>
