@@ -493,6 +493,7 @@
         border-color: #2563eb;
     }
 
+
 @media (max-width: 600px) {
     .emp-field-row {
         grid-template-columns: 1fr;

@@ -298,6 +298,12 @@ body {
     border-bottom: 1px solid var(--line);
 }
 
+.app-card, .ad-card, .ad-header-center {
+    border-radius: 20px !important;
+    overflow: hidden; /* هذا السطر هو السر لظهور الانحناء */
+} 
+
+
 .top-user {
     display: flex;
     align-items: center;

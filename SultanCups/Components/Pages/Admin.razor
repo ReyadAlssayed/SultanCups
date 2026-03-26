@@ -188,6 +188,16 @@
     </div>
 }
 
+@if (!string.IsNullOrEmpty(ToastMessage))
+{
+    <div class="ad-toast-container">
+        <div class="ad-toast @(IsErrorToast ? "error" : "success")">
+            <div class="ad-toast-icon">@(IsErrorToast ? "✕" : "✓")</div>
+            <span>@ToastMessage</span>
+        </div>
+    </div>
+}
+
 
 @code {
     List<SultanCups.Models.Admain>? Admins;
@@ -199,6 +209,10 @@
     string? UsernameError;
     string? PhoneError;
     string? RoleError;
+
+    // متغيرات الإشعارات
+    string? ToastMessage;
+    bool IsErrorToast = false;
 
     SultanCups.Models.Admain? EditAdmin;
     SultanCups.Models.Admain? DeleteAdminItem;
@@ -220,6 +234,16 @@
         ShowEditDialog = true;
     }
 
+    async Task ShowToast(string message, bool isError = false)
+    {
+        ToastMessage = message;
+        IsErrorToast = isError;
+        StateHasChanged();
+        await Task.Delay(3000);
+        ToastMessage = null;
+        StateHasChanged();
+    }
+
     void OpenDeleteDialog(SultanCups.Models.Admain a)
     {
         DeleteAdminItem = a;
@@ -228,10 +252,10 @@
 
     async Task SaveEditAdmin()
     {
-        if (EditAdmin is null)
+        if (EditAdmin is null || Admins is null)
             return;
 
-        // تصفير الأخطاء
+        // 1. تصفير الأخطاء
         FullNameError = null;
         UsernameError = null;
         PhoneError = null;
@@ -244,90 +268,75 @@
 
         bool hasError = false;
 
-        // الاسم
-        if (string.IsNullOrWhiteSpace(name))
+        // 2. التحقق من الحقول الفارغة والصيغ (منطقك السابق)
+        if (string.IsNullOrWhiteSpace(name)) { FullNameError = "الاسم الكامل مطلوب"; hasError = true; }
+        else if (!name.All(c => char.IsLetter(c) || c == ' ')) { FullNameError = "الاسم يجب أن يحتوي على حروف فقط"; hasError = true; }
+
+        if (string.IsNullOrWhiteSpace(username)) { UsernameError = "اسم المستخدم مطلوب"; hasError = true; }
+        else if (!username.All(char.IsLetterOrDigit)) { UsernameError = "مسموح فقط حروف وأرقام"; hasError = true; }
+
+        if (string.IsNullOrWhiteSpace(phone)) { PhoneError = "رقم الهاتف مطلوب"; hasError = true; }
+        else if (phone.Length != 10 || !phone.StartsWith("09")) { PhoneError = "رقم الهاتف غير صحيح"; hasError = true; }
+
+        if (string.IsNullOrWhiteSpace(role)) { RoleError = "الدور مطلوب"; hasError = true; }
+
+        if (hasError) return;
+
+        // ---------------------------------------------------------
+        // 3. منع التكرار (الفحص الجديد)
+        // ---------------------------------------------------------
+
+        // فحص إذا كان اسم المستخدم محجوزاً لشخص آخر
+        var usernameExists = Admins.Any(a => a.username.Equals(username, StringComparison.OrdinalIgnoreCase)
+                                         && a.admin_id != EditAdmin.admin_id);
+        if (usernameExists)
         {
-            FullNameError = "الاسم الكامل مطلوب";
-            hasError = true;
-        }
-        else if (!name.All(c => char.IsLetter(c) || c == ' '))
-        {
-            FullNameError = "الاسم يجب أن يحتوي على حروف فقط";
+            UsernameError = "اسم المستخدم هذا مستخدم من قبل مسؤول آخر";
             hasError = true;
         }
 
-        // username
-        if (string.IsNullOrWhiteSpace(username))
+        // فحص إذا كان رقم الهاتف محجوزاً لشخص آخر
+        var phoneExists = Admins.Any(a => a.phone == phone && a.admin_id != EditAdmin.admin_id);
+        if (phoneExists)
         {
-            UsernameError = "اسم المستخدم مطلوب";
-            hasError = true;
-        }
-        else if (!username.Any(char.IsLetter))
-        {
-            UsernameError = "يجب أن يحتوي على حرف واحد على الأقل";
-            hasError = true;
-        }
-        else if (!username.All(char.IsLetterOrDigit))
-        {
-            UsernameError = "مسموح فقط حروف وأرقام";
+            PhoneError = "رقم الهاتف هذا مسجل لمسؤول آخر";
             hasError = true;
         }
 
-        // phone
-        if (string.IsNullOrWhiteSpace(phone))
-        {
-            PhoneError = "رقم الهاتف مطلوب";
-            hasError = true;
-        }
-        else if (phone.Length != 10)
-        {
-            PhoneError = "رقم الهاتف يجب أن يكون 10 أرقام";
-            hasError = true;
-        }
-        else if (!phone.StartsWith("09"))
-        {
-            PhoneError = "رقم الهاتف يجب أن يبدأ بـ 09";
-            hasError = true;
-        }
-        else if (!phone.All(char.IsDigit))
-        {
-            PhoneError = "رقم الهاتف يجب أن يحتوي أرقام فقط";
-            hasError = true;
-        }
+        if (hasError) return;
+        // ---------------------------------------------------------
 
-        // role
-        if (string.IsNullOrWhiteSpace(role))
-        {
-            RoleError = "الدور مطلوب";
-            hasError = true;
-        }
-
-        if (hasError)
-            return;
-
+        // 4. تنفيذ التحديث
         var updated = await AdminService.UpdateAdmin(EditAdmin);
 
         if (updated)
         {
             Admins = await AdminService.GetAdmins();
+            CloseDialogs();
+            _ = ShowToast("تم تحديث بيانات المسؤول بنجاح");
         }
-
-        CloseDialogs();
+        else
+        {
+            _ = ShowToast("حدث خطأ أثناء التحديث، حاول مرة أخرى", true);
+        }
     }
 
     async Task ConfirmDeleteAdmin()
     {
-        if (DeleteAdminItem is null)
-            return;
+        if (DeleteAdminItem is null) return;
 
         var deleted = await AdminService.DeleteAdmin(DeleteAdminItem.admin_id);
 
         if (deleted)
         {
             Admins = await AdminService.GetAdmins();
+            CloseDialogs();
+            _ = ShowToast("تم حذف المسؤول بنجاح"); // إشعار نجاح
         }
-
-        CloseDialogs();
+        else
+        {
+            _ = ShowToast("عذراً، تعذر حذف المسؤول", true); // إشعار فشل
+        }
     }
 
     void CloseDialogs()

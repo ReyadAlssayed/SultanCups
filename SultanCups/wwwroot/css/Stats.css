@@ -154,21 +154,20 @@
 
 .stats-section {
     background: white;
-    border-radius: 28px;
-    border: 1px solid #f1f5f9;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-    overflow: hidden;
-    transition: 0.3s ease;
+    border-radius: 24px;
+    /* تحديد إطار أغمق لتبدو البطاقة واضحة */
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .section-head {
-    padding: 20px 25px;
-    background: #f8fafc;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #f1f5f9;
+    /* جعل لون الرأس رمادي غامق ليفصل تماماً عن محتوى البطاقة */
+    background: #e2e8f0 !important;
+    padding: 15px 20px;
+    border-bottom: 1px solid #cbd5e1 !important;
+    border-radius: 24px;
 }
+
 
 .stat-item {
     display: flex;

@@ -23,7 +23,9 @@
     <div class="emp-search-bar">
         <input class="emp-search-input"
                placeholder="ابحث باسم الموظف أو رقم الهاتف"
-               @bind="SearchText" />
+               @bind="SearchText"
+               @bind:event="oninput"
+               @onkeydown="HandleEnterSearch"/>
 
         <button type="button"
                 class="emp-search-btn"
@@ -382,6 +384,15 @@
         }
     }
 
+
+    async Task HandleEnterSearch(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !IsSearching)
+        {
+            await SearchEmployees();
+        }
+    }
+
     async Task ResetSearch()
     {
         SearchText = "";
@@ -468,7 +479,7 @@
 
     async Task SaveAddEmployee()
     {
-        // 1. تصفير الأخطاء السابقة
+        // 1. تصفير الأخطاء السابقة لتحديث الواجهة
         FullNameError = null;
         PhoneError = null;
         RankError = null;
@@ -480,19 +491,26 @@
 
         bool hasError = false;
 
-        // 2. التحقق من البيانات (Validation)
+        // 2. التحقق من "الاسم الكامل"
         if (string.IsNullOrWhiteSpace(name))
         {
             FullNameError = "الاسم مطلوب";
             hasError = true;
         }
-        // القيد الجديد: الاسم لا يحتوي على أرقام
+        // قيد: منع وجود أرقام في اسم الموظف
         else if (name.Any(char.IsDigit))
         {
             FullNameError = "الاسم لا يمكن أن يحتوي على أرقام";
             hasError = true;
         }
+        // قيد: منع تكرار الاسم (تطابق 100%)
+        else if (EmployeeList != null && EmployeeList.Any(e => e.full_name?.Trim().ToLower() == name.ToLower()))
+        {
+            FullNameError = "هذا الاسم موجود مسبقاً، يرجى كتابة الاسم الثلاثي للتمييز";
+            hasError = true;
+        }
 
+        // 3. التحقق من "رقم الهاتف"
         if (!string.IsNullOrWhiteSpace(phone))
         {
             if (phone.Length != 10)
@@ -507,18 +525,19 @@
             }
             else if (!phone.All(char.IsDigit))
             {
-                PhoneError = "رقم الهاتف يجب أن يحتوي أرقام فقط";
+                PhoneError = "رقم الهاتف يجب أن يحتوي على أرقام فقط";
                 hasError = true;
             }
         }
 
+        // 4. التحقق من "الدور الوظيفي"
         if (string.IsNullOrWhiteSpace(rank))
         {
             RankError = "الدور مطلوب";
             hasError = true;
         }
 
-        // القيد الجديد: الراتب بين 1 و 20,000
+        // 5. التحقق من "الراتب الأساسي" (بين 1 و 20,000)
         if (EmployeeForm.base_salary <= 0)
         {
             SalaryError = "الراتب الأساسي يجب أن يكون أكبر من صفر";
@@ -530,24 +549,29 @@
             hasError = true;
         }
 
+        // توقف في حال وجود أي خطأ
         if (hasError) return;
 
-        // ... باقي الكود (التنفيذ البرمجي) كما هو ...
+        // 6. التنفيذ البرمجي والحفظ
         try
         {
             await HrService.AddEmployee(EmployeeForm);
+        
+            // تحديث القائمة لإظهار الموظف الجديد فوراً
             EmployeeList = await HrService.GetEmployees();
+        
             CloseDialogs();
             await ShowToast("تمت إضافة الموظف بنجاح", "success");
         }
         catch (Exception)
         {
-            await ShowToast("حدث خطأ أثناء الإضافة", "error");
+            await ShowToast("حدث خطأ أثناء الإضافة، تأكد من الاتصال بالخادم", "error");
         }
     }
 
     async Task SaveEditEmployee()
     {
+        // 1. تصفير الأخطاء السابقة
         FullNameError = null;
         PhoneError = null;
         RankError = null;
@@ -559,28 +583,53 @@
 
         bool hasError = false;
 
-        // قيد الاسم
+        // 2. التحقق من "الاسم الكامل"
         if (string.IsNullOrWhiteSpace(name))
         {
             FullNameError = "الاسم مطلوب";
             hasError = true;
         }
+        // منع الأرقام
         else if (name.Any(char.IsDigit))
         {
             FullNameError = "الاسم لا يمكن أن يحتوي على أرقام";
             hasError = true;
         }
-
-        // قيد الهاتف
-        if (!string.IsNullOrWhiteSpace(phone))
+        // قيد: منع تكرار الاسم (مع استثناء الموظف الذي يتم تعديله حالياً)
+        else if (EmployeeList != null && EmployeeList.Any(e => e.full_name?.Trim().ToLower() == name.ToLower() && e.employee_id != EmployeeForm.employee_id))
         {
-            if (phone.Length != 10) { PhoneError = "رقم الهاتف 10 أرقام"; hasError = true; }
-            else if (!phone.StartsWith("09")) { PhoneError = "يجب أن يبدأ بـ 09"; hasError = true; }
+            FullNameError = "هذا الاسم مستخدم لموظف آخر، يرجى كتابة اسم ثلاثي مختلف";
+            hasError = true;
         }
 
-        if (string.IsNullOrWhiteSpace(rank)) { RankError = "الدور مطلوب"; hasError = true; }
+        // 3. التحقق من "رقم الهاتف"
+        if (!string.IsNullOrWhiteSpace(phone))
+        {
+            if (phone.Length != 10)
+            {
+                PhoneError = "رقم الهاتف يجب أن يكون 10 أرقام";
+                hasError = true;
+            }
+            else if (!phone.StartsWith("09"))
+            {
+                PhoneError = "رقم الهاتف يجب أن يبدأ بـ 09";
+                hasError = true;
+            }
+            else if (!phone.All(char.IsDigit))
+            {
+                PhoneError = "رقم الهاتف يجب أن يحتوي على أرقام فقط";
+                hasError = true;
+            }
+        }
 
-        // قيد الراتب 20,000
+        // 4. التحقق من "الدور الوظيفي"
+        if (string.IsNullOrWhiteSpace(rank))
+        {
+            RankError = "الدور مطلوب";
+            hasError = true;
+        }
+
+        // 5. التحقق من "الراتب الأساسي" (بين 1 و 20,000)
         if (EmployeeForm.base_salary <= 0)
         {
             SalaryError = "الراتب يجب أن يكون أكبر من صفر";
@@ -592,19 +641,23 @@
             hasError = true;
         }
 
+        // توقف في حال وجود أي خطأ
         if (hasError) return;
 
-        // ... باقي كود التحديث ...
+        // 6. تنفيذ التحديث
         try
         {
             await HrService.UpdateEmployee(EmployeeForm);
+        
+            // تحديث القائمة لإظهار البيانات الجديدة
             EmployeeList = await HrService.GetEmployees();
+        
             CloseDialogs();
             await ShowToast("تم تعديل بيانات الموظف بنجاح", "success");
         }
         catch (Exception)
         {
-            await ShowToast("فشل تحديث البيانات", "error");
+            await ShowToast("فشل تحديث البيانات، يرجى المحاولة لاحقاً", "error");
         }
     }
 

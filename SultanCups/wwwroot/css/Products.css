@@ -1,251 +1,396 @@
-﻿/* ================= Page ================= */
+﻿/* =======================================================
+   Vigor Line - Products.css (النسخة الكاملة الموحدة)
+   التعديلات: مطابقة نظام الموظفين والمسؤولين بالكامل.
+   ======================================================= */
+
+:root {
+    --prod-bg: #f3f6fb;
+    --prod-card-solid: #ffffff;
+    --prod-line: #e2e8f0;
+    --prod-text: #0f172a;
+    --prod-muted: #64748b;
+    --prod-primary: #2563eb; /* Royal Blue */
+    --prod-shadow: 0 10px 30px rgba(2,6,23,0.08);
+}
+
+/* ================= Page Layout ================= */
 .prod-page {
     padding: 26px;
     direction: rtl;
+    background: var(--prod-bg);
+    min-height: 100vh;
 }
 
 .prod-topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
-    margin-bottom: 16px;
+    margin-bottom: 25px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 16px;
+    box-shadow: var(--prod-shadow);
 }
 
 .prod-title {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 950;
-    color: #0f172a;
+    color: var(--prod-text);
     margin: 0;
 }
 
-/* ===== Buttons ===== */
-.prod-btn {
-    border: 0;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-weight: 900;
-    cursor: pointer;
-}
-
-.prod-btn-add {
-    background: #2563eb;
-    color: #fff;
-}
-
-    .prod-btn-add:hover {
-        background: #1e40af;
-    }
-
-/* ===== Card ===== */
+/* ================= Table Styling (مطابق للموظفين تماماً) ================= */
 .prod-card {
-    background: rgba(255,255,255,.75);
-    border: 1px solid rgba(255,255,255,.55);
-    border-radius: 22px;
-    box-shadow: 0 28px 70px rgba(2,6,23,.10);
+    background: var(--prod-card-solid);
+    border-radius: 16px;
+    box-shadow: var(--prod-shadow);
     overflow: hidden;
-    backdrop-filter: blur(10px);
+    border: 1px solid var(--prod-line);
 }
 
-/* ===== Table ===== */
 .prod-table-wrap {
     width: 100%;
     overflow: auto;
-    padding: 14px;
 }
 
 .prod-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0; /* تم إزالة الفراغ 10px */
-    min-width: 700px;
+    border-collapse: collapse;
+    min-width: 860px; /* لضمان ثبات المربع ومنع الضغط */
 }
 
     .prod-table thead th {
-        color: #64748b;
-        font-size: 12px;
+        background: #f8fafc;
+        color: var(--prod-muted);
+        font-size: 13px;
         font-weight: 950;
-        padding: 10px 16px;
+        padding: 18px 20px;
         text-align: right;
-        white-space: nowrap;
+        border-bottom: 2px solid var(--prod-line);
     }
 
-    .prod-table tbody td {
-        background: #fff;
-        border-top: 1px solid rgba(226,232,240,.85);
-        border-bottom: 1px solid rgba(226,232,240,.85);
-        padding: 14px 16px;
-        font-weight: 800; /* تخفيف الخط قليلاً */
-        white-space: nowrap;
+    .prod-table tbody tr {
+        border-bottom: 1px solid var(--prod-line);
+        transition: background 0.2s ease;
     }
 
-        .prod-table tbody td + td {
-            border-right: 1px solid rgba(226,232,240,.6);
+        /* نظام الصفوف المتبادلة الأدكن */
+        .prod-table tbody tr:nth-child(even) {
+            background: #f8fafc; /* رصاصي خفيف */
         }
 
-/* ===== Columns ===== */
-.prod-code {
-    color: #0b2a66;
-    font-weight: 950;
-    width: 120px;
-}
+        .prod-table tbody tr:nth-child(odd) {
+            background: #ffffff; /* أبيض */
+        }
 
+        .prod-table tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+    .prod-table tbody td {
+        padding: 16px 20px;
+        font-weight: 800;
+        color: var(--prod-text);
+        vertical-align: middle;
+    }
+
+/* تخصيص الأعمدة لتمييز البيانات */
 .prod-name {
-    color: #0f172a;
-    font-weight: 800;
+    color: #1e40af;
+    font-weight: 950 !important;
 }
 
-/* ===== Actions ===== */
+.prod-code {
+    font-family: monospace;
+    color: #475569;
+    font-weight: 700 !important;
+}
+
+.prod-price {
+    color: #059669;
+    font-weight: 950 !important;
+}
+
+/* ================= Actions & Buttons ================= */
 .prod-actions-cell {
     display: flex;
-    gap: 8px;
-}
-
-.prod-small {
-    border: 0;
-    padding: 7px 12px;
-    border-radius: 10px;
-    font-weight: 900;
-    cursor: pointer;
+    gap: 10px;
 }
 
 .prod-edit {
-    background: #0ea5e9;
-    color: #fff;
+    background: #2563eb;
+    color: white;
+    border: 0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
 .prod-del {
-    background: #ef4444;
-    color: #fff;
+    background: #dc2626;
+    color: white;
+    border: 0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
-/* ===== Dialogs ===== */
+.prod-btn-add, .prod-save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    -webkit-text-fill-color: #ffffff !important;
+    transition: transform .2s ease, background .2s ease;
+}
+
+    .prod-btn-add:hover, .prod-save:hover {
+        background: #1e40af !important;
+        transform: translateY(-2px);
+    }
+
+/* ================= Overlay & Dialog Box ================= */
 .prod-dialog-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.45);
+    background: rgba(15, 23, 42, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 9999;
+    padding: 20px;
 }
 
 .prod-dialog-box {
     background: #fff;
     border-radius: 24px;
-    width: 92%;
-    max-width: 460px;
-    box-shadow: 0 20px 40px rgba(0,0,0,.2);
-    overflow: hidden;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: prodPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes prodPop {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .prod-dialog-top-image {
     width: 100%;
-    height: 110px;
-    overflow: hidden;
-    border-bottom: 1px solid #e2e8f0;
+    height: 120px;
+    background: #f1f5f9;
 }
 
     .prod-dialog-top-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
     }
 
 .prod-dialog-body {
-    padding: 22px;
-    text-align: right; /* العناوين لليمين */
+    padding: 25px;
 }
 
-    .prod-dialog-body h3 {
-        text-align: center;
-        margin-bottom: 20px;
-        font-weight: 900;
-    }
-
+/* ================= Inputs & Labels (النمط المصغر) ================= */
 .prod-field {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
 }
 
 .prod-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 900;
-    color: #64748b;
-    margin-bottom: 5px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #94a3b8;
+    margin-right: 5px;
+    text-transform: uppercase;
 }
 
 .prod-input {
     width: 100%;
     padding: 12px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid #e2e8f0;
-    direction: rtl;
+    font-weight: 700;
+    background: #fff;
+    color: #1e293b;
+    transition: border 0.2s;
 }
 
+    .prod-input:focus {
+        border-color: var(--prod-primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .prod-input.is-invalid {
+        border-color: #ef4444 !important;
+        background-color: #fff5f5;
+    }
+
+.prod-error-message {
+    font-size: 11px;
+    color: #ef4444;
+    font-weight: 800;
+    margin-top: 4px;
+}
+
+/* ================= Dialog Actions ================= */
 .prod-dialog-actions {
     display: flex;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.prod-save, .prod-cancel {
-    flex: 1;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 900;
-    border: none;
-    cursor: pointer;
-}
-
-.prod-save {
-    background: #2563eb;
-    color: #fff;
+    gap: 12px;
+    margin-top: 20px;
 }
 
 .prod-cancel {
-    background: #64748b;
-    color: #fff;
+    flex: 1;
+    background: #f1f5f9;
+    color: #475569;
+    border: 0;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
-/* ===== Delete Dialog ===== */
+    .prod-cancel:hover {
+        background: #e2e8f0;
+    }
+
+/* ================= Delete Dialog Specific ================= */
 .prod-delete-icon-wrap {
     display: flex;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .prod-delete-icon {
-    width: 62px;
-    height: 62px;
-    border-radius: 50%;
+    width: 70px;
+    height: 70px;
     background: #fee2e2;
-    color: #dc2626;
+    color: #ef4444;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 30px;
-    margin: 0 auto;
+    font-weight: 950;
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.1);
+}
+
+.prod-delete-title {
+    text-align: center;
+    color: #991b1b;
+    font-weight: 950;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.prod-delete-text {
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 25px;
 }
 
 .prod-delete-confirm {
-    flex: 1;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
+    flex: 2;
+    background: #dc2626;
+    color: white;
+    border: 0;
     padding: 12px;
     border-radius: 12px;
     font-weight: 900;
-    border: none;
     cursor: pointer;
+    transition: 0.2s;
 }
 
-@media (max-width: 768px) {
-    .prod-title {
-        font-size: 22px;
+    .prod-delete-confirm:hover {
+        background: #b91c1c;
     }
 
-    .prod-table {
-        min-width: 500px;
+/* ================= Toast Notification (الموحدة) ================= */
+.prod-toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+}
+
+.prod-toast {
+    min-width: 320px;
+    padding: 16px 25px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 950;
+    border: 1px solid var(--prod-line);
+    animation: toastIn 0.4s ease forwards;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.prod-toast.success {
+    border-right: 6px solid #22c55e;
+    color: #166534;
+}
+
+.prod-toast.error {
+    border-right: 6px solid #ef4444;
+    color: #991b1b;
+}
+
+/* ================= استجابة الجوال ================= */
+@media (max-width: 600px) {
+    .prod-topbar {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .prod-dialog-box {
+        width: 95%;
     }
 }

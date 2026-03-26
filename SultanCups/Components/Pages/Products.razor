@@ -1,9 +1,19 @@
 ﻿@page "/Products"
+@using System.Text.RegularExpressions
 @layout Layout.MainLayout
 @inject SultanCups.Services.InventoryService InventoryService
 
+
 <div class="prod-page">
 
+    @if (!string.IsNullOrEmpty(ToastMessage))
+    {
+        <div class="prod-toast-container">
+            <div class="prod-toast @ToastClass">
+                @ToastMessage
+            </div>
+        </div>
+    }
     <div class="prod-topbar">
         <button class="prod-btn prod-btn-add" @onclick="OpenAddDialog">إضافة منتج</button>
         <h2 class="prod-title">المنتجات</h2>
@@ -15,7 +25,7 @@
             <table class="prod-table">
                 <thead>
                     <tr>
-                        <th>رقم القيد</th>
+                        @* تم حذف رأس عمود رقم القيد *@
                         <th>اسم المنتج</th>
                         <th>الإجراءات</th>
                     </tr>
@@ -23,20 +33,19 @@
                 <tbody>
                     @if (ProductList is null)
                     {
-                        <tr><td colspan="3">جاري التحميل...</td></tr>
+                        <tr><td colspan="2">جاري التحميل...</td></tr>
                     }
                     else if (ProductList.Count == 0)
                     {
-                        <tr><td colspan="3">لا توجد بيانات</td></tr>
+                        <tr><td colspan="2">لا توجد بيانات</td></tr>
                     }
                     else
                     {
                         @foreach (var p in ProductList)
                         {
                             <tr>
-                                <td class="prod-code">@p.product_id</td>
+                                @* تم حذف خلية رقم القيد *@
                                 <td class="prod-name">@p.name</td>
-
                                 <td class="prod-actions-cell">
                                     <button class="prod-small prod-edit" @onclick="() => OpenEditDialog(p)">تعديل</button>
                                     <button class="prod-small prod-del" @onclick="() => OpenDeleteDialog(p)">حذف</button>
@@ -55,7 +64,7 @@
     <div class="prod-dialog-overlay">
         <div class="prod-dialog-box">
             <div class="prod-dialog-top-image">
-                <img src="images/Background.jpg" />
+                <img src="images/Background.png" />
             </div>
 
             <div class="prod-dialog-body">
@@ -63,7 +72,13 @@
 
                 <div class="prod-field">
                     <label class="prod-label">اسم المنتج</label>
-                    <input class="prod-input" @bind="ProductForm.name" />
+                    <input class="prod-input @(string.IsNullOrWhiteSpace(Message) ? "" : "is-invalid")"
+                           @bind="ProductForm.name" maxlength="100" />
+                    
+                    @if (!string.IsNullOrWhiteSpace(Message))
+                    {
+                        <div class="prod-error-message">@Message</div>
+                    }
                 </div>
 
                 <div class="prod-dialog-actions">
@@ -80,7 +95,7 @@
     <div class="prod-dialog-overlay">
         <div class="prod-dialog-box prod-delete-dialog-box">
             <div class="prod-dialog-top-image prod-delete-top-image">
-                <img src="images/Background.jpg" />
+                <img src="images/Background.png" />
             </div>
 
             <div class="prod-dialog-body prod-delete-dialog-body">
@@ -108,6 +123,11 @@
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
 
+    string Message = string.Empty;
+    string ToastMessage = string.Empty;
+    string ToastClass = "success"; // أضفنا هذا المتغير لتحديد اللون
+
+
     SultanCups.Models.Product ProductForm = new();
 
     protected override async Task OnInitializedAsync()
@@ -118,6 +138,7 @@
     void OpenAddDialog()
     {
         CloseDialogs();
+        Message = string.Empty;
         ProductForm = new SultanCups.Models.Product();
         ShowAddDialog = true;
     }
@@ -125,6 +146,7 @@
     void OpenEditDialog(SultanCups.Models.Product p)
     {
         CloseDialogs();
+        Message = string.Empty;
 
         ProductForm = new SultanCups.Models.Product
         {
@@ -138,6 +160,7 @@
     void OpenDeleteDialog(SultanCups.Models.Product p)
     {
         CloseDialogs();
+        Message = string.Empty;
 
         ProductForm = new SultanCups.Models.Product
         {
@@ -148,18 +171,45 @@
         ShowDeleteDialog = true;
     }
 
+
     async Task SaveProduct()
     {
-        if (ShowAddDialog)
+        Message = string.Empty;
+        var name = ProductForm.name?.Trim();
+
+        // 1. التحقق من الحقل الفارغ
+        if (string.IsNullOrWhiteSpace(name)) { Message = "اسم المنتج مطلوب"; return; }
+
+        // 2. السماح بالحروف، الأرقام، المسافات، والنقطة فقط
+        // أضفنا \. للسماح بالنقطة
+        if (!Regex.IsMatch(name, @"^[a-zA-Z0-9\u0600-\u06FF\s\.]+$"))
         {
-            await InventoryService.AddProduct(ProductForm);
-        }
-        else
-        {
-            await InventoryService.UpdateProduct(ProductForm);
+            Message = "لا يسمح بالرموز الخاصة (يسمح فقط بالحروف، الأرقام، والنقطة)";
+            return;
         }
 
+        // 3. منع إدخال أرقام ونقاط فقط (يجب وجود حرف واحد على الأقل)
+        if (Regex.IsMatch(name, @"^[0-9\.\s]+$"))
+        {
+            Message = "يجب أن يحتوي اسم المنتج على حروف وليس أرقاماً فقط";
+            return;
+        }
+
+        // 4. التحقق من التكرار
+        if (ProductList != null && ProductList.Any(p => p.name?.Trim().ToLower() == name.ToLower() && p.product_id != ProductForm.product_id))
+        {
+            Message = "اسم المنتج موجود مسبقًا";
+            return;
+        }
+
+        ProductForm.name = name!;
+        string actionText = ShowAddDialog ? "إضافة" : "تعديل";
+
+        if (ShowAddDialog) await InventoryService.AddProduct(ProductForm);
+        else await InventoryService.UpdateProduct(ProductForm);
+
         ProductList = await InventoryService.GetProducts();
+        ShowToast($"تم {actionText} المنتج بنجاح", "success");
         CloseDialogs();
     }
 
@@ -167,7 +217,21 @@
     {
         await InventoryService.DeleteProduct(ProductForm.product_id);
         ProductList = await InventoryService.GetProducts();
+        // أضفنا "error" هنا ليكون الإشعار أحمر
+        ShowToast("تم حذف المنتج بنجاح", "error");
         CloseDialogs();
+    }
+
+    void ShowToast(string msg, string type = "success")
+    {
+        ToastMessage = msg;
+        ToastClass = type; // تحديد الكلاس بناءً على النوع
+        StateHasChanged();
+        Task.Delay(3000).ContinueWith(_ =>
+        {
+            ToastMessage = string.Empty;
+            InvokeAsync(StateHasChanged);
+        });
     }
 
     void CloseDialogs()
@@ -175,6 +239,7 @@
         ShowAddDialog = false;
         ShowEditDialog = false;
         ShowDeleteDialog = false;
+        Message = string.Empty;
         ProductForm = new SultanCups.Models.Product();
     }
 }
