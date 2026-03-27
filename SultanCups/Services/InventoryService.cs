@@ -19,13 +19,20 @@ namespace SultanCups.Services
 
         public async Task<List<Product>> GetProducts()
         {
-            return await _context.products.ToListAsync();
+            return await _context.products
+                .Where(p => p.is_active)
+                .ToListAsync();
         }
 
         public async Task AddProduct(Product product)
         {
             _context.products.Add(product);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Product>> GetAllProducts()
+        {
+            return await _context.products.ToListAsync();
         }
 
         public async Task<bool> UpdateProduct(Product updatedProduct)
@@ -50,9 +57,9 @@ namespace SultanCups.Services
             if (product == null)
                 return false;
 
-            _context.products.Remove(product);
-            await _context.SaveChangesAsync();
+            product.is_active = false;
 
+            await _context.SaveChangesAsync();
             return true;
         }
 
