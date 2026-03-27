@@ -22,5 +22,6 @@ namespace SultanCups.Models
 
         [ForeignKey("product_id")]
         public Product Product { get; set; } = null!;
+        public string? notes { get; set; }
     }
 }

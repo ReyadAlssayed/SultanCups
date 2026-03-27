@@ -80,6 +80,8 @@ namespace SultanCups.Services
                 production.production_date,
                 DateTimeKind.Unspecified);
 
+            production.notes = production.notes?.Trim();
+
             _context.production.Add(production);
             await _context.SaveChangesAsync();
         }
@@ -95,6 +97,8 @@ namespace SultanCups.Services
             prod.product_id = updated.product_id;
             prod.box_cost = updated.box_cost;
             prod.box_count = updated.box_count;
+            prod.notes = updated.notes?.Trim(); 
+
             prod.production_date = DateTime.SpecifyKind(
                 updated.production_date,
                 DateTimeKind.Unspecified);
