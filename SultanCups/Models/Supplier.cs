@@ -14,5 +14,7 @@ namespace SultanCups.Models
         public string? email { get; set; }
 
         public string? location { get; set; }
+        public bool is_active { get; set; } = true;
+        public string? notes { get; set; }
     }
 }
