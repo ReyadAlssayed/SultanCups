@@ -122,6 +122,7 @@
     bool ShowAddDialog = false;
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
+    bool ShowInactive = false;
 
     string Message = string.Empty;
     string ToastMessage = string.Empty;
@@ -241,5 +242,15 @@
         ShowDeleteDialog = false;
         Message = string.Empty;
         ProductForm = new SultanCups.Models.Product();
+    }
+
+    async Task ToggleInactive()
+    {
+        ShowInactive = !ShowInactive;
+
+        if (ShowInactive)
+            ProductList = await InventoryService.GetAllProducts(); // الكل
+        else
+            ProductList = await InventoryService.GetProducts(); // النشط فقط
     }
 }
