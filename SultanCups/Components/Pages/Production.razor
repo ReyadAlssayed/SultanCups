@@ -3,10 +3,9 @@
 @inject SultanCups.Services.InventoryService InventoryService
 
 <div class="pro-page">
-
     <div class="pro-topbar">
-        <button type="button" class="pro-btn pro-btn-add" @onclick="OpenAddDialog">إضافة إنتاج</button>
-        <h2 class="pro-title">الإنتاج</h2>
+        <button type="button" class="pro-btn-add" @onclick="OpenAddDialog">إضافة إنتاج جديد</button>
+        <h2 class="pro-title">سجلات الإنتاج</h2>
         <div></div>
     </div>
 
@@ -15,39 +14,33 @@
             <table class="pro-table">
                 <thead>
                     <tr>
-                        <th>رقم القيد</th>
-                        <th>اسم المنتج</th>
-                        <th>عدد الكراتين</th>
+                        <th>المنتج</th>
+                        <th>الكمية (كرتونة)</th>
                         <th>تكلفة الكرتونة</th>
-                        <th>التكلفة الكلية</th>
+                        <th>إجمالي التكلفة</th>
                         <th>تاريخ الإنتاج</th>
-                        <th>الإجراءات</th>
+                        <th style="text-align:center">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (ProductionList is null)
                     {
-                        <tr>
-                            <td colspan="7">جاري التحميل...</td>
-                        </tr>
+                        <tr><td colspan="6" class="pro-loading">جاري التحميل...</td></tr>
                     }
                     else if (ProductionList.Count == 0)
                     {
-                        <tr>
-                            <td colspan="7">لا توجد بيانات</td>
-                        </tr>
+                        <tr><td colspan="6" class="pro-empty">لا توجد بيانات إنتاج حالية</td></tr>
                     }
                     else
                     {
                         @foreach (var p in ProductionList)
                         {
                             <tr>
-                                <td class="pro-code">@p.production_id</td>
-                                <td class="pro-name">@p.Product.name</td>
-                                <td class="pro-money">@p.box_count</td>
+                                <td class="pro-name">@p.Product?.name</td>
+                                <td class="pro-count">@p.box_count</td>
                                 <td class="pro-money">@Fmt(p.box_cost)</td>
-                                <td class="pro-money pro-total">@Fmt(p.total_cost)</td>
-                                <td class="pro-muted">@p.production_date.ToString("yyyy-MM-dd")</td>
+                                <td class="pro-money"><span class="pro-total">@Fmt(p.total_cost)</span></td>
+                                <td class="pro-date">@p.production_date.ToString("yyyy-MM-dd")</td>
 
                                 <td class="pro-actions-cell">
                                     <button type="button" class="pro-small pro-edit" @onclick="() => OpenEditDialog(p)">تعديل</button>
@@ -67,7 +60,7 @@
     <div class="pro-dialog-overlay">
         <div class="pro-dialog-box">
             <div class="pro-dialog-top-image">
-                <img src="images/Background.jpg" />
+                <img src="images/Background.png" />
             </div>
 
             <div class="pro-dialog-body">
@@ -115,7 +108,7 @@
     <div class="pro-dialog-overlay">
         <div class="pro-dialog-box pro-delete-dialog-box">
             <div class="pro-dialog-top-image pro-delete-top-image">
-                <img src="images/Background.jpg" />
+                <img src="images/Background.png" />
             </div>
 
             <div class="pro-dialog-body pro-delete-dialog-body">

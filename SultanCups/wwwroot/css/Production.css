@@ -1,163 +1,243 @@
-﻿/* ================= Production Page ================= */
+﻿/* =======================================================
+   Vigor Line - Production.css (النسخة النهائية المعتمدة)
+   1. تلوين السجلات متبادل (أبيض / رصاصي باهت جداً).
+   2. حواف دائرية ناعمة للهيدر (بدون زوايا حادة).
+   3. إزالة كافة الخطوط العمودية (مطابق لصفحة الموظفين).
+   4. إضافة خط فاصل Smooth بين السجلات.
+   ======================================================= */
+
+:root {
+    --pro-bg: #f3f6fb;
+    --pro-card-solid: #ffffff;
+    --pro-line: #e2e8f0;
+    --pro-text: #0f172a;
+    --pro-muted: #64748b;
+    --pro-primary: #2563eb;
+    --pro-shadow: 0 10px 30px rgba(2,6,23,0.08);
+}
+
+/* ================= Page Layout ================= */
 .pro-page {
     padding: 26px;
     direction: rtl;
+    background: var(--pro-bg);
+    min-height: 100vh;
 }
 
 .pro-topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
-    margin-bottom: 16px;
+    margin-bottom: 25px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 16px;
+    box-shadow: var(--pro-shadow);
+    border-right: 6px solid var(--pro-primary);
 }
 
 .pro-title {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 950;
-    color: #0f172a;
+    color: var(--pro-text);
     margin: 0;
 }
 
-/* ===== Buttons ===== */
-.pro-btn {
-    border: 0;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-weight: 900;
-    cursor: pointer;
-}
-
-.pro-btn-add {
-    background: #2563eb;
-    color: #fff;
-}
-
-    .pro-btn-add:hover {
-        background: #1e40af;
-    }
-
-/* ===== Card ===== */
+/* ================= Table Styling ================= */
 .pro-card {
-    background: rgba(255,255,255,.75);
-    border: 1px solid rgba(255,255,255,.55);
-    border-radius: 22px;
-    box-shadow: 0 28px 70px rgba(2,6,23,.10);
+    background: var(--pro-card-solid);
+    border-radius: 16px;
+    box-shadow: var(--pro-shadow);
     overflow: hidden;
-    backdrop-filter: blur(10px);
+    border: none !important;
 }
 
-/* ===== Table ===== */
 .pro-table-wrap {
     width: 100%;
     overflow: auto;
-    padding: 14px;
 }
 
 .pro-table {
     width: 100%;
-    border-collapse: separate;
+    /* ضروري لتفعيل الـ Border Radius في الزوايا */
+    border-collapse: separate !important;
     border-spacing: 0;
     min-width: 900px;
+    border: none !important;
 }
 
+    /* --- الهيدر والحواف الناعمة --- */
     .pro-table thead th {
-        color: #64748b;
-        font-size: 12px;
+        background: #f8fafc;
+        color: var(--pro-muted);
+        font-size: 13px;
         font-weight: 950;
-        padding: 10px 16px;
+        padding: 18px 20px;
         text-align: right;
-        white-space: nowrap;
+        border: none !important;
+        border-bottom: 2px solid var(--pro-line) !important;
     }
 
+    /* تنعيم الزوايا العلوية للهيدر */
+    .pro-table thead tr th:first-child {
+        border-top-right-radius: 16px;
+    }
+
+    .pro-table thead tr th:last-child {
+        border-top-left-radius: 16px;
+    }
+
+    /* --- تلوين السجلات والخط الفاصل Smooth --- */
+    .pro-table tbody tr {
+        border: none !important;
+        transition: background 0.2s ease;
+    }
+
+    /* 1. إزالة أي لون خلفية سابق من الخلايا لضمان ظهور لون الصف مع إضافة الخط الفاصل */
     .pro-table tbody td {
-        background: #fff;
-        border-top: 1px solid rgba(226,232,240,.85);
-        border-bottom: 1px solid rgba(226,232,240,.85);
-        padding: 14px 16px;
-        font-weight: 800; /* تخفيف الخط */
-        white-space: nowrap;
+        background-color: transparent !important;
+        border: none !important;
+        padding: 16px 20px;
+        font-weight: 800;
+        color: var(--pro-text);
+        vertical-align: middle;
+        /* هذا هو الخط الفاصل Smooth بين السجلات */
+        border-bottom: 1.5px solid #e2e8f0 !important; /* درجة أغمق وأوضح */
     }
 
-        .pro-table tbody td + td {
-            border-right: 1px solid rgba(226,232,240,.6);
-        }
+    /* إزالة الخط السفلـي من السجل الأخير تماماً */
+    .pro-table tbody tr:last-child td {
+        border-bottom: none !important;
+    }
 
-/* ===== Columns ===== */
-.pro-code {
-    color: #0b2a66;
-    font-weight: 950;
-    width: 110px;
-}
+    /* 2. تلوين السجل الفردي (أبيض) */
+    .pro-table tbody tr:nth-child(odd) {
+        background-color: #ffffff !important;
+    }
 
+    /* 3. تلوين السجل الزوجي (رصاصي احترافي باهت جداً) */
+    .pro-table tbody tr:nth-child(even) {
+        background-color: #f7f9fc !important;
+    }
+
+    /* 4. تأثير التمرير (Hover) */
+    .pro-table tbody tr:hover {
+        background-color: #f1f5f9 !important;
+    }
+
+/* --- تخصيص البيانات --- */
 .pro-name {
-    color: #0f172a;
-    font-weight: 950;
-}
-
-.pro-muted {
-    color: #64748b;
-    font-weight: 800;
+    color: #1e40af;
+    font-weight: 950 !important;
 }
 
 .pro-money {
-    font-family: ui-monospace, monospace;
+    font-family: monospace;
+    font-weight: 900;
 }
 
 .pro-total {
     color: #16a34a;
+    background: #f0fdf4;
+    padding: 6px 12px;
+    border-radius: 8px;
     font-weight: 950;
+    display: inline-block;
 }
 
-/* ===== Actions ===== */
+/* ================= Buttons & Actions ================= */
 .pro-actions-cell {
     display: flex;
-    gap: 8px;
-}
-
-.pro-small {
-    border: 0;
-    padding: 7px 12px;
-    border-radius: 10px;
-    font-weight: 900;
-    cursor: pointer;
+    gap: 10px;
 }
 
 .pro-edit {
-    background: #0ea5e9;
-    color: #fff;
+    background: #e0f2fe !important;
+    color: #0369a1 !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    font-weight: 800 !important;
+    cursor: pointer;
+    transition: 0.2s;
 }
+
+    .pro-edit:hover {
+        background: #0ea5e9 !important;
+        color: #ffffff !important;
+    }
 
 .pro-del {
-    background: #ef4444;
-    color: #fff;
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    font-weight: 800 !important;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
-/* ===== Dialogs ===== */
+    .pro-del:hover {
+        background: #ef4444 !important;
+        color: white !important;
+    }
+
+.pro-btn-add, .pro-save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 10px;
+    background: var(--pro-primary) !important;
+    color: #ffffff !important;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform .2s ease;
+}
+
+/* ================= Dialogs & Modals ================= */
 .pro-dialog-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.45);
+    background: rgba(15, 23, 42, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
 }
 
 .pro-dialog-box {
     background: #fff;
     border-radius: 24px;
-    width: 92%;
-    max-width: 480px;
-    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    animation: proPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow: hidden;
+}
+
+@keyframes proPop {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .pro-dialog-top-image {
     width: 100%;
     height: 110px;
-    overflow: hidden;
-    border-bottom: 1px solid #e2e8f0;
+    background: #f1f5f9;
+    border-bottom: 2px solid var(--pro-primary);
 }
 
     .pro-dialog-top-image img {
@@ -167,108 +247,106 @@
     }
 
 .pro-dialog-body {
-    padding: 22px;
-    text-align: right;
+    padding: 25px;
 }
 
     .pro-dialog-body h3 {
         text-align: center;
         margin-bottom: 20px;
-        font-weight: 900;
+        font-weight: 950;
+        color: var(--pro-text);
     }
-
-.pro-fields-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.pro-field {
-    margin-bottom: 10px;
-}
-
-.pro-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 900;
-    color: #64748b;
-    margin-bottom: 4px;
-}
 
 .pro-input {
     width: 100%;
     padding: 12px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid #e2e8f0;
+    font-weight: 700;
+    background: #fcfcfc;
 }
 
-.pro-dialog-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 15px;
-}
+    .pro-input:focus {
+        border-color: var(--pro-primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
 
-.pro-save, .pro-cancel {
-    flex: 1;
+.pro-cancel {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid var(--pro-line);
     padding: 12px;
     border-radius: 12px;
     font-weight: 900;
-    border: none;
     cursor: pointer;
+    flex: 1;
 }
 
-.pro-save {
-    background: #2563eb;
-    color: #fff;
-}
-
-.pro-cancel {
-    background: #64748b;
-    color: #fff;
-}
-
-/* ===== Delete Dialog ===== */
-.pro-delete-icon-wrap {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
+/* نافذة الحذف */
 .pro-delete-icon {
-    width: 62px;
-    height: 62px;
-    border-radius: 50%;
+    width: 70px;
+    height: 70px;
     background: #fee2e2;
-    color: #dc2626;
+    color: #ef4444;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 30px;
-    margin: 0 auto;
-}
-
-.pro-delete-title {
-    text-align: center;
+    margin: 0 auto 15px;
     font-weight: 950;
 }
+/* =======================================================
+   تحديث أزرار مربع الحوار - Vigor Line
+   ======================================================= */
 
-.pro-delete-text {
-    text-align: center;
-    color: #64748b;
-    margin-bottom: 20px;
+.pro-dialog-actions {
+    display: flex;
+    gap: 15px; /* مسافة متناسقة بين الزرين */
+    margin-top: 25px;
+    width: 100%;
 }
 
-.pro-delete-confirm {
-    flex: 1;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 900;
+/* زر إلغاء - تم تكبيره ليتساوى مع زر الحذف */
+.pro-cancel {
+    flex: 1; /* يعطي الزر مساحة متساوية */
+    background: #64748b; /* اللون الرمادي الاحترافي الظاهر في الصورة */
+    color: white !important;
     border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 950;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-@media (max-width: 768px) {
-    .pro-fields-grid {
-        grid-template-columns: 1fr;
+/* زر حذف / حفظ */
+.pro-delete-confirm, .pro-save {
+    flex: 1; /* يعطي الزر مساحة متساوية */
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 950;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* حالة الحذف باللون الأحمر */
+.pro-delete-confirm {
+    background: #ef4444 !important;
+    color: white !important;
+}
+
+.pro-cancel:hover {
+    background: #475569;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+    .pro-dialog-box {
+        width: 95%;
     }
 }
