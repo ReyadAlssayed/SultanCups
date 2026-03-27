@@ -128,7 +128,9 @@ namespace SultanCups.Services
         // جلب جميع الموردين
         public async Task<List<Supplier>> GetSuppliers()
         {
-            return await _context.suppliers.ToListAsync();
+            return await _context.suppliers
+                .Where(s => s.is_active)
+                .ToListAsync();
         }
 
         // إضافة مورد جديد
@@ -153,13 +155,15 @@ namespace SultanCups.Services
             supplier.phone = updated.phone;
             supplier.email = updated.email;
             supplier.location = updated.location;
+            supplier.is_active = updated.is_active;
+            supplier.notes = updated.notes;
 
             await _context.SaveChangesAsync();
             return true;
         }
 
         // حذف مورد
-        public async Task<bool> DeleteSupplier(int id)
+        public async Task<bool> ToggleSupplier(int id)
         {
             var supplier = await _context.suppliers
                 .FirstOrDefaultAsync(s => s.supplier_id == id);
@@ -167,9 +171,9 @@ namespace SultanCups.Services
             if (supplier == null)
                 return false;
 
-            _context.suppliers.Remove(supplier);
-            await _context.SaveChangesAsync();
+            supplier.is_active = !supplier.is_active;
 
+            await _context.SaveChangesAsync();
             return true;
         }
     }
