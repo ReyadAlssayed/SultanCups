@@ -183,6 +183,21 @@
         color: white !important;
     }
 
+/* تنسيق حقل الملاحظات في سجلات الإنتاج */
+textarea.pro-input {
+    min-height: 100px;
+    resize: vertical; /* السماح بتغيير الحجم عمودياً فقط */
+    grid-column: span 2; /* التأكد من أخذ العرض الكامل في الشبكة */
+    line-height: 1.5;
+    padding: 12px;
+}
+
+.pro-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* تقسيم الحقول لعمودين */
+    gap: 15px;
+}
+
 .pro-btn-add, .pro-save {
     display: inline-flex;
     align-items: center;

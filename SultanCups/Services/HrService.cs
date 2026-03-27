@@ -17,19 +17,21 @@ namespace SultanCups.Services
         // جلب جميع الموظفين من قاعدة البيانات
         public async Task<List<Employee>> GetEmployees()
         {
-            return await _context.employees.ToListAsync();
+            return await _context.employees
+                .AsNoTracking() // إضافة هذه للسرعة
+                .ToListAsync();
         }
 
 
         //هدا خاص بالبحث عن موظف
         public async Task<List<Employee>> SearchEmployees(string? searchText, bool? isActive = null)
         {
-            var query = _context.employees.AsQueryable();
+            // أضفنا AsNoTracking هنا في بداية الاستعلام
+            var query = _context.employees.AsNoTracking().AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchText))
             {
                 searchText = searchText.Trim();
-
                 query = query.Where(e =>
                     e.full_name.Contains(searchText) ||
                     (e.phone != null && e.phone.Contains(searchText)));
@@ -42,7 +44,6 @@ namespace SultanCups.Services
 
             return await query.ToListAsync();
         }
-
 
         // هذا الجزء خاص بجدول employees
         // إضافة موظف جديد

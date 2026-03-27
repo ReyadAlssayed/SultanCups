@@ -17,6 +17,7 @@ namespace SultanCups.Services
         public async Task<List<Salary>> GetSalaries()
         {
             return await _context.salaries
+                .AsNoTracking() // إضافة هذه لسرعة العرض وتوفير الذاكرة
                 .Include(s => s.Employee)
                 .Include(s => s.CashBox)
                 .ToListAsync();

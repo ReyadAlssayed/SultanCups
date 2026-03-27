@@ -92,6 +92,13 @@
                         <label class="pro-label">التاريخ</label>
                         <input class="pro-input" type="date" @bind="ProForm.production_date" />
                     </div>
+
+                    <div class="pro-field" style="grid-column: span 2;">
+                        @* span 2 ليأخذ العرض الكامل *@
+                        <label class="pro-label">ملاحظات</label>
+                        <textarea class="pro-input" @bind="ProForm.notes" rows="3" placeholder="أضف ملاحظاتك هنا..."></textarea>
+                    </div>
+
                 </div>
 
                 <div class="pro-dialog-actions">
@@ -167,7 +174,8 @@
             product_id = p.product_id,
             box_count = p.box_count,
             box_cost = p.box_cost,
-            production_date = p.production_date
+            production_date = p.production_date,
+            notes = p.notes // أضف هذا السطر لربط الملاحظات
         };
 
         ShowEditDialog = true;
@@ -183,10 +191,11 @@
             product_id = p.product_id,
             box_count = p.box_count,
             box_cost = p.box_cost,
-            production_date = p.production_date
+            production_date = p.production_date,
+            notes = p.notes // أضف هذا السطر
         };
 
-        DeleteProductName = p.Product.name;
+        DeleteProductName = p.Product?.name ?? "منتج غير معروف";
         ShowDeleteDialog = true;
     }
 

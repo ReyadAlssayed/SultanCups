@@ -51,7 +51,9 @@ namespace SultanCups.Services
         // جلب جميع المسؤولين من قاعدة البيانات
         public async Task<List<Admain>> GetAdmins()
         {
-            return await _context.admins.ToListAsync();
+            return await _context.admins
+                .AsNoTracking() // للعرض فقط، توفر الذاكرة والوقت
+                .ToListAsync();
         }
 
         // هذا الجزء خاص بجدول admins

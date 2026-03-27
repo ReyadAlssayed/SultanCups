@@ -20,6 +20,7 @@ namespace SultanCups.Services
         public async Task<List<Product>> GetProducts()
         {
             return await _context.products
+                .AsNoTracking() // الإضافة هنا
                 .Where(p => p.is_active)
                 .ToListAsync();
         }
@@ -70,6 +71,7 @@ namespace SultanCups.Services
         public async Task<List<Production>> GetProduction()
         {
             return await _context.production
+                .AsNoTracking() // الإضافة هنا
                 .Include(p => p.Product)
                 .ToListAsync();
         }
