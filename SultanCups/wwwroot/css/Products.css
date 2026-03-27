@@ -1,6 +1,6 @@
 ﻿/* =======================================================
    Vigor Line - Products.css (النسخة الكاملة الموحدة)
-   التعديلات: مطابقة نظام الموظفين والمسؤولين بالكامل.
+   التعديل: تصحيح أزرار الجدول لتطابق الصفحات الأخرى
    ======================================================= */
 
 :root {
@@ -30,6 +30,7 @@
     padding: 15px 25px;
     border-radius: 16px;
     box-shadow: var(--prod-shadow);
+    border-right: 6px solid var(--prod-primary);
 }
 
 .prod-title {
@@ -39,7 +40,7 @@
     margin: 0;
 }
 
-/* ================= Table Styling (مطابق للموظفين تماماً) ================= */
+/* ================= Table Styling ================= */
 .prod-card {
     background: var(--prod-card-solid);
     border-radius: 16px;
@@ -56,7 +57,7 @@
 .prod-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 860px; /* لضمان ثبات المربع ومنع الضغط */
+    min-width: 900px;
 }
 
     .prod-table thead th {
@@ -74,13 +75,12 @@
         transition: background 0.2s ease;
     }
 
-        /* نظام الصفوف المتبادلة الأدكن */
         .prod-table tbody tr:nth-child(even) {
-            background: #f8fafc; /* رصاصي خفيف */
+            background: #f8fafc;
         }
 
         .prod-table tbody tr:nth-child(odd) {
-            background: #ffffff; /* أبيض */
+            background: #ffffff;
         }
 
         .prod-table tbody tr:hover {
@@ -94,7 +94,6 @@
         vertical-align: middle;
     }
 
-/* تخصيص الأعمدة لتمييز البيانات */
 .prod-name {
     color: #1e40af;
     font-weight: 950 !important;
@@ -106,20 +105,16 @@
     font-weight: 700 !important;
 }
 
-.prod-price {
-    color: #059669;
-    font-weight: 950 !important;
-}
-
-/* ================= Actions & Buttons ================= */
+/* ================= Actions & Buttons (التعديل المطلوب هنا) ================= */
 .prod-actions-cell {
     display: flex;
     gap: 10px;
 }
 
+/* زر التعديل - خلفية زرقاء باهتة ونص غامق */
 .prod-edit {
-    background: #2563eb;
-    color: white;
+    background: #e0f2fe;
+    color: #0369a1;
     border: 0;
     padding: 8px 16px;
     border-radius: 8px;
@@ -128,9 +123,15 @@
     transition: 0.2s;
 }
 
+    .prod-edit:hover {
+        background: #0ea5e9;
+        color: white;
+    }
+
+/* زر الحذف - خلفية حمراء باهتة ونص غامق */
 .prod-del {
-    background: #dc2626;
-    color: white;
+    background: #fee2e2;
+    color: #dc2626;
     border: 0;
     padding: 8px 16px;
     border-radius: 8px;
@@ -139,6 +140,12 @@
     transition: 0.2s;
 }
 
+    .prod-del:hover {
+        background: #ef4444;
+        color: white;
+    }
+
+/* أزرار الإضافة والحفظ - تبقى باللون الملكي الكامل */
 .prod-btn-add, .prod-save {
     display: inline-flex;
     align-items: center;
@@ -147,12 +154,11 @@
     padding: 10px 22px;
     border: none;
     border-radius: 10px;
-    background: #2563eb !important;
+    background: var(--prod-primary) !important;
     color: #ffffff !important;
     font-size: 16px;
     font-weight: 900;
     cursor: pointer;
-    -webkit-text-fill-color: #ffffff !important;
     transition: transform .2s ease, background .2s ease;
 }
 
@@ -171,6 +177,7 @@
     justify-content: center;
     z-index: 9999;
     padding: 20px;
+    backdrop-filter: blur(4px);
 }
 
 .prod-dialog-box {
@@ -201,6 +208,7 @@
     width: 100%;
     height: 120px;
     background: #f1f5f9;
+    border-bottom: 2px solid var(--prod-primary);
 }
 
     .prod-dialog-top-image img {
@@ -213,7 +221,14 @@
     padding: 25px;
 }
 
-/* ================= Inputs & Labels (النمط المصغر) ================= */
+    .prod-dialog-body h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 950;
+        color: var(--prod-text);
+    }
+
+/* ================= Inputs & Labels ================= */
 .prod-field {
     margin-bottom: 20px;
     display: flex;
@@ -238,7 +253,7 @@
     font-weight: 700;
     background: #fff;
     color: #1e293b;
-    transition: border 0.2s;
+    transition: 0.2s;
 }
 
     .prod-input:focus {
@@ -330,11 +345,7 @@
     transition: 0.2s;
 }
 
-    .prod-delete-confirm:hover {
-        background: #b91c1c;
-    }
-
-/* ================= Toast Notification (الموحدة) ================= */
+/* ================= Toast Notification ================= */
 .prod-toast-container {
     position: fixed;
     top: 20px;
@@ -382,7 +393,7 @@
     color: #991b1b;
 }
 
-/* ================= استجابة الجوال ================= */
+/* ================= Mobile Response ================= */
 @media (max-width: 600px) {
     .prod-topbar {
         flex-direction: column;
