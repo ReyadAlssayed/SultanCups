@@ -38,6 +38,22 @@
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
 
+    <script>
+        let timer;
+        function resetTimer(helper) {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+        helper.invokeMethodAsync('Logout');
+        }, 300000); // 5 دقائق
+        }
+
+        window.initIdleTimer = (helper) => {
+        const events = ['mousedown', 'mousemove', 'keypress', 'touchstart'];
+        events.forEach(e => document.addEventListener(e, () => resetTimer(helper)));
+        resetTimer(helper);
+        };
+    </script>
+
 </body>
 
 </html>

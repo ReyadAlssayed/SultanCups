@@ -19,6 +19,101 @@
     --btn-radius: 999px;
 }
 
+.idle-alert-danger {
+    position: relative;
+    overflow: hidden; /* ضروري لقص الحركة الزائدة */
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 2px solid #ef4444; /* إطار أقوى */
+    padding: 14px 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+    display: flex;
+    align-items: center;
+}
+
+.alert-content {
+    position: relative;
+    z-index: 2; /* لجعل النص فوق الحركة */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+/* تأثير الشفشافية الضوئية المتحركة */
+.shimmer-effect {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient( 90deg, transparent, rgba(255, 255, 255, 0.6), /* وهج أبيض شفاف */
+    transparent );
+    z-index: 1;
+    animation: shimmerSwipe 2s infinite linear;
+}
+
+/* أيقونة القفل مع نبض خفيف */
+.secure-icon-bold {
+    animation: iconPulse 1s infinite alternate;
+}
+
+/* أنميشن مسح الضوء */
+@keyframes shimmerSwipe {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+/* أنميشن نبض الأيقونة */
+@keyframes iconPulse {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.15);
+    }
+}
+
+/* أنميشن اهتزاز خفيف للصندوق عند الظهور */
+.idle-alert-danger {
+    animation: shakeEntry 0.5s ease-out;
+}
+
+@keyframes shakeEntry {
+    0% {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+
+    20% {
+        transform: translateX(-15px);
+    }
+
+    40% {
+        transform: translateX(10px);
+    }
+
+    60% {
+        transform: translateX(-5px);
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
 * {
     box-sizing: border-box;
 }

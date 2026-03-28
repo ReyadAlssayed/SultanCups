@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager Nav
 @using System.Timers
+@inject IJSRuntime JS
 
 <div class="app-shell @(IsSidebarCollapsed ? "sidebar-collapsed" : "")">
 
@@ -100,7 +101,7 @@
 
             <div class="nav-sep"></div>
 
-            <button type="button" class="nav-logout" @onclick="Logout">
+            <button type="button" class="nav-logout" @onclick="ManualLogout">
                 تسجيل الخروج
             </button>
 
@@ -155,6 +156,29 @@
         _timer.Enabled = true;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // تشغيل مراقب السكون بمجرد تحميل الواجهة
+            var linter = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initIdleTimer", linter);
+        }
+    }
+
+    // للدخول التلقائي (من السكربت) - نرسل السبب
+    [JSInvokable]
+    public void Logout()
+    {
+        Nav.NavigateTo("/?reason=idle");
+    }
+
+    // للخروج اليدوي (من الزر) - نذهب للرئيسية مباشرة بدون سبب
+    void ManualLogout()
+    {
+        Nav.NavigateTo("/");
+    }
+
     private void UpdateTime(object? sender, ElapsedEventArgs? e)
     {
         var now = DateTime.Now;
@@ -187,8 +211,4 @@
         Nav.NavigateTo(url);
     }
 
-    void Logout()
-    {
-        Nav.NavigateTo("/");
-    }
 }

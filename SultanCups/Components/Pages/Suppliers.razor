@@ -182,7 +182,7 @@
 
     async Task ConfirmDelete()
     {
-        await InventoryService.DeleteSupplier(SupplierForm.supplier_id);
+        await InventoryService.ToggleSupplier(SupplierForm.supplier_id);
         SuppliersList = await InventoryService.GetSuppliers();
         CloseDialogs();
     }

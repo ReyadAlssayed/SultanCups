@@ -16,6 +16,32 @@
     --pro-shadow: 0 10px 30px rgba(2,6,23,0.08);
 }
 
+/* علامة موقوف بجانب الاسم */
+.pro-status-tag {
+    font-size: 10px;
+    background-color: #fee2e2; /* أحمر فاتح جداً خلفية */
+    color: #ef4444; /* أحمر هادئ للنص */
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 6px;
+    font-weight: bold;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.is-invalid {
+    border: 1px solid #dc3545 !important;
+    background-color: #fff8f8;
+}
+
+.pro-error-text {
+    color: #dc3545;
+    font-size: 11px;
+    margin-top: 4px;
+    font-weight: bold;
+    padding-right: 5px;
+}
+
 /* ================= Page Layout ================= */
 .pro-page {
     padding: 26px;
@@ -358,6 +384,62 @@ textarea.pro-input {
 .pro-cancel:hover {
     background: #475569;
     transform: translateY(-2px);
+}
+
+/* حاوية التنبيه - نظام الكارت العائم */
+.prod-toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.prod-toast {
+    min-width: 320px;
+    padding: 16px 25px;
+    border-radius: 16px; /* زوايا ناعمة مثل الموظفين */
+    background: white;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    font-weight: 950;
+    font-size: 15px;
+    border: 1px solid #e2e8f0;
+    animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+    /* التلوين الجانبي الذكي */
+    .prod-toast.success {
+        border-right: 6px solid #22c55e; /* أخضر للنجاح */
+        color: #166534;
+    }
+
+    .prod-toast.error {
+        border-right: 6px solid #ef4444; /* أحمر للحذف */
+        color: #991b1b;
+    }
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+textarea.pro-input:focus {
+    border-color: var(--pro-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 @media (max-width: 600px) {

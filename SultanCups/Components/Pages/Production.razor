@@ -3,6 +3,14 @@
 @inject SultanCups.Services.InventoryService InventoryService
 
 <div class="pro-page">
+    @if (!string.IsNullOrEmpty(ToastMessage))
+    {
+        <div class="prod-toast-container">
+            <div class="prod-toast @ToastClass">
+                @ToastMessage
+            </div>
+        </div>
+    }
     <div class="pro-topbar">
         <button type="button" class="pro-btn-add" @onclick="OpenAddDialog">إضافة إنتاج جديد</button>
         <h2 class="pro-title">سجلات الإنتاج</h2>
@@ -36,7 +44,13 @@
                         @foreach (var p in ProductionList)
                         {
                             <tr>
-                                <td class="pro-name">@p.Product?.name</td>
+                                <td class="pro-name">
+                                    @p.Product?.name
+                                    @if (p.Product != null && !p.Product.is_active)
+                                    {
+                                        <span class="pro-status-tag">موقوف</span>
+                                    }
+                                </td>
                                 <td class="pro-count">@p.box_count</td>
                                 <td class="pro-money">@Fmt(p.box_cost)</td>
                                 <td class="pro-money"><span class="pro-total">@Fmt(p.total_cost)</span></td>
@@ -58,7 +72,10 @@
 @if (ShowAddDialog || ShowEditDialog)
 {
     <div class="pro-dialog-overlay">
+        @* هذا السطر الذي كان ينقصك لفتح النافذة *@
         <div class="pro-dialog-box">
+            @* وهذا السطر أيضاً *@
+            
             <div class="pro-dialog-top-image">
                 <img src="images/Background.png" />
             </div>
@@ -67,38 +84,59 @@
                 <h3>@(ShowAddDialog ? "إضافة إنتاج" : "تعديل الإنتاج")</h3>
 
                 <div class="pro-fields-grid">
+                    @* حقل المنتج *@
                     <div class="pro-field">
                         <label class="pro-label">المنتج</label>
-                        <select class="pro-input" @bind="ProForm.product_id">
+                        <select class="pro-input @(string.IsNullOrEmpty(ProductError) ? "" : "is-invalid")" @bind="ProForm.product_id">
                             <option value="0">اختر المنتج</option>
                             @foreach (var product in ProductList)
                             {
                                 <option value="@product.product_id">@product.name</option>
                             }
                         </select>
+                        @if (!string.IsNullOrEmpty(ProductError))
+                        {
+                            <div class="pro-error-text">@ProductError</div>
+                        }
                     </div>
 
+                    @* حقل عدد الكراتين *@
                     <div class="pro-field">
-                        <label class="pro-label">عدد الكراتين</label>
-                        <input class="pro-input" type="number" @bind="ProForm.box_count" />
+                        <label class="pro-label">عدد الكراتين (1-1000)</label>
+                        <input class="pro-input @(string.IsNullOrEmpty(CountError) ? "" : "is-invalid")" type="number" @bind="ProForm.box_count" />
+                        @if (!string.IsNullOrEmpty(CountError))
+                        {
+                            <div class="pro-error-text">@CountError</div>
+                        }
                     </div>
 
+                    @* حقل تكلفة الكرتونة *@
                     <div class="pro-field">
                         <label class="pro-label">تكلفة الكرتونة (د.ل)</label>
-                        <input class="pro-input" type="number" step="0.01" @bind="ProForm.box_cost" />
+                        <input class="pro-input @(string.IsNullOrEmpty(CostError) ? "" : "is-invalid")" type="number" step="0.01" @bind="ProForm.box_cost" />
+                        @if (!string.IsNullOrEmpty(CostError))
+                        {
+                            <div class="pro-error-text">@CostError</div>
+                        }
                     </div>
 
+                    @* حقل التاريخ *@
                     <div class="pro-field">
                         <label class="pro-label">التاريخ</label>
                         <input class="pro-input" type="date" @bind="ProForm.production_date" />
                     </div>
 
+                    @* حقل الملاحظات *@
                     <div class="pro-field" style="grid-column: span 2;">
-                        @* span 2 ليأخذ العرض الكامل *@
-                        <label class="pro-label">ملاحظات</label>
-                        <textarea class="pro-input" @bind="ProForm.notes" rows="3" placeholder="أضف ملاحظاتك هنا..."></textarea>
+                        <label class="pro-label">ملاحظات (الحد الأقصى 100 حرف)</label>
+                        <textarea class="pro-input @(string.IsNullOrEmpty(NoteError) ? "" : "is-invalid")"
+                                      @bind="ProForm.notes" rows="3" maxlength="100" placeholder="أضف ملاحظاتك هنا...">
+</textarea>
+                        @if (!string.IsNullOrEmpty(NoteError))
+                        {
+                            <div class="pro-error-text">@NoteError</div>
+                        }
                     </div>
-
                 </div>
 
                 <div class="pro-dialog-actions">
@@ -143,6 +181,14 @@
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
 
+    string ProductError = "";
+    string CountError = "";
+    string CostError = "";
+    string NoteError = "";
+
+    string ToastMessage = string.Empty;
+    string ToastClass = "success";
+
     SultanCups.Models.Production ProForm = new();
     string DeleteProductName = "";
 
@@ -162,6 +208,21 @@
             production_date = DateTime.Today
         };
         ShowAddDialog = true;
+    }
+
+
+    void ShowToast(string msg, string type = "success")
+    {
+        ToastMessage = msg;
+        ToastClass = type;
+        StateHasChanged();
+    
+        // يختفي التنبيه تلقائياً بعد 3 ثواني
+        Task.Delay(3000).ContinueWith(_ =>
+        {
+            ToastMessage = string.Empty;
+            InvokeAsync(StateHasChanged);
+        });
     }
 
     void OpenEditDialog(SultanCups.Models.Production p)
@@ -201,16 +262,28 @@
 
     async Task SaveProduction()
     {
+        // تصفير جميع الأخطاء قبل الفحص
+        ProductError = CountError = CostError = NoteError = "";
+
+        bool hasError = false;
+
+        if (ProForm.product_id <= 0) { ProductError = "يرجى اختيار منتج"; hasError = true; }
+        if (ProForm.box_count < 1 || ProForm.box_count > 1000) { CountError = "العدد بين 1 و 1000"; hasError = true; }
+        if (ProForm.box_cost <= 0 || ProForm.box_cost > 100) { CostError = "التكلفة بين 0.01 و 100"; hasError = true; }
+        if (!string.IsNullOrEmpty(ProForm.notes) && ProForm.notes.Length > 100) { NoteError = "أقصى حد 100 حرف"; hasError = true; }
+
+        if (hasError) return;
+
+        string actionText = ShowAddDialog ? "إضافة" : "تعديل";
+
         if (ShowAddDialog)
-        {
             await InventoryService.AddProduction(ProForm);
-        }
         else
-        {
             await InventoryService.UpdateProduction(ProForm);
-        }
 
         ProductionList = await InventoryService.GetProduction();
+    
+        ShowToast($"تم {actionText} الإنتاج بنجاح", "success");
         CloseDialogs();
     }
 
@@ -218,6 +291,8 @@
     {
         await InventoryService.DeleteProduction(ProForm.production_id);
         ProductionList = await InventoryService.GetProduction();
+    
+        ShowToast("تم حذف سجل الإنتاج بنجاح", "error");
         CloseDialogs();
     }
 
@@ -228,6 +303,7 @@
         ShowDeleteDialog = false;
         ProForm = new SultanCups.Models.Production();
         DeleteProductName = "";
+        ProductError = CountError = CostError = NoteError = "";
     }
 
 }
