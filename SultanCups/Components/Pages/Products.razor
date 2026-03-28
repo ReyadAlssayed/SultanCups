@@ -258,8 +258,16 @@
         {
             if (DuplicateProduct != null && DuplicateProduct.product_id != ProductForm.product_id)
             {
-                // الرسالة التي طلبتها
-                Message = "هذا الاسم موجود بالفعل؛ إذا كنت تريد تفعيله، أعد كتابته في واجهة (إضافة منتج) بنفس الاسم ثم اضغط تنشيط.";
+                if (DuplicateProduct.is_active)
+                {
+                    // إذا كان الاسم مستخدم في منتج آخر نشط
+                    Message = "هذا المنتج موجود نشطاً بالفعل؛ لا يمكنك تكرار نفس الاسم.";
+                }
+                else
+                {
+                    // إذا كان الاسم موجوداً في الأرشيف
+                    Message = "هذا الاسم موجود مسبقاً في الأرشيف (غير نشط)؛ لا يمكنك استخدامه هنا.";
+                }
                 return;
             }
             await InventoryService.UpdateProduct(ProductForm);
