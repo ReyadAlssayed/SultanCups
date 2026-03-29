@@ -181,5 +181,55 @@ namespace SultanCups.Services
             return true;
         }
 
+        // =========================================
+        // 🔹 raw_materials (المواد الخام)
+        // =========================================
+
+        public async Task<List<RawMaterial>> GetActiveRawMaterials()
+        {
+            return await _context.raw_materials
+                .Where(r => r.is_active)
+                .ToListAsync();
+        }
+        public async Task AddRawMaterial(RawMaterial material)
+        {
+            _context.raw_materials.Add(material);
+            await _context.SaveChangesAsync();
+        }
+        public async Task<bool> UpdateRawMaterial(RawMaterial updated)
+        {
+            var material = await _context.raw_materials
+                .FirstOrDefaultAsync(r => r.raw_material_id == updated.raw_material_id);
+
+            if (material == null)
+                return false;
+
+            material.name = updated.name;
+            material.size = updated.size;
+            material.unit_of_measure = updated.unit_of_measure;
+            material.unit_cost = updated.unit_cost;
+            material.is_active = updated.is_active;
+            material.notes = updated.notes;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> ToggleRawMaterial(int id)
+        {
+            var material = await _context.raw_materials
+                .FirstOrDefaultAsync(r => r.raw_material_id == id);
+
+            if (material == null)
+                return false;
+
+            material.is_active = !material.is_active;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+
+
     }
 }
