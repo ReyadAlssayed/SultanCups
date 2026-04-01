@@ -133,6 +133,7 @@ namespace SultanCups.Services
         public async Task<List<Supplier>> GetSuppliers()
         {
             return await _context.suppliers
+                .AsNoTracking()
                 .Where(s => s.is_active)
                 .ToListAsync();
         }
@@ -181,5 +182,11 @@ namespace SultanCups.Services
             return true;
         }
 
+        public async Task<List<Supplier>> GetAllSuppliers()
+        {
+            return await _context.suppliers
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

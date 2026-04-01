@@ -1,173 +1,185 @@
-﻿/* ================= CSS الموحد للنظام (التنسيق النهائي) ================= */
+﻿/* =======================================================
+   Vigor Line - Suppliers.css (النسخة النهائية الصارمة)
+   التوافق: مطابق لكود Razor بأسماء st-main-table و st-row-item
+   ======================================================= */
 
-/* ----- التنسيق العام للصفحة ----- */
+:root {
+    --inv-bg: #f3f6fb;
+    --inv-card-solid: #ffffff;
+    --inv-line: #e2e8f0;
+    --inv-text: #0f172a;
+    --inv-muted: #64748b;
+    --inv-primary: #2563eb;
+    --inv-shadow: 0 10px 30px rgba(2,6,23,0.08);
+}
+
 .inv-page {
     padding: 26px;
     direction: rtl;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--inv-bg);
+    min-height: 100vh;
 }
 
+/* التوب بار والعنوان */
 .inv-topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 16px;
+    box-shadow: var(--inv-shadow);
+    border-right: 6px solid var(--inv-primary);
 }
 
 .inv-title {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 950;
-    color: #0f172a;
-    margin: 0;
+    color: var(--inv-text);
 }
 
-/* ----- الزر الرئيسي لإضافة سجل ----- */
-.inv-btn-add {
-    background: #2563eb;
-    color: white;
-    border: 0;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-weight: 900;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-    .inv-btn-add:hover {
-        background: #1e40af;
-        transform: translateY(-1px);
-    }
-
-/* ----- البطاقة والجدول ----- */
+/* الكرت الحاوي للجدول */
 .inv-card {
-    background: rgba(255, 255, 255, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.55);
-    border-radius: 22px;
-    box-shadow: 0 28px 70px rgba(2, 6, 23, 0.1);
-    backdrop-filter: blur(10px);
+    background: var(--inv-card-solid);
+    border-radius: 16px;
+    box-shadow: var(--inv-shadow);
     overflow: hidden;
+    border: 1px solid var(--inv-line);
 }
 
-.inv-table-wrap {
+/* ================= نظام الجدول (st-main-table) ================= */
+.st-main-table {
     width: 100%;
-    overflow: auto;
-    padding: 14px;
+    border-collapse: collapse;
 }
 
-.inv-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-    .inv-table thead th {
-        color: #64748b;
+    .st-main-table thead th {
+        background: #f8fafc; /* اللون الرصاصي الباهت المطلوب */
+        color: var(--inv-muted);
         font-size: 13px;
         font-weight: 950;
-        padding: 12px 16px;
-        text-align: right;
+        padding: 18px 20px;
+        text-align: center;
+        border-bottom: 2px solid var(--inv-line);
     }
 
-    .inv-table tbody td {
-        background: white;
-        border-top: 1px solid rgba(226, 232, 240, 0.85);
-        padding: 14px 16px;
-        font-weight: 800;
-    }
-
-.inv-code {
-    color: #0b2a66;
-    font-weight: 950;
+.badge-active {
+    color: #10b981;
+    background: #ecfdf5;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
 }
 
-.inv-money {
-    font-family: ui-monospace, monospace;
+.badge-inactive {
+    color: #ef4444;
+    background: #fef2f2;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
 }
 
-.inv-amount {
-    color: #22c55e;
-    font-weight: 950;
+/* تطبيق "لون بلون" على st-row-item */
+.st-row-item:nth-child(odd) {
+    background-color: #ffffff !important;
 }
 
-.inv-muted {
-    color: #64748b;
-    font-size: 13px;
+.st-row-item:nth-child(even) {
+    background-color: #f8fafc !important; /* الرمادي الباهت المطلوب */
 }
 
-/* ----- أزرار الإجراءات داخل الجدول ----- */
-.inv-actions-cell {
-    display: flex;
-    gap: 8px;
+.st-row-item:hover {
+    background-color: #f1f5f9 !important;
 }
 
-.inv-small {
+.st-row-item td {
+    padding: 16px 20px;
+    font-weight: 800;
+    color: var(--inv-text);
+    text-align: center;
+    border-bottom: 1px solid var(--inv-line);
+}
+
+/* كلاسات الأعمدة الخاصة */
+.st-col-name {
+    color: var(--inv-primary) !important;
+    font-weight: 950 !important;
+}
+
+.st-loading-text, .st-empty-text {
+    padding: 30px;
+    color: var(--inv-muted);
+    font-weight: 800;
+}
+
+/* ================= الأزرار (Buttons) ================= */
+.inv-btn-add, .inv-save {
+    background: var(--inv-primary);
+    color: white;
     border: 0;
-    padding: 7px 12px;
+    padding: 10px 22px;
     border-radius: 10px;
-    font-weight: 900;
+    font-weight: 950;
     cursor: pointer;
 }
 
 .inv-edit {
-    background: #0ea5e9;
-    color: white;
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
 }
 
 .inv-del {
-    background: #ef4444;
-    color: white;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
 }
 
-/* ================= مربعات الحوار (Dialogs) ================= */
-
+/* ================= النوافذ المنبثقة (Dialogs) ================= */
 .inv-dialog-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(15, 23, 42, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
-    backdrop-filter: blur(2px);
+    z-index: 9999;
+    backdrop-filter: blur(4px);
 }
 
 .inv-dialog-box {
     background: white;
     border-radius: 24px;
-    width: 92%;
-    max-width: 600px;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-}
-
-.inv-dialog-top-image {
     width: 100%;
-    height: 100px;
+    max-width: 550px;
     overflow: hidden;
-    background: #f1f5f9;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
 }
 
-    .inv-dialog-top-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+.inv-dialog-top-image img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
 
 .inv-dialog-body {
-    padding: 20px;
+    padding: 25px;
 }
 
-    .inv-dialog-body h3 {
-        text-align: center;
-        font-weight: 950;
-        margin-bottom: 20px;
-    }
-
-/* شبكة الحقول (حقلين في السطر) */
 .inv-fields-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr; /* تقسيم متساوي */
     gap: 16px;
+    align-items: start;
 }
 
 .full-width {
@@ -176,110 +188,100 @@
 
 .inv-label {
     display: block;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 900;
-    color: #64748b;
+    color: #94a3b8;
     margin-bottom: 6px;
 }
 
 .inv-input-dialog {
     width: 100%;
     padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    font-weight: 800;
+    border-radius: 10px;
+    border: 1px solid var(--inv-line);
     background: #f8fafc;
+    font-weight: 800;
+    box-sizing: border-box; /* لضمان ثبات الحقل داخل الـ Grid وعدم اختفائه */
 }
 
-/* أزرار التحكم في الحوار */
 .inv-dialog-actions {
     display: flex;
     gap: 12px;
     margin-top: 25px;
 }
 
-.inv-save {
-    flex: 1;
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 14px;
-    border-radius: 12px;
-    font-weight: 900;
-    cursor: pointer;
-}
-
 .inv-cancel {
     flex: 1;
-    background: #64748b;
-    color: white;
+    background: #f1f5f9;
+    color: #475569;
     border: none;
-    padding: 14px;
-    border-radius: 12px;
+    padding: 12px;
+    border-radius: 10px;
     font-weight: 900;
     cursor: pointer;
 }
 
-/* ================= تنسيق خاص بمربع الحذف ================= */
-
-.inv-delete-top-image {
-    background: #fee2e2; /* أحمر خفيف خلف الأيقونة */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 120px;
+.inv-delete-confirm {
+    flex: 2;
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
 }
 
 .inv-delete-icon {
-    width: 70px;
-    height: 70px;
-    background: white;
-    color: #ef4444;
+    width: 60px;
+    height: 60px;
+    background: #fee2e2;
+    color: #dc2626;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 40px;
-    font-weight: bold;
-    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
-    border: 4px solid #fca5a5;
+    font-size: 30px;
+    margin: 0 auto 15px;
 }
 
-.inv-delete-title {
-    text-align: center;
-    color: #b91c1c;
-    font-weight: 950;
-}
 
-.inv-delete-text {
-    text-align: center;
-    color: #475569;
-    font-weight: 800;
-    padding: 0 10px;
-}
-
-.inv-delete-confirm {
-    flex: 1;
-    background: linear-gradient(135deg, #ef4444, #b91c1c);
-    color: white;
-    border: none;
-    padding: 14px;
+/* النسخة المعتمدة والمنظفة لأزرار الحالة */
+.status-toggle-container {
+    display: flex;
+    gap: 12px;
+    margin-top: 5px;
+    background: #f8fafc;
+    padding: 5px;
     border-radius: 12px;
+    border: 1px solid var(--inv-line);
+}
+
+.status-btn {
+    flex: 1;
+    padding: 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
     font-weight: 900;
     cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--inv-muted);
 }
 
-/* استجابة الجوال */
-@media (max-width: 600px) {
-    .inv-fields-grid {
-        grid-template-columns: 1fr;
+    .status-btn.btn-active.selected {
+        border-color: #10b981;
+        background: #ecfdf5;
+        color: #064e3b;
     }
 
-    .full-width {
-        grid-column: span 1;
+    .status-btn.btn-inactive.selected {
+        border-color: #ef4444; /* اللون الأحمر المطلوب */
+        background: #fef2f2;
+        color: #991b1b;
     }
 
-    .inv-dialog-box {
-        width: 95%;
+    .status-btn:hover:not(.selected) {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
     }
-}

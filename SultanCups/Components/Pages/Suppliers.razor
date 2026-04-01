@@ -1,6 +1,8 @@
 ﻿@page "/Suppliers"
+@using SultanCups.Services
 @layout Layout.MainLayout
 @inject SultanCups.Services.InventoryService InventoryService
+@inject SultanCups.Services.ToastService ToastService
 
 <div class="inv-page">
     <div class="inv-topbar">
@@ -10,14 +12,15 @@
     </div>
 
     <div class="inv-card">
-        <div class="inv-table-wrap">
-            <table class="inv-table">
+        <div class="st-table-container">
+            <table class="st-main-table">
                 <thead>
                     <tr>
                         <th>اسم المورد</th>
                         <th>رقم الهاتف</th>
                         <th>الموقع</th>
                         <th>البريد الإلكتروني</th>
+                        <th>الحالة</th>
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
@@ -25,25 +28,35 @@
                     @if (SuppliersList is null)
                     {
                         <tr>
-                            <td colspan="5">جاري التحميل...</td>
+                            <td colspan="5" class="st-loading-text">جاري التحميل...</td>
                         </tr>
                     }
                     else if (SuppliersList.Count == 0)
                     {
                         <tr>
-                            <td colspan="5">لا توجد بيانات</td>
+                            <td colspan="5" class="st-empty-text">لا توجد بيانات</td>
                         </tr>
                     }
                     else
                     {
                         @foreach (var s in SuppliersList)
                         {
-                            <tr>
-                                <td class="inv-code">@s.name</td>
+                            <tr class="st-row-item">
+                                <td class="st-col-name">@s.name</td>
                                 <td>@s.phone</td>
+                                <td class="st-col-mail">@s.email</td>
                                 <td>@s.location</td>
-                                <td class="inv-muted">@s.email</td>
-                                <td class="inv-actions-cell">
+                                <td>
+                                    @if (s.is_active)
+                                    {
+                                        <span class="badge-active">نشط</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-inactive">موقف</span>
+                                    }
+                                </td>
+                                <td class="st-actions-cell">
                                     <button type="button" class="inv-small inv-edit" @onclick="() => OpenEditDialog(s)">تعديل</button>
                                     <button type="button" class="inv-small inv-del" @onclick="() => OpenDeleteDialog(s)">حذف</button>
                                 </td>
@@ -61,28 +74,99 @@
     <div class="inv-dialog-overlay">
         <div class="inv-dialog-box">
             <div class="inv-dialog-top-image">
-                <img src="images/Background.jpg" />
+                <img src="images/Background.png" />
             </div>
             <div class="inv-dialog-body">
                 <h3>@(ShowAddDialog ? "إضافة مورد جديد" : "تعديل بيانات المورد")</h3>
                 <div class="inv-fields-grid">
+                    
                     <div class="inv-field">
                         <label class="inv-label">اسم المورد</label>
-                        <input class="inv-input-dialog" @bind="SupplierForm.name" />
+                        <input class="inv-input-dialog @(string.IsNullOrEmpty(Message) ? "" : "is-invalid")"
+                               @bind="SupplierForm.name"
+                               @oninput="@((e) => { Message = ""; ShowActivatePrompt = false; SupplierForm.name = e.Value?.ToString(); })"
+                               maxlength="40" />
+
+                        @if (!string.IsNullOrEmpty(Message))
+                        {
+                            <div class="prod-alert-curtain">
+                                <div class="prod-error-message">@Message</div>
+                                @if (ShowActivatePrompt)
+                                {
+                                    <button type="button" @onclick="ActivateExisting" class="prod-btn-activate-link">
+                                        تنشيط المورد المؤرشف الآن؟
+                                    </button>
+                                }
+                            </div>
+                        }
                     </div>
+                    @* رقم الهاتف *@
                     <div class="inv-field">
                         <label class="inv-label">رقم الهاتف</label>
-                        <input class="inv-input-dialog" @bind="SupplierForm.phone" />
+                        <input class="inv-input-dialog @(string.IsNullOrEmpty(PhoneError) ? "" : "is-invalid")"
+                               @bind="SupplierForm.phone"
+                               @oninput="@((e) => { PhoneError = ""; SupplierForm.phone = e.Value?.ToString(); })"
+                               maxlength="20" />
+                        @if (!string.IsNullOrEmpty(PhoneError))
+                        {
+                            <div class="pro-error-text">@PhoneError</div>
+                        }
                     </div>
-                    <div class="inv-field">
+
+                    @* البريد الإلكتروني *@
+                    <div class="inv-field full-width">
                         <label class="inv-label">البريد الإلكتروني</label>
-                        <input class="inv-input-dialog" @bind="SupplierForm.email" />
+                        <input type="email" class="inv-input-dialog @(string.IsNullOrEmpty(EmailError) ? "" : "is-invalid")"
+                               @bind="SupplierForm.email" maxlength="50" />
+                        @if (!string.IsNullOrEmpty(EmailError))
+                        {
+                            <div class="pro-error-text">@EmailError</div>
+                        }
                     </div>
+
+                    @* الموقع *@
                     <div class="inv-field full-width">
                         <label class="inv-label">الموقع / العنوان</label>
-                        <input class="inv-input-dialog" @bind="SupplierForm.location" />
+                        <input class="inv-input-dialog @(string.IsNullOrEmpty(LocationError) ? "" : "is-invalid")"
+                               @bind="SupplierForm.location"
+                               @oninput="@((e) => { LocationError = ""; SupplierForm.location = e.Value?.ToString(); })"
+                               maxlength="30" placeholder="مثلاً: الصين - مكان المورد" />
+                        @if (!string.IsNullOrEmpty(LocationError))
+                        {
+                            <div class="pro-error-text">@LocationError</div>
+                        }
+                    </div>
+
+                    @* الحالة - تظهر فقط في التعديل كما طلبت *@
+                    @if (ShowEditDialog)
+                    {
+                        <div class="inv-field full-width">
+                            <label class="inv-label">حالة المورد</label>
+                            <div class="status-toggle-container">
+                                <button type="button" class="status-btn btn-active @(SupplierForm.is_active ? "selected" : "")"
+                                        @onclick="() => SupplierForm.is_active = true">
+                                    نشط
+                                </button>
+                                <button type="button" class="status-btn btn-inactive @(!SupplierForm.is_active ? "selected" : "")"
+                                        @onclick="() => SupplierForm.is_active = false">
+                                    معطل
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                    @* الملاحظات *@
+                    <div class="inv-field full-width">
+                        <label class="inv-label">الملاحظات</label>
+                        <textarea class="inv-input-dialog @(string.IsNullOrEmpty(NoteError) ? "" : "is-invalid")"
+                                  @bind="SupplierForm.notes" rows="2" maxlength="100"></textarea>
+                        @if (!string.IsNullOrEmpty(NoteError))
+                        {
+                            <div class="pro-error-text">@NoteError</div>
+                        }
                     </div>
                 </div>
+
                 <div class="inv-dialog-actions">
                     <button type="button" class="inv-save" @onclick="SaveSupplier">حفظ</button>
                     <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
@@ -97,20 +181,28 @@
     <div class="inv-dialog-overlay">
         <div class="inv-dialog-box inv-delete-dialog-box">
             <div class="inv-dialog-top-image inv-delete-top-image">
-                <img src="images/Background.jpg" />
+                <img src="images/Background.png" />
             </div>
             <div class="inv-dialog-body inv-delete-dialog-body">
                 <div class="inv-delete-icon-wrap"><div class="inv-delete-icon">!</div></div>
-                <h3 class="inv-delete-title">تأكيد الحذف</h3>
-                <p class="inv-delete-text">هل أنت متأكد من حذف المورد "@SupplierForm.name"؟</p>
+                
+                @* تعديل العنوان *@
+                <h3 class="inv-delete-title">تأكيد إلغاء التنشيط</h3>
+                
+                @* تعديل نص السؤال *@
+                <p class="inv-delete-text">هل أنت متأكد من إلغاء تنشيط المورد "@SupplierForm.name"؟ سيتم نقله إلى الأرشيف.</p>
+                
                 <div class="inv-dialog-actions">
-                    <button type="button" class="inv-delete-confirm" @onclick="ConfirmDelete">حذف المورد</button>
-                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
+                    @* تعديل نص زر التأكيد *@
+                    <button type="button" class="inv-delete-confirm" @onclick="ConfirmDelete">إلغاء التنشيط الآن</button>
+                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">تراجع</button>
                 </div>
             </div>
         </div>
     </div>
 }
+
+
 
 @code {
     List<SultanCups.Models.Supplier>? SuppliersList;
@@ -118,6 +210,17 @@
     bool ShowAddDialog = false;
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
+
+    string Message = ""; // رسالة الخطأ (الستارة)
+    bool ShowActivatePrompt = false; // لإظهار زر التنشيط إذا كان المورد مؤرشفاً
+    SultanCups.Models.Supplier? DuplicateSupplier; // لتخزين المورد المكرر المكتشف
+
+    string NameError = "";
+    string PhoneError = "";
+    string EmailError = "";
+    string NoteError = "";
+
+    string LocationError = "";
 
     SultanCups.Models.Supplier SupplierForm = new();
 
@@ -128,9 +231,29 @@
 
     void OpenAddDialog()
     {
-        CloseDialogs();
+        CloseDialogs(); // يصفر الرسائل والمؤشرات أولاً
+    
         SupplierForm = new SultanCups.Models.Supplier();
+        SupplierForm.is_active = true;
+    
+        // تأكد من تصفير مؤشر المورد المكرر هنا أيضاً
+        DuplicateSupplier = null;
+        ShowActivatePrompt = false;
+
         ShowAddDialog = true;
+    }
+    async Task ActivateExisting()
+    {
+        if (DuplicateSupplier != null)
+        {
+            DuplicateSupplier.is_active = true;
+            await InventoryService.UpdateSupplier(DuplicateSupplier);
+
+            ToastService.ShowToast("تم إعادة تنشيط المورد بنجاح", "success");
+
+            SuppliersList = await InventoryService.GetSuppliers();
+            CloseDialogs();
+        }
     }
 
     void OpenEditDialog(SultanCups.Models.Supplier s)
@@ -143,7 +266,9 @@
             name = s.name,
             phone = s.phone,
             email = s.email,
-            location = s.location
+            location = s.location,
+            is_active = s.is_active, // إضافة الحالة
+            notes = s.notes           // إضافة الملاحظات
         };
 
         ShowEditDialog = true;
@@ -167,31 +292,161 @@
 
     async Task SaveSupplier()
     {
-        if (ShowAddDialog)
+
+        var name = SupplierForm.name?.Trim();
+        // 1. تصفير رسائل الأخطاء السابقة
+        Message = "";
+        NameError = PhoneError = EmailError = NoteError = LocationError = "";
+        ShowActivatePrompt = false;
+        bool hasError = false;
+
+        
+
+        // 2. التحقق من اسم المورد (نظام الستارة وفحص التكرار)
+        if (string.IsNullOrWhiteSpace(name))
         {
-            await InventoryService.AddSupplier(SupplierForm);
+            Message = "اسم المورد مطلوب";
+            hasError = true;
         }
         else
         {
-            await InventoryService.UpdateSupplier(SupplierForm);
+            var allSuppliers = await InventoryService.GetAllSuppliers();
+            DuplicateSupplier = allSuppliers
+      .FirstOrDefault(s =>
+          s.name != null &&
+          s.name.Trim().ToLower() == name.ToLower() &&
+          (ShowAddDialog || s.supplier_id != SupplierForm.supplier_id)
+      );
+
+            if (ShowAddDialog)
+            {
+                if (DuplicateSupplier != null)
+                {
+                    if (DuplicateSupplier.is_active)
+                    {
+                        Message = "هذا المورد موجود مسبقاً وهو نشط.";
+                        return;
+                    }
+                    else
+                    {
+                        Message = $"المورد '{name}' موجود مسبقاً في الأرشيف.";
+                        ShowActivatePrompt = true;
+                        return;
+                    }
+                }
+            }
+            else // في حالة التعديل
+            {
+                if (DuplicateSupplier != null && DuplicateSupplier.supplier_id != SupplierForm.supplier_id)
+                {
+                    if (DuplicateSupplier.is_active)
+                    {
+                        Message = "هذا المورد موجود نشطاً بالفعل؛ لا يمكنك التكرار.";
+                    }
+                    else
+                    {
+                        Message = "هذا المورد موجود في الأرشيف؛ لا يمكنك استخدامه.";
+                    }
+                    return;
+                }
+            }
         }
 
-        SuppliersList = await InventoryService.GetSuppliers();
-        CloseDialogs();
+        // 3. التحقق من رقم الهاتف
+        if (string.IsNullOrWhiteSpace(SupplierForm.phone))
+        {
+            PhoneError = "رقم الهاتف مطلوب";
+            hasError = true;
+        }
+        else if (SupplierForm.phone.Length < 10 || SupplierForm.phone.Length > 20)
+        {
+            PhoneError = "رقم الهاتف يجب أن يكون بين 10 و 20 خانة";
+            hasError = true;
+        }
+
+        // 4. التحقق من الموقع
+        if (string.IsNullOrWhiteSpace(SupplierForm.location))
+        {
+            LocationError = "يرجى تحديد موقع أو عنوان المورد";
+            hasError = true;
+        }
+
+        // 5. البريد الإلكتروني (اختياري - Gmail فقط)
+        if (!string.IsNullOrWhiteSpace(SupplierForm.email))
+        {
+            string email = SupplierForm.email.ToLower().Trim();
+            if (!email.EndsWith("@gmail.com"))
+            {
+                EmailError = "يجب أن يكون البريد Gmail صحيحاً";
+                hasError = true;
+            }
+        }
+
+        // إذا وجد أي خطأ، نتوقف ونظهر التنبيه
+        if (hasError)
+        {
+            if (string.IsNullOrEmpty(Message)) // إذا لم يكن الخطأ في الاسم (الستارة)
+                ToastService.ShowToast("يرجى إكمال البيانات المطلوبة بشكل صحيح", "error");
+            return;
+        }
+
+        try
+        {
+            if (ShowAddDialog)
+            {
+                await InventoryService.AddSupplier(SupplierForm);
+                ToastService.ShowToast("تم إضافة المورد بنجاح", "success");
+            }
+            else
+            {
+                await InventoryService.UpdateSupplier(SupplierForm);
+                ToastService.ShowToast("تم تحديث بيانات المورد بنجاح", "success");
+            }
+
+            SuppliersList = await InventoryService.GetSuppliers();
+            CloseDialogs();
+        }
+        catch (Exception)
+        {
+            ToastService.ShowToast("حدث خطأ أثناء الاتصال بقاعدة البيانات", "error");
+        }
     }
 
     async Task ConfirmDelete()
     {
-        await InventoryService.ToggleSupplier(SupplierForm.supplier_id);
-        SuppliersList = await InventoryService.GetSuppliers();
-        CloseDialogs();
+        try
+        {
+            await InventoryService.ToggleSupplier(SupplierForm.supplier_id);
+            
+            // تحديث القائمة
+            SuppliersList = await InventoryService.GetSuppliers();
+            
+            // إظهار التنبيه الأخضر عند نجاح الحذف/التعطيل
+            ToastService.ShowToast("تم تغيير حالة المورد بنجاح", "success");
+            
+            CloseDialogs();
+        }
+        catch (Exception)
+        {
+            ToastService.ShowToast("عذراً، فشل تنفيذ إجراء الحذف", "error");
+        }
     }
-
     void CloseDialogs()
     {
         ShowAddDialog = false;
         ShowEditDialog = false;
         ShowDeleteDialog = false;
+    
+        // تصفير كل رسائل الأخطاء والمؤشرات
+        Message = "";
+        NameError = "";
+        PhoneError = "";
+        EmailError = "";
+        NoteError = "";
+        LocationError = "";
+        ShowActivatePrompt = false;
+        DuplicateSupplier = null;
+
         SupplierForm = new SultanCups.Models.Supplier();
     }
 }

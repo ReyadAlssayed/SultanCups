@@ -2,6 +2,9 @@
 @inject NavigationManager Nav
 @using System.Timers
 @inject IJSRuntime JS
+@inject SultanCups.Services.ToastService ToastService
+@using SultanCups.Components
+@using SultanCups.Components.Pages
 
 <div class="app-shell @(IsSidebarCollapsed ? "sidebar-collapsed" : "")">
 
@@ -125,6 +128,8 @@
                 </div>
 
             </header>
+            
+           <ToastContainer />
 
             <main class="app-content">
                 @Body

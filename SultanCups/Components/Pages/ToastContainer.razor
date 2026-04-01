@@ -1,0 +1,93 @@
+﻿@inject SultanCups.Services.ToastService ToastService
+@implements IDisposable
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <div class="prod-toast-container">
+        @* إضافة كلاس prod-toast ونوع الحالة success أو error *@
+        <div class="prod-toast @CssClass">
+            <span class="toast-icon">@(CssClass == "success" ? "✅" : "⚠️")</span>
+            <span class="toast-text">@Message</span>
+        </div>
+    </div>
+}
+
+<style>
+    /* الحاوية الرئيسية للتوسط في أعلى الشاشة */
+    .prod-toast-container { 
+        position: fixed; 
+        top: 25px; 
+        left: 50%; 
+        transform: translateX(-50%); 
+        z-index: 10001; 
+        display: flex;
+        justify-content: center;
+        pointer-events: none;
+    }
+
+    /* التنسيق الأساسي للإشعار - مطابق لـ Vigor Line */
+    .prod-toast { 
+        min-width: 320px;
+        padding: 16px 25px; 
+        border-radius: 16px; /* حواف دائرية ناعمة */
+        background: white; 
+        display: flex; 
+        align-items: center; 
+        gap: 15px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15); /* ظل عميق لإعطاء مظهر طافي */
+        font-weight: 950; /* خط عريض جداً كما في الهوية */
+        border: 1px solid #e2e8f0; 
+        direction: rtl;
+        animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    /* أنيميشن الدخول من الأعلى مع ارتداد خفيف */
+    @@keyframes toastIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* حالة النجاح - حدود خضراء يمين ونص غامق */
+    .prod-toast.success { 
+        border-right: 6px solid #22c55e; 
+        color: #166534; 
+    }
+
+    /* حالة الخطأ - حدود حمراء يمين ونص غامق */
+    .prod-toast.error { 
+        border-right: 6px solid #ef4444; 
+        color: #991b1b; 
+    }
+
+    .toast-icon { 
+        font-size: 1.2rem;
+    }
+
+    .toast-text {
+        white-space: nowrap;
+    }
+</style>
+
+@code {
+    private string Message = "";
+    private string CssClass = "";
+
+    protected override void OnInitialized()
+    {
+        ToastService.OnShow += HandleShow;
+    }
+
+    private async void HandleShow(string message, string cssClass)
+    {
+        Message = message;
+        CssClass = cssClass;
+        await InvokeAsync(StateHasChanged); // التأكد من التحديث في UI Thread
+
+        await Task.Delay(3000); 
+        
+        Message = "";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose() => ToastService.OnShow -= HandleShow;
+}

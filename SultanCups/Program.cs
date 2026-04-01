@@ -18,6 +18,7 @@ builder.Services.AddScoped<SalesService>();
 builder.Services.AddScoped<InventoryService>();
 builder.Services.AddScoped<FinanceService>();
 builder.Services.AddScoped<HrService>();
+builder.Services.AddScoped<SultanCups.Services.ToastService>();
 
 var app = builder.Build();
 
