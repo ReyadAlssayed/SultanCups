@@ -28,13 +28,13 @@
                     @if (SuppliersList is null)
                     {
                         <tr>
-                            <td colspan="5" class="st-loading-text">جاري التحميل...</td>
+                            <td colspan="6" class="st-loading-text">جاري التحميل...</td>
                         </tr>
                     }
                     else if (SuppliersList.Count == 0)
                     {
                         <tr>
-                            <td colspan="5" class="st-empty-text">لا توجد بيانات</td>
+                            <td colspan="6" class="st-empty-text">لا توجد بيانات</td>
                         </tr>
                     }
                     else
@@ -44,8 +44,8 @@
                             <tr class="st-row-item">
                                 <td class="st-col-name">@s.name</td>
                                 <td>@s.phone</td>
-                                <td class="st-col-mail">@s.email</td>
                                 <td>@s.location</td>
+                                <td class="st-col-mail">@s.email</td>
                                 <td>
                                     @if (s.is_active)
                                     {

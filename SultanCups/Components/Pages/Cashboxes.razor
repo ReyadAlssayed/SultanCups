@@ -1,6 +1,10 @@
 ﻿@page "/CashBoxes"
+@using SultanCups.Models
+@using SultanCups.Services
 @layout Layout.MainLayout
 @inject NavigationManager Nav
+@inject FinanceService FinanceService
+@inject ToastService ToastService
 
 <div class="cb-page">
 
@@ -17,9 +21,7 @@
 
                 <thead>
                     <tr>
-                        <th>رقم الخزنة</th>
                         <th>اسم الخزنة</th>
-                        <th>الرصيد الافتتاحي</th>
                         <th>الحالة</th>
                         <th>الإجراءات</th>
                     </tr>
@@ -29,18 +31,16 @@
                     @foreach (var c in CashBoxes)
                     {
                         <tr>
-                            <td class="cb-id">@c.Id</td>
-                            <td class="cb-name">@c.Name</td>
-                            <td class="cb-balance">@c.OpeningBalance د.ل</td>
+                            <td class="cb-name">@c.name</td>
                             <td class="cb-status">
-                                <span class="@(c.IsActive ? "cb-active" : "cb-inactive")">
-                                    @(c.IsActive ? "نشطة" : "غير نشطة")
+                                <span class="@(@c.is_active ? "cb-active" : "cb-inactive")">
+                                    @(@c.is_active ? "نشطة" : "غير نشطة")
                                 </span>
                             </td>
 
                             <td class="cb-actions">
                                 <button class="cb-edit" @onclick="() => OpenEditDialog(c)">تعديل</button>
-                                <button class="cb-delete" @onclick="() => OpenDeleteDialog(c)">حذف</button>
+                                <button class="cb-delete1" @onclick="() => OpenDeleteDialog(c)">حذف</button>
                             </td>
                         </tr>
                     }
@@ -67,24 +67,39 @@
 
                 <div class="cb-field">
                     <label class="cb-label">اسم الخزنة</label>
-                    <input class="cb-input" @bind="Form.Name" />
-                </div>
+                    <input class="cb-input @(string.IsNullOrEmpty(NameError) ? "" : "is-invalid")"
+                           @bind="Form.name"
+                           maxlength="50"
+                           @oninput="@((e) => {
+                               NameError = ""; // تصفير الخطأ عند الكتابة
+                               Message = "";
+                               ShowActivatePrompt = false;
+                               Form.name = e.Value?.ToString();
+                           })" />
 
-                <div class="cb-field">
-                    <label class="cb-label">الرصيد الافتتاحي</label>
-                    <input class="cb-input" type="number" @bind="Form.OpeningBalance" />
-                </div>
+                @* استبدل هذا في نافذة الإضافة *@
+                @if (!string.IsNullOrEmpty(NameError))
+                {
+                    <span class="pro-error-text">@NameError</span>
+                }
 
-                <div class="cb-field">
-                    <label class="cb-label">الحالة</label>
-                    <select class="cb-input" @bind="Form.IsActive">
-                        <option value="true">نشطة</option>
-                        <option value="false">غير نشطة</option>
-                    </select>
-                </div>
+                @* هذا الجزء مخصص لرسائل التكرار أو التنشيط *@
+                @if (!string.IsNullOrEmpty(Message))
+                {
+                    <div class="prod-alert-curtain">
+                        <div class="prod-error-message">@Message</div>
+                        @if (ShowActivatePrompt)
+                        {
+                            <button type="button" @onclick="ActivateExisting" class="prod-btn-activate-link">
+                                تنشيط الخزنة المؤرشفة الآن؟
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
 
                 <div class="cb-dialog-actions">
-                    <button type="button" class="cb-save">حفظ</button>
+                    <button type="button" class="cb-save" @onclick="Save">حفظ</button>
                     <button type="button" class="cb-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
             </div>
@@ -107,31 +122,62 @@
 
                 <div class="cb-field">
                     <label class="cb-label">اسم الخزنة</label>
-                    <input class="cb-input" @bind="Form.Name" />
-                </div>
+                    <input class="cb-input @(string.IsNullOrEmpty(NameError) && string.IsNullOrEmpty(Message) ? "" : "is-invalid")"
+                           @bind="Form.name"
+                           @oninput="@((e) => {
+                                               Message = "";
+                                               NameError = ""; // تصفير الخطأ عند البدء بالكتابة
+                                               ShowActivatePrompt = false;
+                                               Form.name = e.Value?.ToString();
+                                           })" />
 
-                <div class="cb-field">
-                    <label class="cb-label">الرصيد الافتتاحي</label>
-                    <input class="cb-input" type="number" @bind="Form.OpeningBalance" />
-                </div>
+                @if (!string.IsNullOrEmpty(Message))
+                {
+                    <div class="prod-alert-curtain">
+                        <div class="prod-error-message">@Message</div>
+                        @if (ShowActivatePrompt)
+                        {
+                            <button type="button" @onclick="ActivateExisting" class="prod-btn-activate-link">
+                                تنشيط الخزنة المؤرشفة الآن؟
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
 
-                <div class="cb-field">
-                    <label class="cb-label">الحالة</label>
-                    <select class="cb-input" @bind="Form.IsActive">
-                        <option value="true">نشطة</option>
-                        <option value="false">غير نشطة</option>
-                    </select>
-                </div>
+            @* --- قسم رسالة الخطأ (اسم الخزنة مطلوب) --- *@
+            @if (!string.IsNullOrEmpty(NameError))
+            {
+                <span class="pro-error-text">@NameError</span>
+            }
 
-                <div class="cb-dialog-actions">
-                    <button type="button" class="cb-save">حفظ</button>
-                    <button type="button" class="cb-cancel" @onclick="CloseDialogs">إلغاء</button>
+            @* --- قسم أزرار الحالة في التعديل --- *@
+            <div class="cb-field">
+                <label class="cb-label">الحالة</label>
+                <div class="cb-status-buttons">
+                    <button type="button"
+                            class="cb-status-btn @(Form.is_active ? "cb-active-selected" : "")"
+                            @onclick="() => Form.is_active = true">
+                        نشطة
+                    </button>
+                    <button type="button"
+                            class="cb-status-btn @(!Form.is_active ? "cb-inactive-selected" : "")"
+                            @onclick="() => Form.is_active = false">
+                        غير نشطة
+                    </button>
                 </div>
             </div>
 
+            <div class="cb-dialog-actions">
+                <button type="button" class="cb-save" @onclick="Save">حفظ</button>
+                <button type="button" class="cb-cancel" @onclick="CloseDialogs">إلغاء</button>
+            </div>
         </div>
+
     </div>
+</div>
 }
+
 @if (ShowDeleteDialog)
 {
     <div class="cb-dialog-overlay">
@@ -147,11 +193,11 @@
                     <div class="cb-delete-icon">!</div>
                 </div>
 
-                <h3 class="cb-delete-title">تأكيد الحذف</h3>
-                <p class="cb-delete-text">هل تريد حذف الخزنة؟</p>
+                <h3 class="cb-delete-title">تأكيد إلغاء التنشيط</h3>
+                <p class="cb-delete-text">هل تريد إلغاء تنشيط هذه الخزنة؟</p>
 
                 <div class="cb-dialog-actions">
-                    <button class="cb-delete-confirm">حذف</button>
+                    <button class="cb-delete" @onclick="() => Toggle(Form.cash_box_id)">تعطيل</button>
                     <button class="cb-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
 
@@ -163,62 +209,170 @@
 
 @code {
 
-    List<CashBoxRow> CashBoxes = new()
-    {
-        new CashBoxRow { Id = 1, Name = "الخزنة الرئيسية", OpeningBalance = 20000, IsActive = true },
-        new CashBoxRow { Id = 2, Name = "خزنة الرواتب", OpeningBalance = 5000, IsActive = true },
-        new CashBoxRow { Id = 3, Name = "خزنة احتياطية", OpeningBalance = 3000, IsActive = false }
-    };
+    List<CashBox> CashBoxes = new();
+    CashBox Form = new();
 
-    CashBoxRow Form = new CashBoxRow();
+
+    string Message = "";
+    bool ShowActivatePrompt = false;
+    CashBox? DuplicateCashBox;
 
     bool ShowAddDialog = false;
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
 
+    string NameError = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        CashBoxes = await FinanceService.GetActiveCashBoxes();
+    }
+
     void OpenAddDialog()
     {
-        Form = new CashBoxRow
+        Form = new CashBox
         {
-            Id = 0,
-            Name = "",
-            OpeningBalance = 0,
-            IsActive = true
+            cash_box_id = 0,
+            name = "",
+            is_active = true
         };
+
+        Message = "";
+        NameError = "";
+        ShowActivatePrompt = false;
+        DuplicateCashBox = null;
 
         ShowAddDialog = true;
         ShowEditDialog = false;
         ShowDeleteDialog = false;
     }
 
-    void OpenEditDialog(CashBoxRow c)
+    void OpenEditDialog(CashBox c)
     {
-        Form = new CashBoxRow
+        Form = new CashBox
         {
-            Id = c.Id,
-            Name = c.Name,
-            OpeningBalance = c.OpeningBalance,
-            IsActive = c.IsActive
+            cash_box_id = c.cash_box_id,
+            name = c.name,
+            is_active = c.is_active
         };
+
+        Message = "";
+        NameError = "";
+        ShowActivatePrompt = false;
+        DuplicateCashBox = null;
 
         ShowAddDialog = false;
         ShowEditDialog = true;
         ShowDeleteDialog = false;
     }
 
-    void OpenDeleteDialog(CashBoxRow c)
+    void OpenDeleteDialog(CashBox c)
     {
-        Form = new CashBoxRow
-        {
-            Id = c.Id,
-            Name = c.Name,
-            OpeningBalance = c.OpeningBalance,
-            IsActive = c.IsActive
-        };
+        Form = c;
 
         ShowAddDialog = false;
         ShowEditDialog = false;
         ShowDeleteDialog = true;
+    }
+
+    async Task Save()
+    {
+        Message = "";
+        ShowActivatePrompt = false;
+
+        var name = Form.name?.Trim();
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            NameError = "اسم الخزنة مطلوب";
+            return;
+        }
+
+        if (name.Length < 3)
+        {
+            NameError = "اسم الخزنة يجب أن يكون 3 أحرف على الأقل";
+            return;
+        }
+
+        if (name.Length > 50)
+        {
+            NameError = "اسم الخزنة لا يجب أن يتجاوز 50 حرف";
+            return;
+        }
+
+        var all = await FinanceService.GetCashBoxes();
+
+        DuplicateCashBox = all.FirstOrDefault(c =>
+            c.name != null &&
+            c.name.Trim().ToLower() == name.ToLower() &&
+            (ShowAddDialog || c.cash_box_id != Form.cash_box_id)
+        );
+
+        if (ShowAddDialog)
+        {
+            if (DuplicateCashBox != null)
+            {
+                if (DuplicateCashBox.is_active)
+                {
+                    Message = "هذه الخزنة موجودة مسبقاً وهي نشطة";
+                    return;
+                }
+                else
+                {
+                    Message = "الخزنة موجودة مسبقاً لكنها غير نشطة";
+                    ShowActivatePrompt = true;
+                    return;
+                }
+            }
+
+            await FinanceService.AddCashBox(Form);
+            ToastService.ShowToast("تم إضافة الخزنة بنجاح", "success");
+        }
+        else
+        {
+            if (DuplicateCashBox != null &&
+     DuplicateCashBox.cash_box_id != Form.cash_box_id)
+            {
+                if (DuplicateCashBox.is_active)
+                {
+                    Message = "اسم الخزنة مستخدم بالفعل";
+                    return;
+                }
+                else
+                {
+                    Message = "هذا الاسم يعود لخزنة غير نشطة، إذا كنت تريد إعادة تنشيطها توجه إلى زر إضافة خزنة";
+                    ShowActivatePrompt = true;
+                    return;
+                }
+            }
+
+            await FinanceService.UpdateCashBox(Form);
+            ToastService.ShowToast("تم تحديث الخزنة بنجاح", "success");
+        }
+
+        CashBoxes = await FinanceService.GetActiveCashBoxes();
+        CloseDialogs();
+    }
+
+    async Task ActivateExisting()
+    {
+        if (DuplicateCashBox != null)
+        {
+            DuplicateCashBox.is_active = true;
+            await FinanceService.UpdateCashBox(DuplicateCashBox);
+            ToastService.ShowToast("تم إعادة تنشيط الخزنة بنجاح", "success");
+
+            CashBoxes = await FinanceService.GetActiveCashBoxes();
+            CloseDialogs();
+        }
+    }
+
+    async Task Toggle(int id)
+    {
+        await FinanceService.ToggleCashBox(id);
+        ToastService.ShowToast("تم تغيير حالة الخزنة بنجاح", "success");
+        CashBoxes = await FinanceService.GetActiveCashBoxes();
+        CloseDialogs();
     }
 
     void CloseDialogs()
@@ -226,13 +380,10 @@
         ShowAddDialog = false;
         ShowEditDialog = false;
         ShowDeleteDialog = false;
-    }
 
-    public class CashBoxRow
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = "";
-        public decimal OpeningBalance { get; set; }
-        public bool IsActive { get; set; }
+        Message = "";
+        NameError = "";
+        ShowActivatePrompt = false;
+        DuplicateCashBox = null;
     }
 }

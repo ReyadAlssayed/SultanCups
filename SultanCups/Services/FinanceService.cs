@@ -29,12 +29,15 @@ namespace SultanCups.Services
 
         public async Task<List<CashBox>> GetCashBoxes()
         {
-            return await _context.cash_boxes.ToListAsync();
+            return await _context.cash_boxes
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<List<CashBox>> GetActiveCashBoxes()
         {
             return await _context.cash_boxes
+                .AsNoTracking()
                 .Where(c => c.is_active)
                 .ToListAsync();
         }
@@ -60,7 +63,7 @@ namespace SultanCups.Services
             return true;
         }
 
-        public async Task<bool> ToggleCashBox(int id, bool status)
+        public async Task<bool> ToggleCashBox(int id)
         {
             var box = await _context.cash_boxes
                 .FirstOrDefaultAsync(c => c.cash_box_id == id);
@@ -68,7 +71,7 @@ namespace SultanCups.Services
             if (box == null)
                 return false;
 
-            box.is_active = status;
+            box.is_active = !box.is_active;
 
             await _context.SaveChangesAsync();
             return true;

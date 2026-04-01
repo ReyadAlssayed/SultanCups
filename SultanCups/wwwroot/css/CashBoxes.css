@@ -1,270 +1,410 @@
-﻿/* ================= Page ================= */
+﻿/* ==========================================================
+   CashBoxes Page Styles - Final Optimized Version
+   ========================================================== */
 
+/* حاوية الصفحة */
 .cb-page {
     padding: 26px;
     direction: rtl;
+    background: #f8fafc; /* خلفية هادئة */
+    min-height: 100vh;
 }
 
-/* ===== Topbar ===== */
-
+/* البار العلوي - مطابق للمنتجات */
 .cb-topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(2, 6, 23, 0.05);
+    border-right: 5px solid #2563eb; /* لمسة جمالية أزرق ملكي */
 }
 
 .cb-title-center {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 950;
     color: #0f172a;
     margin: 0;
 }
 
-/* ===== Button ===== */
-
+/* أزرار الإضافة الرئيسية */
 .cb-add-btn {
     border: 0;
-    padding: 10px 16px;
-    border-radius: 10px;
+    padding: 10px 22px;
+    border-radius: 12px;
     font-weight: 900;
     cursor: pointer;
     background: #2563eb;
     color: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
 }
 
     .cb-add-btn:hover {
         background: #1e40af;
+        transform: translateY(-2px);
     }
 
-/* ===== Card ===== */
-
+/* الكارد الحاوي للجدول */
 .cb-card {
-    background: rgba(255,255,255,.75);
-    border: 1px solid rgba(255,255,255,.55);
-    border-radius: 22px;
-    box-shadow: 0 28px 70px rgba(2,6,23,.10);
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
     overflow: hidden;
-    backdrop-filter: blur(10px);
+    border: 1px solid #e2e8f0;
 }
-
-/* ===== Table ===== */
 
 .cb-table-wrap {
     width: 100%;
     overflow: auto;
-    padding: 14px;
 }
 
+/* ================= استايل الجدول الملكي ================= */
 .cb-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
     min-width: 900px;
 }
 
+    /* الهيدر */
     .cb-table thead th {
+        background: #f8fafc;
         color: #64748b;
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 950;
-        padding: 10px 16px;
+        padding: 20px;
         text-align: right;
+        border-bottom: 2px solid #f1f5f9;
     }
 
-    .cb-table tbody td {
-        background: #fff;
-        border-top: 1px solid rgba(226,232,240,.85);
-        border-bottom: 1px solid rgba(226,232,240,.85);
-        padding: 14px 16px;
-        font-weight: 900;
+    /* الصفوف والتلوين التبادلي */
+    .cb-table tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.2s;
     }
 
-        .cb-table tbody td + td {
-            border-right: 1px solid rgba(226,232,240,.6);
+        .cb-table tbody tr:nth-child(even) {
+            background: #fbfcfe; /* لون خفيف للسجلات الزوجية */
         }
 
-/* ===== Columns ===== */
+        .cb-table tbody tr:nth-child(odd) {
+            background: #ffffff;
+        }
 
+        .cb-table tbody tr:hover {
+            background: #f1f5f9; /* تأثير التحويم */
+        }
+
+    /* الخلايا */
+    .cb-table tbody td {
+        padding: 18px 20px;
+        font-weight: 800;
+        color: #334155;
+        vertical-align: middle;
+        border-right: none !important; /* إلغاء التخطيط الرأسي */
+    }
+
+/* أعمدة خاصة */
 .cb-id {
-    color: #0b2a66;
-    font-weight: 950;
+    color: #94a3b8;
+    font-family: 'Cascadia Code', monospace;
+    font-size: 13px;
     width: 100px;
 }
 
 .cb-name {
-    color: #0f172a;
+    color: #1e40af; /* أزرق ملكي للاسم */
+    font-weight: 950 !important;
+    font-size: 16px;
 }
 
-.cb-balance {
-    font-family: monospace;
-}
-
-.cb-status {
-    font-weight: 900;
-}
-
+/* ألوان الحالة */
 .cb-active {
     color: #16a34a;
+    background: #dcfce7;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 12px;
 }
 
 .cb-inactive {
-    color: #ef4444;
+    color: #dc2626;
+    background: #fee2e2;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 12px;
 }
 
-/* ===== Actions ===== */
-
+/* ================= أزرار الأكشن (تعديل/حذف في الجدول) ================= */
 .cb-actions {
     display: flex;
     gap: 8px;
 }
 
-.cb-edit,
-.cb-delete {
+.cb-edit {
+    background: #eff6ff;
+    color: #2563eb;
     border: 0;
-    padding: 7px 12px;
+    padding: 8px 14px;
     border-radius: 10px;
     font-weight: 900;
     cursor: pointer;
+    transition: 0.2s;
 }
 
-.cb-edit {
-    background: #0ea5e9;
-    color: #fff;
-}
+    .cb-edit:hover {
+        background: #2563eb;
+        color: #fff;
+    }
 
-.cb-delete {
-    background: #ef4444;
-    color: #fff;
-}
-
-/* ===== Dialog ===== */
-
+/* ================= الديالوج (النوافذ المنبثقة) ================= */
 .cb-dialog-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.45);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
+    padding: 20px;
 }
 
 .cb-dialog-box {
     background: #fff;
-    border-radius: 24px;
-    width: 92%;
-    max-width: 460px;
-    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+    border-radius: 28px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     overflow: hidden;
+    animation: dialogShow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+@keyframes dialogShow {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* إصلاح صورة الهيدر (أكواب السلطان) */
 .cb-dialog-top-image {
     width: 100%;
-    height: 110px;
+    height: 140px;
+    background: #fff;
+    position: relative;
     overflow: hidden;
-    border-bottom: 1px solid #e2e8f0;
 }
 
     .cb-dialog-top-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        opacity: 1 !important; /* لظهور الألوان والشعار بوضوح */
     }
 
 .cb-dialog-body {
-    padding: 22px;
-    text-align: right;
+    padding: 30px;
+}
+
+    .cb-dialog-body h3 {
+        margin: 0 0 20px 0;
+        font-weight: 950;
+        color: #0f172a;
+        font-size: 20px;
+    }
+
+/* الحقول */
+.cb-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 900;
+    color: #64748b;
+    margin-bottom: 8px;
 }
 
 .cb-input {
     width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    margin-bottom: 10px;
+    padding: 14px;
+    border-radius: 14px;
+    border: 2px solid #f1f5f9;
+    background: #f8fafc;
+    font-weight: 800;
+    color: #0f172a;
+    transition: all 0.3s;
 }
 
+    .cb-input:focus {
+        outline: none;
+        border-color: #2563eb;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+/* ================= إصلاح أزرار الديالوج (تساوي الأحجام) ================= */
 .cb-dialog-actions {
     display: flex;
-    gap: 8px;
-    margin-top: 6px;
+    gap: 12px;
+    margin-top: 30px;
+    width: 100%;
 }
 
-.cb-save {
-    flex: 1;
-    background: #2563eb;
-    color: #fff;
-    border: none;
-    padding: 12px;
-    border-radius: 12px;
+/*  العرض لجميع الأزرار */
+.cb-save, .cb-cancel, .cb-delete {
+    flex: 1 !important;
+    padding: 14px;
+    border-radius: 14px;
     font-weight: 900;
-}
-
-.cb-cancel {
-    flex: 1;
-    background: #64748b;
-    color: #fff;
+    cursor: pointer;
     border: none;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 900;
-}
-
-/* ===== Delete Dialog ===== */
-
-.cb-delete-icon {
-    width: 62px;
-    height: 62px;
-    border-radius: 50%;
-    background: #fee2e2;
-    color: #dc2626;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30px;
-    margin: 0 auto 10px;
+    transition: all 0.2s;
 }
 
-.cb-delete-confirm {
-    flex: 1;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
+/* ==========================================================
+   إصلاح وتنسيق أيقونة الحذف/التعطيل داخل الديالوج
+   ========================================================== */
+
+/* 1. الحاوية العامة للأيقونة - لتوسطها في الديالوج */
+.cb-delete-icon-wrap {
+    display: flex;
+    justify-content: center; /* توسيط الأيقونة أفقياً */
+    align-items: center; /* توسيط الأيقونة رأسياً إذا احتاجت */
+    margin-bottom: 25px; /* مسافة مناسبة تحتها فوق العنوان */
+    position: relative;
+    top: -15px; /* رفع الأيقونة قليلاً لتبرز فوق التنبيه */
+}
+
+/* 2. وسم الأيقونة الأحمر الدائري */
+.cb-delete-icon {
+    width: 72px; /* عرض مناسب للأيقونة */
+    height: 72px; /* ارتفاع مطابق لضمان الدائرة */
+    border-radius: 50%; /* لجعلها دائرية تماماً */
+    background: #fee2e2; /* خلفية حمراء باهتة جداً */
+    color: #ef4444; /* لون نص أحمر غامق للتنبيه */
+    display: flex; /* لتوسيط علامة التعجب داخلها */
+    align-items: center; /* توسيط النص رأسياً */
+    justify-content: center; /* توسيط النص أفقياً */
+    font-size: 38px; /* حجم كبير لعلامة التعجب */
+    font-weight: 950; /* خط عريض جداً وبارز */
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.15); /* ظل خفيف باللون الأحمر */
+    border: 3px solid #fff; /* إطار أبيض لتبرز فوق الصورة */
+    transform: translateY(-50%); /* لضمان ظهور نصفها فوق هيدر الصورة */
+}
+
+.cb-delete1 {
+    display: inline-flex; /* لضمان عدم تمدده مثل أزرار الديالوج */
+    align-items: center;
+    justify-content: center;
+    background: #fff1f2; /* خلفية حمراء باهتة جداً */
+    color: #e11d48; /* لون نص أحمر غامق */
     border: none;
-    padding: 12px;
-    border-radius: 12px;
+    padding: 8px 16px; /* مقاس مناسب لداخل الجدول */
+    border-radius: 10px;
     font-weight: 900;
     cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+    font-size: 14px; /* حجم خط مناسب */
+    margin: 0; /* إلغاء أي هوامش تلقائية */
+    width: auto; /* لضمان عدم أخذ flex: 1 */
+}
+
+    .cb-delete1:hover {
+        background: #e11d48; /* يتحول للون الأحمر الغامق عند التمرير */
+        color: #ffffff; /* يصبح النص أبيض */
+    }
+
+/* ألوان الأزرار */
+.cb-save {
+    background: #2563eb;
+    color: #fff;
 }
 
 .cb-cancel {
-    flex: 1;
-}
-
-.cb-field {
-    margin-bottom: 10px;
-}
-
-.cb-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 900;
+    background: #f1f5f9;
     color: #64748b;
-    margin-bottom: 4px;
 }
 
-/* ===== Responsive ===== */
+.cb-delete {
+    background: #fef2f2;
+    color: #e11d48;
+}
 
+    .cb-delete:hover {
+        background: #e11d48;
+        color: #fff;
+    }
+
+/* تنبيهات الخطأ (الستارة) */
+.prod-alert-curtain {
+    background: #fef2f2;
+    border-right: 4px solid #ef4444;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.pro-error-text {
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 800;
+    margin-top: 5px;
+    display: block;
+}
+
+/* أزرار اختيار الحالة داخل الديالوج */
+.cb-status-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.cb-status-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: 2px solid #f1f5f9;
+    background: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.cb-active-selected {
+    border-color: #22c55e;
+    background: #f0fdf4;
+    color: #166534;
+}
+
+.cb-inactive-selected {
+    border-color: #ef4444;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
     .cb-page {
-        padding: 16px;
+        padding: 15px;
     }
 
     .cb-title-center {
-        font-size: 22px;
+        font-size: 20px;
     }
 
     .cb-table {
-        min-width: 700px;
+        min-width: 600px;
     }
 }
