@@ -9,7 +9,7 @@ namespace SultanCups.Models
 
         public string name { get; set; } = string.Empty;
 
-        public string size { get; set; } = string.Empty;
+        public decimal size { get; set; }
 
         public string unit_of_measure { get; set; } = string.Empty;
 

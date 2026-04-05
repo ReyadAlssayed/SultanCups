@@ -1,6 +1,8 @@
 ﻿@page "/Raw"
+@using SultanCups.Services
 @layout Layout.MainLayout
 @inject SultanCups.Services.InventoryService InventoryService
+@inject SultanCups.Services.ToastService ToastService
 
 <div class="rm-page">
     <div class="rm-topbar">
@@ -42,8 +44,8 @@
 
                                 <td class="rm-actions">
                                     <button class="rm-edit" @onclick="() => OpenEditDialog(r)">تعديل</button>
-                                    <button class="rm-delete" @onclick="() => ToggleRawMaterial(r.raw_material_id)">
-                                        @(r.is_active ? "تعطيل" : "تفعيل")
+                                    <button class="rm-delete" @onclick="() => OpenDeleteDialog(r)">
+                                        حذف
                                     </button>
                                 </td>
                             </tr>
@@ -58,37 +60,130 @@
 
 @if (ShowAddDialog || ShowEditDialog)
 {
-<div class="rm-dialog-overlay">
-    <div class="rm-dialog-box">
-        <div class="rm-dialog-top-image"> <img src="images/Background.jpg" /> </div> <div class="rm-dialog-body">
-            <h3>@(ShowAddDialog ? "إضافة مادة خام" : "تعديل المادة الخام")</h3>
 
-            
-            <div class="rm-fields-grid">
-                <div class="rm-field">
-                    <label>الاسم</label>
-                    <input class="rm-input" @bind="RawMaterialForm.name" />
+    <div class="rm-dialog-overlay">
+        <div class="rm-dialog-box">
+            <div class="rm-dialog-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="rm-dialog-body">
+                <h3>@(ShowAddDialog ? "إضافة مادة خام" : "تعديل المادة الخام")</h3>
+
+                <div class="rm-fields-grid">
+
+                    <!-- الاسم -->
+                    <div class="rm-field">
+                        <label class="rm-label">اسم المادة</label>
+
+                        <input class="rm-input @(string.IsNullOrEmpty(Message) ? "" : "is-invalid")"
+                               maxlength="50"
+                               @bind="RawMaterialForm.name"
+                               @oninput="@((e) => {
+                                               Message = "";
+                                               ShowActivatePrompt = false;
+                                               RawMaterialForm.name = e.Value?.ToString();
+                                           })" />
+
+                    @if (!string.IsNullOrEmpty(Message))
+                    {
+                        <div class="prod-alert-curtain">
+                            <div class="prod-error-message">@Message</div>
+
+                            @if (ShowActivatePrompt)
+                            {
+                                <button @onclick="ActivateExisting" class="prod-btn-activate-link">
+                                    تنشيط المادة الآن؟
+                                </button>
+                            }
+                        </div>
+                    }
                 </div>
 
+                <!-- الحجم -->
                 <div class="rm-field">
-                    <label>الحجم</label>
-                    <input class="rm-input" @bind="RawMaterialForm.size" />
+                    <label class="rm-label">الحجم</label>
+
+                    <input type="number"
+                           min="1" max="1000"
+                           class="rm-input @(string.IsNullOrEmpty(SizeError) ? "" : "is-invalid")"
+                           @bind="RawMaterialForm.size"
+                           @oninput="@((e) => SizeError = "")" />
+
+                    @if (!string.IsNullOrEmpty(SizeError))
+                    {
+                        <div class="pro-error-text">@SizeError</div>
+                    }
                 </div>
 
+                <!-- وحدة القياس -->
                 <div class="rm-field">
-                    <label>وحدة القياس</label>
-                    <input class="rm-input" @bind="RawMaterialForm.unit_of_measure" />
+                    <label class="rm-label">وحدة القياس</label>
+
+                    <input class="rm-input @(string.IsNullOrEmpty(UomError) ? "" : "is-invalid")"
+                           maxlength="10"
+                           @bind="RawMaterialForm.unit_of_measure"
+                           @oninput="@((e) => UomError = "")" />
+
+                    @if (!string.IsNullOrEmpty(UomError))
+                    {
+                        <div class="pro-error-text">@UomError</div>
+                    }
                 </div>
 
+                <!-- التكلفة -->
                 <div class="rm-field">
-                    <label>تكلفة الوحدة</label>
-                    <input class="rm-input" type="number" @bind="RawMaterialForm.unit_cost" />
+                    <label class="rm-label">تكلفة الوحدة</label>
+
+                    <input type="number"
+                           min="1" max="1000" step="0.01"
+                           class="rm-input @(string.IsNullOrEmpty(CostError) ? "" : "is-invalid")"
+                           @bind="RawMaterialForm.unit_cost"
+                           @oninput="@((e) => CostError = "")" />
+
+                    @if (!string.IsNullOrEmpty(CostError))
+                    {
+                        <div class="pro-error-text">@CostError</div>
+                    }
                 </div>
 
+                <!-- الملاحظات -->
                 <div class="rm-field" style="grid-column: span 2;">
-                    <label>ملاحظات</label>
-                    <input class="rm-input" @bind="RawMaterialForm.notes" />
+                    <label class="rm-label">الملاحظات</label>
+
+                    <input class="rm-input @(string.IsNullOrEmpty(NoteError) ? "" : "is-invalid")"
+                           maxlength="100"
+                           @bind="RawMaterialForm.notes"
+                           @oninput="@((e) => NoteError = "")" />
+
+                    @if (!string.IsNullOrEmpty(NoteError))
+                    {
+                        <div class="pro-error-text">@NoteError</div>
+                    }
                 </div>
+
+                <!-- الحالة -->
+                @if (ShowEditDialog)
+                {
+                    <div class="rm-field" style="grid-column: span 2;">
+                        <label class="rm-label">الحالة</label>
+
+                        <div class="status-toggle-container">
+                            <button type="button"
+                                    class="status-btn btn-active @(RawMaterialForm.is_active ? "selected" : "")"
+                                    @onclick="() => RawMaterialForm.is_active = true">
+                                نشط
+                            </button>
+
+                            <button type="button"
+                                    class="status-btn btn-inactive @(!RawMaterialForm.is_active ? "selected" : "")"
+                                    @onclick="() => RawMaterialForm.is_active = false">
+                                معطل
+                            </button>
+                        </div>
+                    </div>
+                }
+
             </div>
 
             <div class="rm-dialog-actions">
@@ -97,11 +192,61 @@
             </div>
         </div>
     </div>
-</div>
 
+</div>
+}
+
+
+@if (ShowDeleteDialog)
+{
+    <div class="rm-dialog-overlay">
+        <div class="rm-dialog-box">
+
+            <div class="rm-dialog-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="rm-dialog-body rm-delete-dialog-body">
+
+                <div class="rm-delete-icon-wrap">
+                    <div class="rm-delete-icon">!</div>
+                </div>
+
+                <h3 class="rm-delete-title">تأكيد إلغاء التنشيط</h3>
+
+                <p class="rm-delete-text">
+                    هل أنت متأكد من إلغاء تنشيط المادة "@RawMaterialForm.name"؟
+                </p>
+
+                <div class="rm-dialog-actions">
+                    <button class="rm-delete-confirm" @onclick="ConfirmDelete">
+                        إلغاء التنشيط الآن
+                    </button>
+
+                    <button class="rm-cancel" @onclick="CloseDialogs">
+                        تراجع
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 }
 
 @code {
+
+
+    string Message = "";
+    bool ShowActivatePrompt = false;
+    SultanCups.Models.RawMaterial? DuplicateRaw;
+
+    string NameError = "";
+    string SizeError = "";
+    string UomError = "";
+    string CostError = "";
+    string NoteError = "";
+
+    bool ShowDeleteDialog = false;
 
 List<SultanCups.Models.RawMaterial>? RawMaterial;
 
@@ -116,10 +261,33 @@ List<SultanCups.Models.RawMaterial>? RawMaterial;
 
     void OpenAddDialog()
     {
-        RawMaterialForm = new SultanCups.Models.RawMaterial();
+        CloseDialogs();
+
+        RawMaterialForm = new SultanCups.Models.RawMaterial
+        {
+            is_active = true
+        };
+
+        DuplicateRaw = null;
+        ShowActivatePrompt = false;
+
         ShowAddDialog = true;
     }
 
+
+    async Task ActivateExisting()
+    {
+        if (DuplicateRaw != null)
+        {
+            DuplicateRaw.is_active = true;
+            await InventoryService.UpdateRawMaterial(DuplicateRaw);
+
+            ToastService.ShowToast("تم إعادة تنشيط المادة بنجاح", "success");
+
+            RawMaterial = await InventoryService.GetActiveRawMaterials();
+            CloseDialogs();
+        }
+    }
     void OpenEditDialog(SultanCups.Models.RawMaterial r)
     {
         RawMaterialForm = new SultanCups.Models.RawMaterial
@@ -138,17 +306,130 @@ List<SultanCups.Models.RawMaterial>? RawMaterial;
 
     async Task SaveRawMaterial()
     {
-        if (ShowAddDialog)
+        var name = RawMaterialForm.name?.Trim();
+
+        Message = "";
+        NameError = SizeError = UomError = CostError = NoteError = "";
+        ShowActivatePrompt = false;
+
+        bool hasError = false;
+
+        // 🔹 الاسم
+        if (string.IsNullOrWhiteSpace(name))
         {
-            await InventoryService.AddRawMaterial(RawMaterialForm);
+            Message = "اسم المادة مطلوب";
+            hasError = true;
+        }
+        else if (name.Length > 50)
+        {
+            Message = "الاسم لا يجب أن يتجاوز 50 حرف";
+            hasError = true;
         }
         else
         {
-            await InventoryService.UpdateRawMaterial(RawMaterialForm);
+            var all = await InventoryService.GetAllRawMaterials();
+
+            DuplicateRaw = all.FirstOrDefault(r =>
+                r.name != null &&
+                r.name.Trim().ToLower() == name.ToLower() &&
+                r.raw_material_id != RawMaterialForm.raw_material_id
+            );
+
+            if (ShowAddDialog)
+            {
+                if (DuplicateRaw != null)
+                {
+                    if (DuplicateRaw.is_active)
+                    {
+                        Message = "هذه المادة موجودة مسبقاً";
+                        return;
+                    }
+                    else
+                    {
+                        Message = "المادة موجودة في الأرشيف";
+                        ShowActivatePrompt = true;
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                if (DuplicateRaw != null)
+                {
+                    Message = DuplicateRaw.is_active
+                        ? "هذا الاسم مستخدم بالفعل"
+                        : "هذا الاسم موجود في الأرشيف";
+                    return;
+                }
+            }
         }
 
-        RawMaterial = await InventoryService.GetActiveRawMaterials();
-        CloseDialogs();
+        if (RawMaterialForm.size <= 0 || RawMaterialForm.size > 1000)
+        {
+            SizeError = "الحجم يجب أن يكون بين 1 و 1000";
+            hasError = true;
+        }
+
+        // 🔹 وحدة القياس
+        if (string.IsNullOrWhiteSpace(RawMaterialForm.unit_of_measure))
+        {
+            UomError = "وحدة القياس مطلوبة";
+            hasError = true;
+        }
+        else if (RawMaterialForm.unit_of_measure.Length > 10)
+        {
+            UomError = "وحدة القياس لا تتجاوز 10 أحرف";
+            hasError = true;
+        }
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(RawMaterialForm.unit_of_measure, @"^[a-zA-Z\u0600-\u06FF\s]+$"))
+        {
+            UomError = "وحدة القياس يجب أن تحتوي على حروف فقط";
+            hasError = true;
+        }
+
+        // 🔹 التكلفة (0 إلى 1000)
+        if (RawMaterialForm.unit_cost < 1 || RawMaterialForm.unit_cost > 1000)
+        {
+            CostError = "التكلفة يجب أن تكون بين 1 و 1000";
+            hasError = true;
+        }
+
+        // 🔹 الملاحظات
+        if (!string.IsNullOrWhiteSpace(RawMaterialForm.notes) &&
+            RawMaterialForm.notes.Length > 100)
+        {
+            NoteError = "الملاحظات لا تتجاوز 100 حرف";
+            hasError = true;
+        }
+
+        if (hasError)
+        {
+            if (string.IsNullOrEmpty(Message))
+                ToastService.ShowToast("يرجى إدخال البيانات بشكل صحيح", "error");
+
+            return;
+        }
+
+        try
+        {
+            if (ShowAddDialog)
+            {
+                await InventoryService.AddRawMaterial(RawMaterialForm);
+                ToastService.ShowToast("تم إضافة المادة بنجاح", "success");
+            }
+            else
+            {
+                await InventoryService.UpdateRawMaterial(RawMaterialForm);
+                ToastService.ShowToast("تم تحديث المادة بنجاح", "success");
+            }
+
+            RawMaterial = await InventoryService.GetActiveRawMaterials();
+            CloseDialogs();
+        }
+        catch
+        {
+            ToastService.ShowToast("خطأ في قاعدة البيانات", "error");
+        }
     }
 
     async Task ToggleRawMaterial(int id)
@@ -157,10 +438,43 @@ List<SultanCups.Models.RawMaterial>? RawMaterial;
         RawMaterial = await InventoryService.GetActiveRawMaterials();
     }
 
-    void CloseDialogs()
+    void OpenDeleteDialog(SultanCups.Models.RawMaterial r)
     {
-        ShowAddDialog = ShowEditDialog = false;
-        RawMaterialForm = new();
+        CloseDialogs();
+
+        RawMaterialForm = r;
+        ShowDeleteDialog = true;
     }
 
+    async Task ConfirmDelete()
+    {
+        try
+        {
+            await InventoryService.ToggleRawMaterial(RawMaterialForm.raw_material_id);
+
+            RawMaterial = await InventoryService.GetActiveRawMaterials();
+
+            ToastService.ShowToast("تم تغيير حالة المادة بنجاح", "success");
+
+            CloseDialogs(); // 🔥 مهم
+        }
+        catch
+        {
+            ToastService.ShowToast("فشل تنفيذ العملية", "error");
+        }
+    }
+
+    void CloseDialogs()
+    {
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowDeleteDialog = false; // 🔥 هذا كان ناقص
+
+        Message = "";
+        NameError = SizeError = UomError = CostError = NoteError = "";
+        ShowActivatePrompt = false;
+        DuplicateRaw = null;
+
+        RawMaterialForm = new();
+    }
 }

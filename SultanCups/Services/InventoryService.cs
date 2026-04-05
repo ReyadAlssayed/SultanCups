@@ -201,6 +201,13 @@ namespace SultanCups.Services
                 .ToListAsync();
         }
 
+        public async Task<List<RawMaterial>> GetAllRawMaterials()
+        {
+            return await _context.raw_materials
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task AddRawMaterial(RawMaterial material)
         {
             _context.raw_materials.Add(material);

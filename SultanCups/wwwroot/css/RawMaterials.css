@@ -1,257 +1,290 @@
 ﻿/* =======================================================
-   RawMaterials.css 
+   RawMaterials.css (نفس suppliers بالضبط)
    ======================================================= */
+
+:root {
+    --inv-bg: #f3f6fb;
+    --inv-card-solid: #ffffff;
+    --inv-line: #e2e8f0;
+    --inv-text: #0f172a;
+    --inv-muted: #64748b;
+    --inv-primary: #2563eb;
+    --inv-shadow: 0 10px 30px rgba(2,6,23,0.08);
+}
+
 .rm-page {
     padding: 26px;
     direction: rtl;
+    background: var(--inv-bg);
+    min-height: 100vh;
 }
 
 .rm-topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 16px;
+    box-shadow: var(--inv-shadow);
+    border-right: 6px solid var(--inv-primary);
 }
 
 .rm-title-center {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 950;
-    color: #0f172a;
-    margin: 0;
+    color: var(--inv-text);
 }
-
-.rm-add-btn {
-    background: #2563eb;
-    color: #fff;
-    border: 0;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-weight: 900;
-    cursor: pointer;
-}
-
-    .rm-add-btn:hover {
-        background: #1e40af;
-    }
 
 .rm-card {
-    background: rgba(255,255,255,.75);
-    border: 1px solid rgba(255,255,255,.55);
-    border-radius: 22px;
-    box-shadow: 0 28px 70px rgba(2,6,23,.10);
+    background: var(--inv-card-solid);
+    border-radius: 16px;
+    box-shadow: var(--inv-shadow);
     overflow: hidden;
-    backdrop-filter: blur(10px);
+    border: 1px solid var(--inv-line);
 }
 
-.rm-table-wrap {
-    width: 100%;
-    overflow: auto;
-    padding: 14px;
-}
-
+/* جدول */
 .rm-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    min-width: 900px;
+    border-collapse: collapse;
 }
 
     .rm-table thead th {
-        color: #64748b;
-        font-size: 12px;
+        background: #f8fafc;
+        color: var(--inv-muted);
+        font-size: 13px;
         font-weight: 950;
-        padding: 10px 16px;
-        text-align: right;
-        white-space: nowrap;
+        padding: 18px 20px;
+        text-align: center;
+        border-bottom: 2px solid var(--inv-line);
     }
 
-    .rm-table tbody tr {
-        transition: background .16s ease;
+    .rm-table tr:nth-child(odd) {
+        background: #ffffff;
     }
 
-        .rm-table tbody tr:hover {
-            background: #f8fafc;
-        }
+    .rm-table tr:nth-child(even) {
+        background: #f8fafc;
+    }
 
-    .rm-table tbody td {
-        background: #fff;
-        border-top: 1px solid rgba(226,232,240,.85);
-        border-bottom: 1px solid rgba(226,232,240,.85);
-        padding: 14px 16px;
+    .rm-table tr:hover {
+        background: #f1f5f9;
+    }
+
+    .rm-table td {
+        padding: 16px 20px;
         font-weight: 800;
-        color: #0f172a;
-        white-space: nowrap;
-        vertical-align: middle;
+        color: var(--inv-text);
+        text-align: center;
+        border-bottom: 1px solid var(--inv-line);
     }
-
-        .rm-table tbody td + td {
-            border-right: 1px solid rgba(226,232,240,.6);
-        }
 
 .rm-name {
-    color: #0b2a66;
+    color: var(--inv-primary);
     font-weight: 950;
 }
 
-.rm-cost {
-    color: #065f46;
-}
-
-.rm-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.rm-edit, .rm-delete {
+/* أزرار */
+.rm-add-btn,
+.rm-save {
+    background: var(--inv-primary);
+    color: white;
     border: 0;
-    padding: 7px 12px;
+    padding: 10px 22px;
     border-radius: 10px;
-    font-weight: 900;
+    font-weight: 950;
     cursor: pointer;
 }
 
 .rm-edit {
-    background: #0ea5e9;
-    color: #fff;
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 800;
 }
 
 .rm-delete {
-    background: #ef4444;
-    color: #fff;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 0;
+    padding: 8px 16px; /* نفس التعديل */
+    border-radius: 8px;
+    font-weight: 800;
 }
 
-/* ================= Dialogs ================= */
-.rm-dialog-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
+.rm-delete-dialog-body {
+    text-align: center;
+    padding: 25px;
 }
 
-.rm-dialog-box {
-    background: #fff;
-    border-radius: 24px;
-    width: 92%;
-    max-width: 460px;
-    box-shadow: 0 20px 40px rgba(0,0,0,.2);
-    overflow: hidden;
-}
-
-.rm-dialog-top-image {
-    width: 100%;
-    height: 110px;
-    overflow: hidden;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-    .rm-dialog-top-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-.rm-dialog-body {
-    padding: 22px;
-    text-align: right;
-}
-
-    .rm-dialog-body h3 {
-        text-align: center;
-        font-size: 18px;
-        font-weight: 900;
-        margin-bottom: 18px;
-    }
-
-.rm-input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    margin-bottom: 10px;
-}
-
-.rm-field {
-    margin-bottom: 10px;
-}
-
-.rm-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 900;
-    color: #64748b;
-    margin-bottom: 4px;
-    text-align: right;
-}
-
-.rm-dialog-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 6px;
-}
-
-.rm-save, .rm-cancel {
-    flex: 1;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 900;
-    border: none;
-    cursor: pointer;
-}
-
-.rm-save {
-    background: #2563eb;
-    color: #fff;
-}
-
-.rm-cancel {
-    background: #64748b;
-    color: #fff;
-}
-
-/* ===== Delete Dialog ===== */
 .rm-delete-icon-wrap {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .rm-delete-icon {
-    width: 62px;
-    height: 62px;
-    border-radius: 50%;
+    width: 60px;
+    height: 60px;
     background: #fee2e2;
     color: #dc2626;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 30px;
-    margin: 0 auto 10px;
+    margin: auto;
+}
+
+.rm-delete-title {
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.rm-delete-text {
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+/* Dialog */
+.rm-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.rm-dialog-box {
+    background: white;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 550px;
+    overflow: hidden;
+}
+
+.rm-dialog-top-image img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+.rm-dialog-body {
+    padding: 25px;
+}
+
+.rm-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.rm-label {
+    font-size: 11px;
+    font-weight: 900;
+    color: #94a3b8;
+}
+
+.rm-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--inv-line);
+    background: #f8fafc;
+    font-weight: 800;
+}
+
+.rm-dialog-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.rm-cancel {
+    flex: 1;
+    background: #f1f5f9;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 900;
 }
 
 .rm-delete-confirm {
-    flex: 1;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
+    flex: 2;
+    background: #dc2626;
+    color: white;
     border: none;
     padding: 12px;
-    border-radius: 12px;
+    border-radius: 10px;
     font-weight: 900;
-    cursor: pointer;
 }
 
-@media (max-width: 900px) {
-    .rm-page {
-        padding: 16px;
+.rm-delete {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 0;
+    border-radius: 8px;
+    font-weight: 800;
+}
+
+.rm-cancel {
+    flex: 1;
+    background: #f1f5f9;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 900;
+}
+
+.rm-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 900;
+    color: #94a3b8; /* رمادي */
+    margin-bottom: 6px;
+}
+
+.status-toggle-container {
+    display: flex;
+    gap: 12px;
+    margin-top: 5px;
+    background: #f8fafc;
+    padding: 5px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.status-btn {
+    flex: 1;
+    padding: 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    font-weight: 900;
+    cursor: pointer;
+    color: #64748b;
+}
+
+    .status-btn.btn-active.selected {
+        border-color: #10b981;
+        background: #ecfdf5;
+        color: #064e3b;
     }
 
-    .rm-title-center {
-        font-size: 22px;
+    .status-btn.btn-inactive.selected {
+        border-color: #ef4444;
+        background: #fef2f2;
+        color: #991b1b;
     }
 
-    .rm-table {
-        min-width: 700px;
-    }
+.rm-edit,
+.rm-delete,
+.rm-save,
+.rm-cancel,
+.rm-delete-confirm,
+.status-btn {
+    cursor: pointer;
 }
