@@ -1,6 +1,6 @@
 ﻿@page "/Raw"
 @layout Layout.MainLayout
-@inject NavigationManager Nav
+@inject SultanCups.Services.InventoryService InventoryService
 
 <div class="rm-page">
     <div class="rm-topbar">
@@ -22,132 +22,145 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var r in RawMaterial)
+                    @if (RawMaterial == null)
                     {
-                        <tr>
-                            <td class="rm-name">@r.Name</td>
-                            <td class="rm-size">@r.Size</td>
-                            <td class="rm-uom">@r.UnitOfMeasure</td>
-                            <td class="rm-cost">@r.UnitCost.ToString("N2") د.ل</td>
-                            <td class="rm-actions">
-                                <button class="rm-edit" @onclick="() => OpenEditDialog(r)">تعديل</button>
-                                <button class="rm-delete" @onclick="() => OpenDeleteDialog(r)">حذف</button>
-                            </td>
-                        </tr>
+                        <tr><td colspan="5">جاري التحميل...</td></tr>
+                    }
+                    else if (RawMaterial.Count == 0)
+                    {
+                        <tr><td colspan="5">لا توجد بيانات</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var r in RawMaterial)
+                        {
+                            <tr>
+                                <td>@r.name</td>
+                                <td>@r.size</td>
+                                <td>@r.unit_of_measure</td>
+                                <td>@r.unit_cost.ToString("0.00") د.ل</td>
+
+                                <td class="rm-actions">
+                                    <button class="rm-edit" @onclick="() => OpenEditDialog(r)">تعديل</button>
+                                    <button class="rm-delete" @onclick="() => ToggleRawMaterial(r.raw_material_id)">
+                                        @(r.is_active ? "تعطيل" : "تفعيل")
+                                    </button>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
         </div>
     </div>
+
 </div>
 
-@* نافذة الإضافة والتعديل مدمجة *@
 @if (ShowAddDialog || ShowEditDialog)
 {
-    <div class="rm-dialog-overlay">
-        <div class="rm-dialog-box">
-            <div class="rm-dialog-top-image">
-                <img src="images/Background.jpg" />
+<div class="rm-dialog-overlay">
+    <div class="rm-dialog-box">
+        <div class="rm-dialog-top-image"> <img src="images/Background.jpg" /> </div> <div class="rm-dialog-body">
+            <h3>@(ShowAddDialog ? "إضافة مادة خام" : "تعديل المادة الخام")</h3>
+
+            
+            <div class="rm-fields-grid">
+                <div class="rm-field">
+                    <label>الاسم</label>
+                    <input class="rm-input" @bind="RawMaterialForm.name" />
+                </div>
+
+                <div class="rm-field">
+                    <label>الحجم</label>
+                    <input class="rm-input" @bind="RawMaterialForm.size" />
+                </div>
+
+                <div class="rm-field">
+                    <label>وحدة القياس</label>
+                    <input class="rm-input" @bind="RawMaterialForm.unit_of_measure" />
+                </div>
+
+                <div class="rm-field">
+                    <label>تكلفة الوحدة</label>
+                    <input class="rm-input" type="number" @bind="RawMaterialForm.unit_cost" />
+                </div>
+
+                <div class="rm-field" style="grid-column: span 2;">
+                    <label>ملاحظات</label>
+                    <input class="rm-input" @bind="RawMaterialForm.notes" />
+                </div>
             </div>
-            <div class="rm-dialog-body">
-                <h3>@(ShowAddDialog ? "إضافة مادة خام" : "تعديل المادة الخام")</h3>
 
-                @* وضعنا الحقول داخل الشبكة ليظهر كل 2 في سطر *@
-                <div class="rm-fields-grid">
-                    <div class="rm-field">
-                        <label class="rm-label">الاسم</label>
-                        <input class="rm-input" @bind="RawMaterialForm.Name" />
-                    </div>
-
-                    <div class="rm-field">
-                        <label class="rm-label">الحجم</label>
-                        <input class="rm-input" @bind="RawMaterialForm.Size" />
-                    </div>
-
-                    <div class="rm-field">
-                        <label class="rm-label">وحدة القياس</label>
-                        <input class="rm-input" @bind="RawMaterialForm.UnitOfMeasure" />
-                    </div>
-
-                    <div class="rm-field">
-                        <label class="rm-label">تكلفة الوحدة (د.ل)</label>
-                        <input class="rm-input" type="number" @bind="RawMaterialForm.UnitCost" />
-                    </div>
-                </div>
-
-                <div class="rm-dialog-actions">
-                    <button type="button" class="rm-save">حفظ</button>
-                    <button type="button" class="rm-cancel" @onclick="CloseDialogs">إلغاء</button>
-                </div>
+            <div class="rm-dialog-actions">
+                <button class="rm-save" @onclick="SaveRawMaterial">حفظ</button>
+                <button class="rm-cancel" @onclick="CloseDialogs">إلغاء</button>
             </div>
         </div>
     </div>
-}
+</div>
 
-@* نافذة الحذف *@
-@if (ShowDeleteDialog)
-{
-    <div class="rm-dialog-overlay">
-        <div class="rm-dialog-box">
-            <div class="rm-delete-top-image">
-                <div class="rm-delete-icon">!</div>
-            </div>
-            <div class="rm-dialog-body">
-                <h3 class="rm-delete-title">تأكيد الحذف</h3>
-                <p class="rm-delete-text">هل تريد حذف المادة الخام "@RawMaterialForm.Name" نهائيًا؟</p>
-                <div class="rm-dialog-actions">
-                    <button type="button" class="rm-delete-confirm">حذف</button>
-                    <button type="button" class="rm-cancel" @onclick="CloseDialogs">إلغاء</button>
-                </div>
-            </div>
-        </div>
-    </div>
 }
 
 @code {
-    List<RawMaterialRow> RawMaterial = new()
-    {
-        new("قاع 2.5", "66 mm", "كجم", 500),
-        new("قاع 6", "62 mm", "كجم", 1200),
-        new("نايلون أصفر", "60 mm", "طن", 800),
-        new("غطاء شفاف", "62 mm", "كجم", 450),
-        new("كرتون تغليف", "كبير", "صندوق", 300),
-    };
 
-    bool ShowAddDialog, ShowEditDialog, ShowDeleteDialog;
-    RawMaterialRow RawMaterialForm = new("", "", "", 0);
+List<SultanCups.Models.RawMaterial>? RawMaterial;
+
+    bool ShowAddDialog, ShowEditDialog;
+
+    SultanCups.Models.RawMaterial RawMaterialForm = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        RawMaterial = await InventoryService.GetActiveRawMaterials();
+    }
 
     void OpenAddDialog()
     {
-        RawMaterialForm = new RawMaterialRow("", "", "", 0);
+        RawMaterialForm = new SultanCups.Models.RawMaterial();
         ShowAddDialog = true;
     }
 
-    void OpenEditDialog(RawMaterialRow r)
+    void OpenEditDialog(SultanCups.Models.RawMaterial r)
     {
-        // نأخذ نسخة من البيانات للتعامل معها في النافذة
-        RawMaterialForm = new RawMaterialRow(r.Name, r.Size, r.UnitOfMeasure, r.UnitCost);
+        RawMaterialForm = new SultanCups.Models.RawMaterial
+        {
+            raw_material_id = r.raw_material_id,
+            name = r.name,
+            size = r.size,
+            unit_of_measure = r.unit_of_measure,
+            unit_cost = r.unit_cost,
+            is_active = r.is_active,
+            notes = r.notes
+        };
+
         ShowEditDialog = true;
     }
 
-    void OpenDeleteDialog(RawMaterialRow r)
+    async Task SaveRawMaterial()
     {
-        RawMaterialForm = r;
-        ShowDeleteDialog = true;
-    }
-
-    void CloseDialogs() => ShowAddDialog = ShowEditDialog = ShowDeleteDialog = false;
-
-    public class RawMaterialRow
-    {
-        public string Name { get; set; }
-        public string Size { get; set; }
-        public string UnitOfMeasure { get; set; }
-        public decimal UnitCost { get; set; }
-
-        public RawMaterialRow(string n, string s, string u, decimal c)
+        if (ShowAddDialog)
         {
-            Name = n; Size = s; UnitOfMeasure = u; UnitCost = c;
+            await InventoryService.AddRawMaterial(RawMaterialForm);
         }
+        else
+        {
+            await InventoryService.UpdateRawMaterial(RawMaterialForm);
+        }
+
+        RawMaterial = await InventoryService.GetActiveRawMaterials();
+        CloseDialogs();
     }
+
+    async Task ToggleRawMaterial(int id)
+    {
+        await InventoryService.ToggleRawMaterial(id);
+        RawMaterial = await InventoryService.GetActiveRawMaterials();
+    }
+
+    void CloseDialogs()
+    {
+        ShowAddDialog = ShowEditDialog = false;
+        RawMaterialForm = new();
+    }
+
 }
