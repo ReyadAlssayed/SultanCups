@@ -78,6 +78,14 @@
     cursor: pointer;
 }
 
+.mk-search {
+    width: 260px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 12px;
+}
+
 .mk-edit {
     background: #e0f2fe;
     color: #0369a1;
@@ -100,5 +108,53 @@
     display: flex;
     justify-content: space-between;
 }
+
+.mk-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 14px 0 20px;
+    justify-content: flex-start;
+}
+
+/* البحث */
+.mk-search-input {
+    width: 340px;
+    padding: 12px 18px;
+    border-radius: 12px; /* أنعم */
+    border: 1px solid #e2e8f0;
+    font-weight: 800;
+    font-size: 14px;
+    outline: none;
+    transition: all .2s ease;
+}
+
+    .mk-search-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+    }
+
+/* الفلترة */
+.mk-filter-select {
+    min-width: 140px;
+    padding: 12px 18px;
+    border-radius: 12px; /* نفس النعومة */
+    border: 1px solid #e2e8f0;
+    font-weight: 800;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+    .mk-filter-select:focus {
+        border-color: #2563eb;
+    }
+
+    /* تحسين شكل الخيارات */
+    .mk-filter-select option {
+        padding: 10px;
+        font-weight: 700;
+    }
 /* ملاحظة: استخدم كلاسات inv-dialog التي أرسلتها في الـ CSS الكامل 
 لأنها تدعم توزيع الحقول حقلين في كل سطر بشكل تلقائي */

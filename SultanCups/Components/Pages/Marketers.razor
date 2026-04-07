@@ -14,6 +14,19 @@
         <div></div>
     </div>
 
+    <div class="mk-search-bar">
+        <input class="mk-search-input"
+               placeholder="ابحث باسم المسوق أو رقم الهاتف"
+               @bind="SearchText"
+               @bind:event="oninput" />
+
+        <select class="mk-filter-select" @bind="MarketerStatusFilter">
+            <option value="all">الكل</option>
+            <option value="active">النشط</option>
+            <option value="inactive">المعطل</option>
+        </select>
+    </div>
+
     <div class="inv-card">
         <div class="mk-table-wrap">
             <table class="st-main-table">
@@ -38,7 +51,7 @@
                     }
                     else
                     {
-                        @foreach (var m in MarketerList)
+                        @foreach (var m in FilteredMarketers)
                         {
                             <tr class="st-row-item">
                                 <td class="st-col-name">@m.name</td>
@@ -225,6 +238,8 @@
 
     bool ShowAddDialog, ShowEditDialog, ShowDeleteDialog;
 
+
+    string SearchText = "";
     string Message = "";
     bool ShowActivatePrompt = false;
     Marketer? DuplicateMarketer;
@@ -232,6 +247,8 @@
     string PhoneError = "";
     string AddressError = "";
     string CommissionError = "";
+
+    string MarketerStatusFilter = "all";
 
     SultanCups.Models.Marketer MarketerForm = new();
 
@@ -384,6 +401,20 @@
             CloseDialogs();
         }
     }
+
+
+    IEnumerable<Marketer> FilteredMarketers =>
+     (MarketerList ?? new List<Marketer>())
+     .Where(m =>
+         (string.IsNullOrWhiteSpace(SearchText) ||
+             (m.name != null && m.name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) ||
+             (m.phone != null && m.phone.Contains(SearchText)))
+         &&
+         (MarketerStatusFilter == "all" ||
+          (MarketerStatusFilter == "active" && m.is_active) ||
+          (MarketerStatusFilter == "inactive" && !m.is_active))
+     );
+
 
     void OpenDeleteDialog(Marketer m)
     {

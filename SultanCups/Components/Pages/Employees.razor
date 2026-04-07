@@ -1,6 +1,7 @@
 ﻿
 @page "/Employees"
 @using System.Text.RegularExpressions
+@using SultanCups.Models
 @layout Layout.MainLayout
 @inject NavigationManager Nav
 @inject SultanCups.Services.HrService HrService
@@ -25,30 +26,14 @@
         <input class="emp-search-input"
                placeholder="ابحث باسم الموظف أو رقم الهاتف"
                @bind="SearchText"
-               @bind:event="oninput"
-               @onkeydown="HandleEnterSearch"/>
-
-        <button type="button"
-                class="emp-search-btn"
-                @onclick="SearchEmployees"
-                disabled="@IsSearching">
-            @(IsSearching ? "جاري البحث..." : "بحث")
-        </button>
+               @bind:event="oninput" />
 
 
-        <select class="emp-filter-select" value="@EmployeeStatusFilter" @onchange="OnFilterChanged">
+        <select class="emp-filter-select" @bind="EmployeeStatusFilter">
             <option value="all">الكل</option>
             <option value="active">النشط</option>
             <option value="inactive">المعطل</option>
         </select>
-
-
-        <button type="button"
-                class="emp-reset-btn"
-                @onclick="ResetSearch"
-                disabled="@IsSearching">
-            عرض الكل
-        </button>
 
        
     </div>
@@ -94,7 +79,7 @@
                     }
                     else
                     {
-                        @foreach (var e in EmployeeList)
+                        @foreach (var e in FilteredEmployees)
                         {
                             <tr>
                                 <td class="emp-name">@e.full_name</td>
@@ -344,6 +329,7 @@
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
 
+    string EmployeeStatusFilter = "all";
     string? Message;
     string MessageType = "";
 
@@ -352,8 +338,6 @@
     string? RankError;
     string? SalaryError;
 
-    bool IsSearching = false;
-    string EmployeeStatusFilter = "all";
 
     private string SearchText = "";
 
@@ -361,45 +345,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        EmployeeList = await HrService.GetEmployees();
-    }
-
-    async Task SearchEmployees()
-    {
-        if (IsSearching) return;
-
-        IsSearching = true;
-
-        try
-        {
-            bool? isActive = EmployeeStatusFilter switch
-            {
-                "active" => true,
-                "inactive" => false,
-                _ => null
-            };
-
-            EmployeeList = await HrService.SearchEmployees(SearchText, isActive);
-        }
-        finally
-        {
-            IsSearching = false;
-        }
-    }
-
-
-    async Task HandleEnterSearch(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter" && !IsSearching)
-        {
-            await SearchEmployees();
-        }
-    }
-
-    async Task ResetSearch()
-    {
-        SearchText = "";
-        EmployeeStatusFilter = "all";
         EmployeeList = await HrService.GetEmployees();
     }
 
@@ -456,12 +401,17 @@
     }
 
 
-    async Task OnFilterChanged(ChangeEventArgs e)
-{
-    EmployeeStatusFilter = e.Value?.ToString() ?? "all";
-    await SearchEmployees();
-}
-
+    IEnumerable<Employee> FilteredEmployees =>
+        (EmployeeList ?? new List<Employee>())
+        .Where(e =>
+            (string.IsNullOrWhiteSpace(SearchText) ||
+                (e.full_name != null && e.full_name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) ||
+                (e.phone != null && e.phone.Contains(SearchText)))
+            &&
+            (EmployeeStatusFilter == "all" ||
+             (EmployeeStatusFilter == "active" && e.is_active) ||
+             (EmployeeStatusFilter == "inactive" && !e.is_active))
+        );
 
     async Task ShowToast(string msg, string type)
     {
