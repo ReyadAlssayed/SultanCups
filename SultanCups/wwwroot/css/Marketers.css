@@ -117,6 +117,21 @@
     justify-content: flex-start;
 }
 
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+.empty-img {
+    width: 160px;
+    opacity: 0.8;
+    margin-bottom: 10px;
+}
+
 /* البحث */
 .mk-search-input {
     width: 340px;

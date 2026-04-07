@@ -10,12 +10,12 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // الأفضل Pool بدل AddDbContext العادي
-builder.Services.AddDbContextPool<AppDbContext>(options =>
+builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<SalesService>();
-builder.Services.AddScoped<InventoryService>();
+builder.Services.AddTransient<InventoryService>();
 builder.Services.AddScoped<FinanceService>();
 builder.Services.AddScoped<HrService>();
 builder.Services.AddScoped<SultanCups.Services.ToastService>();
