@@ -1,14 +1,12 @@
 ﻿@page "/Salaries"
 @layout Layout.MainLayout
-@inject NavigationManager Nav
 @inject SultanCups.Services.FinanceService FinanceService
 
 <div class="sal-page">
 
+
     <div class="sal-topbar">
-        <button type="button" class="sal-add-btn" @onclick="OpenAddDialog">إضافة راتب</button>
         <h2 class="sal-title-center">الرواتب</h2>
-        <div></div>
     </div>
 
     <div class="sal-card">
@@ -20,62 +18,56 @@
                         <th>اسم الموظف</th>
                         <th>نوع الموظف</th>
                         <th>نوع الراتب</th>
-                        <th>القيمة المستحقة</th>
-                        <th>القيمة المدفوعة</th>
-                        <th>القيمة المتبقية</th>
+                        <th>المستحق</th>
+                        <th>المدفوع</th>
+                        <th>المتبقي</th>
                         <th>الحالة</th>
-                        <th>تاريخ الدفع</th>
                         <th>الخزنة</th>
-                        <th>ملاحظة</th>
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @if (Salarie is null)
+                    @if (Salarie == null)
                     {
-                        <tr>
-                            <td colspan="11">جاري التحميل...</td>
-                        </tr>
-                    }
-                    else if (Salarie.Count == 0)
-                    {
-                        <tr>
-                            <td colspan="11">لا توجد بيانات</td>
-                        </tr>
+                        <tr><td colspan="9">جاري التحميل...</td></tr>
                     }
                     else
                     {
                         @foreach (var s in Salarie)
                         {
                             <tr>
-                                <td class="sal-name">@s.Employee.full_name</td>
-                                <td class="sal-emp-type">@s.Employee.rank</td>
-                                <td class="sal-salary-type">@s.salary_type</td>
+                                <td>@s.Employee.full_name</td>
+                                <td>@s.Employee.rank</td>
+                                <td>@s.salary_type</td>
 
-                                <td class="sal-money">@s.amount د.ل</td>
-                                <td class="sal-money">@s.paid_amount د.ل</td>
-                                <td class="sal-remain">@s.Remaining د.ل</td>
+                                <td>@s.amount</td>
+                                <td>@s.paid_amount</td>
+                                <td>@s.Remaining</td>
 
-                                <td class="sal-status">
-                                    <span class="sal-badge @GetStatusClass(s.status)">
+                                <td>
+                                    <span class="@GetStatusClass(s.status)">
                                         @s.status
                                     </span>
                                 </td>
 
-                                <td class="sal-date">@s.salary_date.ToString("yyyy-MM-dd")</td>
-                                <td class="sal-cash">@s.CashBox.name</td>
-                                <td class="sal-notes">@s.notes</td>
+                                <td>@s.CashBox.name</td>
 
                                 <td class="sal-actions">
-                                    <button type="button" class="sal-edit" @onclick="() => OpenEditDialog(s)">تعديل</button>
-                                    <button type="button" class="sal-delete" @onclick="() => OpenDeleteDialog(s)">حذف</button>
+                                    <button class="sal-edit" @onclick="() => OpenEditDialog(s)">تعديل</button>
+
+                                    <button class="sal-pay" @onclick="() => OpenPayDialog(s)">
+                                        دفع
+                                    </button>
+
+                                    <button class="sal-reverse" @onclick="() => OpenReverseDialog(s)">
+                                        تصحيح
+                                    </button>
                                 </td>
                             </tr>
                         }
                     }
                 </tbody>
-
             </table>
         </div>
 
@@ -83,165 +75,123 @@
 
 </div>
 
-@if (ShowAddDialog)
+<!-- Dialog الدفع -->
+@if (ShowPayDialog)
 {
-    <div class="sal-dialog-overlay">
-        <div class="sal-dialog-box">
+<div class="sal-dialog-overlay">
+    <div class="sal-dialog-box">
+        <h3>دفع راتب</h3>
 
-            <div class="sal-dialog-top-image">
-                <img src="images/background.jpg" />
-            </div>
+        <input class="sal-input" type="number" @bind="AmountInput" placeholder="أدخل المبلغ" />
 
-            <div class="sal-dialog-body">
-
-                <h3>إضافة راتب</h3>
-
-                <div class="sal-form-grid">
-
-                    <select class="sal-input">
-                        <option>اختر الموظف</option>
-                    </select>
-
-                    <select class="sal-input" @bind="SalaryForm.salary_type">
-                        <option value="راتب أساسي">راتب أساسي</option>
-                        <option value="مكافأة">مكافأة</option>
-                    </select>
-
-                    <input class="sal-input" placeholder="القيمة المستحقة" @bind="SalaryForm.amount" />
-
-                    <input class="sal-input" placeholder="القيمة المدفوعة" @bind="SalaryForm.paid_amount" />
-
-                    <input class="sal-input" placeholder="القيمة المتبقية" />
-
-                    <select class="sal-input">
-                        <option>الحالة</option>
-                        <option value="خالص">خالص</option>
-                        <option value="خالص جزئي">خالص جزئي</option>
-                        <option value="غير خالص">غير خالص</option>
-                    </select>
-
-                    <input class="sal-input" type="date" />
-
-                    <select class="sal-input">
-                        <option>الخزنة</option>
-                    </select>
-
-                    <input class="sal-input" placeholder="ملاحظة" @bind="SalaryForm.notes" style="grid-column:span 2" />
-
-                </div>
-                <div class="sal-dialog-actions">
-                    <button class="sal-save">حفظ</button>
-                    <button class="sal-cancel" @onclick="CloseDialogs">إلغاء</button>
-                </div>
-
-            </div>
+        <div class="sal-dialog-actions">
+            <button class="sal-save" @onclick="ConfirmPay">تأكيد</button>
+            <button class="sal-cancel" @onclick="CloseDialogs">إلغاء</button>
         </div>
     </div>
+</div>
+
+
 }
 
+<!-- Dialog التصحيح -->
+@if (ShowReverseDialog)
+{
+<div class="sal-dialog-overlay">
+    <div class="sal-dialog-box">
+        <h3>تصحيح راتب</h3>
+
+        ```
+        <input class="sal-input" type="number" @bind="AmountInput" placeholder="أدخل المبلغ" />
+
+        <div class="sal-dialog-actions">
+            <button class="sal-save" @onclick="ConfirmReverse">تأكيد</button>
+            <button class="sal-cancel" @onclick="CloseDialogs">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+}
+
+<!-- Dialog التعديل (مقيد) -->
 @if (ShowEditDialog)
 {
-    <div class="sal-dialog-overlay">
-        <div class="sal-dialog-box">
+<div class="sal-dialog-overlay">
+    <div class="sal-dialog-box">
+        <h3>تعديل (مسموح فقط الملاحظة)</h3>
 
-            <div class="sal-dialog-top-image">
-                <img src="images/Background.jpg" />
-            </div>
+        
+        <input class="sal-input" @bind="SalaryForm.notes" placeholder="ملاحظة" />
 
-            <div class="sal-dialog-body">
-
-                <h3>تعديل راتب</h3>
-
-                <div class="sal-form-grid">
-
-                    <select class="sal-input">
-                        <option>اختر الموظف</option>
-                    </select>
-
-                    <select class="sal-input" @bind="SalaryForm.salary_type">
-                        <option value="راتب أساسي">راتب أساسي</option>
-                        <option value="مكافأة">مكافأة</option>
-                    </select>
-
-                    <input class="sal-input" placeholder="القيمة المستحقة" @bind="SalaryForm.amount" />
-
-                    <input class="sal-input" placeholder="القيمة المدفوعة" @bind="SalaryForm.paid_amount" />
-
-                    <input class="sal-input" placeholder="القيمة المتبقية" />
-
-                    <select class="sal-input">
-                        <option>الحالة</option>
-                        <option value="خالص">خالص</option>
-                        <option value="خالص جزئي">خالص جزئي</option>
-                        <option value="غير خالص">غير خالص</option>
-                    </select>
-
-                    <input class="sal-input" type="date" />
-
-                    <select class="sal-input">
-                        <option>الخزنة</option>
-                    </select>
-
-                    <input class="sal-input" placeholder="ملاحظة" @bind="SalaryForm.notes" style="grid-column:span 2" />
-
-                </div>
-                <select class="sal-input">
-                    <option>الخزنة</option>
-                </select>
-
-                <input class="sal-input" placeholder="ملاحظة" @bind="SalaryForm.notes" />
-                <div class="sal-dialog-actions">
-                    <button class="sal-save">حفظ</button>
-                    <button class="sal-cancel" @onclick="CloseDialogs">إلغاء</button>
-                </div>
-
-            </div>
+        <div class="sal-dialog-actions">
+            <button class="sal-save" @onclick="SaveEdit">حفظ</button>
+            <button class="sal-cancel" @onclick="CloseDialogs">إلغاء</button>
         </div>
     </div>
+</div>
+
+
 }
-
-@if (ShowDeleteDialog)
-{
-    <div class="sal-dialog-overlay">
-        <div class="sal-dialog-box sal-delete-dialog-box">
-
-            <div class="sal-dialog-top-image sal-delete-top-image">
-                <img src="images/background.jpg" />
-            </div>
-
-            <div class="sal-dialog-body sal-delete-dialog-body">
-
-                <div class="sal-delete-icon-wrap">
-                    <div class="sal-delete-icon">!</div>
-                </div>
-
-                <h3 class="sal-delete-title">تأكيد الحذف</h3>
-                <p class="sal-delete-text">هل تريد حذف الراتب؟</p>
-
-                <div class="sal-dialog-actions">
-                    <button class="sal-delete-confirm">حذف</button>
-                    <button class="sal-cancel" @onclick="CloseDialogs">إلغاء</button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-}
-
-
 
 @code {
-    List<SultanCups.Models.Salary>? Salarie;
 
-    bool ShowAddDialog;
-    bool ShowEditDialog;
-    bool ShowDeleteDialog;
+List<SultanCups.Models.Salary>? Salarie;
 
     SultanCups.Models.Salary SalaryForm = new();
+
+    bool ShowEditDialog, ShowPayDialog, ShowReverseDialog;
+
+    decimal AmountInput;
 
     protected override async Task OnInitializedAsync()
     {
         Salarie = await FinanceService.GetSalaries();
+    }
+
+    void OpenEditDialog(SultanCups.Models.Salary s)
+    {
+        SalaryForm = s;
+        ShowEditDialog = true;
+    }
+
+    void OpenPayDialog(SultanCups.Models.Salary s)
+    {
+        SalaryForm = s;
+        AmountInput = 0;
+        ShowPayDialog = true;
+    }
+
+    void OpenReverseDialog(SultanCups.Models.Salary s)
+    {
+        SalaryForm = s;
+        AmountInput = 0;
+        ShowReverseDialog = true;
+    }
+
+    async Task ConfirmPay()
+    {
+        await FinanceService.PaySalary(SalaryForm.salary_id, AmountInput);
+        Salarie = await FinanceService.GetSalaries();
+        CloseDialogs();
+    }
+
+    async Task ConfirmReverse()
+    {
+        await FinanceService.ReverseSalary(SalaryForm.salary_id, AmountInput);
+        Salarie = await FinanceService.GetSalaries();
+        CloseDialogs();
+    }
+
+    async Task SaveEdit()
+    {
+        await FinanceService.UpdateSalaryNotes(SalaryForm.salary_id, SalaryForm.notes);
+        Salarie = await FinanceService.GetSalaries();
+        CloseDialogs();
+    }
+
+    void CloseDialogs()
+    {
+        ShowEditDialog = ShowPayDialog = ShowReverseDialog = false;
     }
 
     string GetStatusClass(string status) => status switch
@@ -251,28 +201,4 @@
         _ => "sal-off"
     };
 
-    void OpenAddDialog()
-    {
-        SalaryForm = new SultanCups.Models.Salary();
-        ShowAddDialog = true;
-    }
-
-    void OpenEditDialog(SultanCups.Models.Salary s)
-    {
-        SalaryForm = s;
-        ShowEditDialog = true;
-    }
-
-    void OpenDeleteDialog(SultanCups.Models.Salary s)
-    {
-        SalaryForm = s;
-        ShowDeleteDialog = true;
-    }
-
-    void CloseDialogs()
-    {
-        ShowAddDialog = false;
-        ShowEditDialog = false;
-        ShowDeleteDialog = false;
-    }
 }

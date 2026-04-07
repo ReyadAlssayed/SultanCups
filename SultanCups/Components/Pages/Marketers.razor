@@ -1,8 +1,10 @@
 ﻿@page "/marketers"
 @layout Layout.MainLayout
+@inject SultanCups.Services.SalesService SalesService
 
 <div class="mk-page">
 
+    
     <div class="mk-topbar">
         <button class="mk-add-btn" @onclick="OpenAddDialog">إضافة مسوق</button>
         <h2 class="mk-title-center">المسوقين</h2>
@@ -22,108 +24,150 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var m in MarketerList)
+                    @if (MarketerList == null)
                     {
-                        <tr>
-                            <td class="mk-name">@m.Name</td>
-                            <td class="mk-phone">@m.Phone</td>
-                            <td class="mk-address">@m.Address</td>
-                            <td class="mk-commission">@m.Commission.ToString("0.00") د.ل</td>
+                        <tr><td colspan="5">جاري التحميل...</td></tr>
+                    }
+                    else if (MarketerList.Count == 0)
+                    {
+                        <tr><td colspan="5">لا توجد بيانات</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var m in MarketerList)
+                        {
+                            <tr>
+                                <td>@m.name</td>
+                                <td>@m.phone</td>
+                                <td>@m.address</td>
+                                <td>@m.commission_per_box.ToString("0.00") د.ل</td>
 
-                            <td class="mk-actions">
-                                <button class="mk-edit" @onclick="() => OpenEditDialog(m)">تعديل</button>
-                                <button class="mk-delete" @onclick="() => OpenDeleteDialog(m)">حذف</button>
-                            </td>
-                        </tr>
+                                <td class="mk-actions">
+                                    <button class="mk-edit" @onclick="() => OpenEditDialog(m)">تعديل</button>
+
+                                    <button class="mk-delete" @onclick="() => ToggleMarketer(m.marketer_id)">
+                                        @(m.is_active ? "تعطيل" : "تفعيل")
+                                    </button>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
         </div>
     </div>
+
 </div>
 
 @if (ShowAddDialog || ShowEditDialog)
 {
-    <div class="inv-dialog-overlay">
-        <div class="inv-dialog-box">
-            <div class="inv-dialog-top-image">
-                <img src="images/Background.jpg" />
-            </div>
-            <div class="inv-dialog-body">
-                <h3>@(ShowAddDialog ? "إضافة مسوق جديد" : "تعديل بيانات المسوق")</h3>
-                
-                <div class="inv-fields-grid">
-                    <div class="inv-field">
-                        <label class="inv-label">اسم المسوق</label>
-                        <input class="inv-input-dialog" @bind="MarketerForm.Name" />
-                    </div>
-                    <div class="inv-field">
-                        <label class="inv-label">رقم الهاتف</label>
-                        <input class="inv-input-dialog" @bind="MarketerForm.Phone" />
-                    </div>
-                    <div class="inv-field">
-                        <label class="inv-label">العنوان</label>
-                        <input class="inv-input-dialog" @bind="MarketerForm.Address" />
-                    </div>
-                    <div class="inv-field">
-                        <label class="inv-label">العمولة (د.ل)</label>
-                        <input class="inv-input-dialog" type="number" step="0.1" @bind="MarketerForm.Commission" />
-                    </div>
+<div class="inv-dialog-overlay">
+    <div class="inv-dialog-box">
+        <div class="inv-dialog-top-image"> <img src="images/Background.jpg" /> </div> <div class="inv-dialog-body">
+            <h3>@(ShowAddDialog ? "إضافة مسوق جديد" : "تعديل بيانات المسوق")</h3>
+
+            
+            <div class="inv-fields-grid">
+                <div class="inv-field">
+                    <label>اسم المسوق</label>
+                    <input class="inv-input-dialog" @bind="MarketerForm.name" />
                 </div>
 
-                <div class="inv-dialog-actions">
-                    <button type="button" class="inv-save">حفظ</button>
-                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
+                <div class="inv-field">
+                    <label>رقم الهاتف</label>
+                    <input class="inv-input-dialog" @bind="MarketerForm.phone" />
                 </div>
+
+                <div class="inv-field">
+                    <label>العنوان</label>
+                    <input class="inv-input-dialog" @bind="MarketerForm.address" />
+                </div>
+
+                <div class="inv-field">
+                    <label>العمولة</label>
+                    <input type="number" class="inv-input-dialog" @bind="MarketerForm.commission_per_box" />
+                </div>
+
+                <div class="inv-field">
+                    <label>النوع</label>
+                    <select class="inv-input-dialog" @bind="MarketerForm.marketer_type">
+                        <option value="خارجي">خارجي</option>
+                        <option value="داخلي">داخلي</option>
+                    </select>
+                </div>
+
+                <div class="inv-field" style="grid-column: span 2;">
+                    <label>ملاحظات</label>
+                    <input class="inv-input-dialog" @bind="MarketerForm.notes" />
+                </div>
+            </div>
+
+            <div class="inv-dialog-actions">
+                <button class="inv-save" @onclick="SaveMarketer">حفظ</button>
+                <button class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
             </div>
         </div>
     </div>
-}
+</div>
 
-@if (ShowDeleteDialog)
-{
-    <div class="inv-dialog-overlay">
-        <div class="inv-dialog-box inv-delete-dialog-box">
-            <div class="inv-dialog-top-image inv-delete-top-image">
-                <img src="images/Background.jpg" />
-            </div>
-            <div class="inv-dialog-body inv-delete-dialog-body">
-                <div class="inv-delete-icon-wrap"><div class="inv-delete-icon">!</div></div>
-                <h3 class="inv-delete-title">تأكيد الحذف</h3>
-                <p class="inv-delete-text">هل تريد حذف المسوق "@MarketerForm.Name" من النظام؟</p>
-                <div class="inv-dialog-actions">
-                    <button type="button" class="inv-delete-confirm">حذف</button>
-                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">إلغاء</button>
-                </div>
-            </div>
-        </div>
-    </div>
 }
 
 @code {
-    List<MarketerModel> MarketerList = new()
-    {
-        new() { Name = "محمد سالم", Phone = "0912345678", Address = "زليتن", Commission = 2m },
-        new() { Name = "علي مفتاح", Phone = "0921112233", Address = "مصراتة", Commission = 3m }
-    };
+    List<SultanCups.Models.Marketer>? MarketerList;
 
-    bool ShowAddDialog, ShowEditDialog, ShowDeleteDialog;
-    MarketerModel MarketerForm = new();
+bool ShowAddDialog, ShowEditDialog;
 
-    void OpenAddDialog() { MarketerForm = new MarketerModel(); ShowAddDialog = true; }
-    void OpenEditDialog(MarketerModel m)
+    SultanCups.Models.Marketer MarketerForm = new();
+
+    protected override async Task OnInitializedAsync()
     {
-        MarketerForm = new MarketerModel { Name = m.Name, Phone = m.Phone, Address = m.Address, Commission = m.Commission };
+        MarketerList = await SalesService.GetMarketers();
+    }
+
+    void OpenAddDialog()
+    {
+        MarketerForm = new();
+        ShowAddDialog = true;
+    }
+
+    void OpenEditDialog(SultanCups.Models.Marketer m)
+    {
+        MarketerForm = new SultanCups.Models.Marketer
+        {
+            marketer_id = m.marketer_id,
+            name = m.name,
+            phone = m.phone,
+            address = m.address,
+            commission_per_box = m.commission_per_box,
+            marketer_type = m.marketer_type,
+            notes = m.notes,
+            is_active = m.is_active
+        };
+
         ShowEditDialog = true;
     }
-    void OpenDeleteDialog(MarketerModel m) { MarketerForm = m; ShowDeleteDialog = true; }
-    void CloseDialogs() => ShowAddDialog = ShowEditDialog = ShowDeleteDialog = false;
 
-    public class MarketerModel
+    async Task SaveMarketer()
     {
-        public string Name { get; set; } = "";
-        public string Phone { get; set; } = "";
-        public string Address { get; set; } = "";
-        public decimal Commission { get; set; }
+        if (ShowAddDialog)
+            await SalesService.AddMarketer(MarketerForm);
+        else
+            await SalesService.UpdateMarketer(MarketerForm);
+
+        MarketerList = await SalesService.GetMarketers();
+        CloseDialogs();
     }
+
+    async Task ToggleMarketer(int id)
+    {
+        await SalesService.ToggleMarketer(id);
+        MarketerList = await SalesService.GetMarketers();
+    }
+
+    void CloseDialogs()
+    {
+        ShowAddDialog = ShowEditDialog = false;
+        MarketerForm = new();
+    }
+
 }

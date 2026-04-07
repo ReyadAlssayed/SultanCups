@@ -8,22 +8,85 @@ namespace SultanCups.Services
     {
         private readonly AppDbContext _context;
 
-        public FinanceService(AppDbContext context)
+
+    public FinanceService(AppDbContext context)
         {
             _context = context;
         }
 
-        // هذا خاص بجدول salaries
+        // =========================================
+        // 🔹 salaries (الرواتب)
+        // =========================================
+
         public async Task<List<Salary>> GetSalaries()
         {
             return await _context.salaries
-                .AsNoTracking() // إضافة هذه لسرعة العرض وتوفير الذاكرة
+                .AsNoTracking()
                 .Include(s => s.Employee)
                 .Include(s => s.CashBox)
                 .ToListAsync();
         }
 
-        // =========================================
+        // 🔥 دفع راتب
+        public async Task<bool> PaySalary(int salaryId, decimal amount)
+        {
+            var salary = await _context.salaries
+                .FirstOrDefaultAsync(s => s.salary_id == salaryId);
+
+            if (salary == null)
+                return false;
+
+            if (salary.paid_amount + amount > salary.amount)
+                return false;
+
+            salary.paid_amount += amount;
+
+            UpdateSalaryStatus(salary);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        // 🔥 تصحيح راتب
+        public async Task<bool> ReverseSalary(int salaryId, decimal amount)
+        {
+            var salary = await _context.salaries
+                .FirstOrDefaultAsync(s => s.salary_id == salaryId);
+
+            if (salary == null)
+                return false;
+
+            if (amount > salary.paid_amount)
+                return false;
+
+            salary.paid_amount -= amount;
+
+            UpdateSalaryStatus(salary);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // 🔥 تحديث الحالة
+        private void UpdateSalaryStatus(Salary salary)
+        {
+            if (salary.paid_amount == 0)
+                salary.status = "غير خالص";
+            else if (salary.paid_amount < salary.amount)
+                salary.status = "خالص جزئي";
+            else
+                salary.status = "خالص";
+        }
+
+        public async Task UpdateSalaryNotes(int id, string? notes)
+        {
+            var s = await _context.salaries.FindAsync(id);
+            if (s == null) return;
+
+            s.notes = notes;
+            await _context.SaveChangesAsync();
+        }
+
+        // =========================================    
         // 🔹 cash_boxes (الخزن)
         // =========================================
 
@@ -77,4 +140,5 @@ namespace SultanCups.Services
             return true;
         }
     }
+
 }

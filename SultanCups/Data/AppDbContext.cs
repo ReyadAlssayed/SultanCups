@@ -15,5 +15,6 @@ namespace SultanCups.Data
         public DbSet<Production> production { get; set; } = null!;
         public DbSet<Supplier> suppliers { get; set; } = null!;
         public DbSet<RawMaterial> raw_materials { get; set; } = null!;
+        public DbSet<Marketer> marketers { get; set; } = null!;
     }
 }
