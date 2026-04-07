@@ -1,5 +1,6 @@
 ﻿
 @page "/Employees"
+@using System.Text.RegularExpressions
 @layout Layout.MainLayout
 @inject NavigationManager Nav
 @inject SultanCups.Services.HrService HrService
@@ -307,16 +308,18 @@
                 <h3 class="emp-delete-title">تأكيد الحذف</h3>
 
                 <p class="emp-delete-text">
-                    هل تريد حذف الموظف
-                    <strong>@EmployeeForm.full_name</strong>
-                    نهائيًا؟
+                        هل تريد حذف الموظف "@EmployeeForm.full_name"؟
+                        <br />
+                        <span style="color:#64748b;font-size:13px;">
+                            ملاحظة: إذا كان مرتبط بسجلات أخرى سيتم تعطيله بدل حذفه
+                        </span>
                 </p>
 
                 <div class="emp-dialog-actions">
                     <button type="button"
                             class="emp-delete-confirm"
                             @onclick="ConfirmDeleteEmployee">
-                        حذف
+                            حذف الآن
                     </button>
 
                     <button type="button"
@@ -498,7 +501,7 @@
             hasError = true;
         }
         // قيد: منع وجود أرقام في اسم الموظف
-        else if (name.Any(char.IsDigit))
+        else if (!Regex.IsMatch(name, @"^[\u0600-\u06FFa-zA-Z\s]+$"))
         {
             FullNameError = "الاسم لا يمكن أن يحتوي على أرقام";
             hasError = true;
@@ -513,9 +516,9 @@
         // 3. التحقق من "رقم الهاتف"
         if (!string.IsNullOrWhiteSpace(phone))
         {
-            if (phone.Length != 10)
+            if (!Regex.IsMatch(phone, @"^09\d{8}$"))
             {
-                PhoneError = "رقم الهاتف يجب أن يكون 10 أرقام";
+                PhoneError = "رقم الهاتف يجب أن يبدأ بـ 09 ويتكون من 10 خانات";
                 hasError = true;
             }
             else if (!phone.StartsWith("09"))
@@ -561,7 +564,7 @@
             EmployeeList = await HrService.GetEmployees();
         
             CloseDialogs();
-            await ShowToast("تمت إضافة الموظف بنجاح", "success");
+            await ShowToast("تم إضافة الموظف بنجاح", "success");
         }
         catch (Exception)
         {
@@ -590,7 +593,7 @@
             hasError = true;
         }
         // منع الأرقام
-        else if (name.Any(char.IsDigit))
+        else if (!Regex.IsMatch(name, @"^[\u0600-\u06FFa-zA-Z\s]+$"))
         {
             FullNameError = "الاسم لا يمكن أن يحتوي على أرقام";
             hasError = true;
@@ -675,7 +678,7 @@
         else if (result == "disabled")
         {
             msg = "الموظف مرتبط بسجلات، لذلك تم تعطيله بدل حذفه";
-            type = "error";
+            type = "warning";
         }
         else
         {

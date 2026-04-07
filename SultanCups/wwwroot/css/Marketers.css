@@ -44,35 +44,6 @@
     padding: 14px;
 }
 
-.mk-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0; /* جعل الجدول متصلاً */
-    min-width: 800px;
-}
-
-    .mk-table thead th {
-        color: #64748b;
-        font-size: 12px;
-        font-weight: 950;
-        padding: 12px 16px;
-        text-align: right;
-    }
-
-    .mk-table tbody td {
-        background: white;
-        border-top: 1px solid rgba(226,232,240,.85);
-        border-bottom: 1px solid rgba(226,232,240,.85);
-        padding: 14px 16px;
-        font-weight: 800;
-        white-space: nowrap;
-    }
-
-        /* فواصل الأعمدة الرقيقة */
-        .mk-table tbody td + td {
-            border-right: 1px solid rgba(226,232,240,.6);
-        }
-
 .mk-name {
     font-weight: 950;
     color: #0b2a66;
@@ -90,7 +61,13 @@
 /* الإجراءات */
 .mk-actions {
     display: flex;
+    justify-content: center;
+    align-items: center;
     gap: 8px;
+}
+
+.st-main-table td.mk-actions {
+    text-align: center;
 }
 
 .mk-edit, .mk-delete {
@@ -102,14 +79,26 @@
 }
 
 .mk-edit {
-    background: #3b82f6;
-    color: white;
+    background: #e0f2fe;
+    color: #0369a1;
 }
 
 .mk-delete {
-    background: #ef4444;
-    color: white;
+    background: #fee2e2;
+    color: #dc2626;
 }
 
+.st-main-table thead th:first-child {
+    border-top-right-radius: 12px;
+}
+
+.st-main-table thead th:last-child {
+    border-top-left-radius: 12px;
+}
+
+.inv-dialog-actions {
+    display: flex;
+    justify-content: space-between;
+}
 /* ملاحظة: استخدم كلاسات inv-dialog التي أرسلتها في الـ CSS الكامل 
 لأنها تدعم توزيع الحقول حقلين في كل سطر بشكل تلقائي */

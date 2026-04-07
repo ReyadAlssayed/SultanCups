@@ -1,6 +1,9 @@
 ﻿@page "/marketers"
+@using SultanCups.Models
+@using SultanCups.Services
 @layout Layout.MainLayout
 @inject SultanCups.Services.SalesService SalesService
+@inject SultanCups.Services.ToastService ToastService
 
 <div class="mk-page">
 
@@ -11,42 +14,54 @@
         <div></div>
     </div>
 
-    <div class="mk-card">
+    <div class="inv-card">
         <div class="mk-table-wrap">
-            <table class="mk-table">
+            <table class="st-main-table">
                 <thead>
                     <tr>
                         <th>الاسم</th>
                         <th>رقم الهاتف</th>
                         <th>العنوان</th>
                         <th>العمولة / كرتونة</th>
+                        <th>الحالة</th>
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (MarketerList == null)
                     {
-                        <tr><td colspan="5">جاري التحميل...</td></tr>
+                        <tr><td colspan="6" class="st-loading-text">جاري التحميل...</td></tr>
                     }
                     else if (MarketerList.Count == 0)
                     {
-                        <tr><td colspan="5">لا توجد بيانات</td></tr>
+                        <tr><td colspan="6" class="st-empty-text">لا توجد بيانات</td></tr>
                     }
                     else
                     {
                         @foreach (var m in MarketerList)
                         {
-                            <tr>
-                                <td>@m.name</td>
+                            <tr class="st-row-item">
+                                <td class="st-col-name">@m.name</td>
                                 <td>@m.phone</td>
                                 <td>@m.address</td>
                                 <td>@m.commission_per_box.ToString("0.00") د.ل</td>
 
+                                <td>
+                                    @if (m.is_active)
+                                    {
+                                        <span class="badge-active">نشط</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-inactive">موقف</span>
+                                    }
+                                </td>
+
                                 <td class="mk-actions">
                                     <button class="mk-edit" @onclick="() => OpenEditDialog(m)">تعديل</button>
 
-                                    <button class="mk-delete" @onclick="() => ToggleMarketer(m.marketer_id)">
-                                        @(m.is_active ? "تعطيل" : "تفعيل")
+                                    <button class="mk-delete" @onclick="() => OpenDeleteDialog(m)">
+                                        حذف
                                     </button>
                                 </td>
                             </tr>
@@ -63,42 +78,98 @@
 {
 <div class="inv-dialog-overlay">
     <div class="inv-dialog-box">
-        <div class="inv-dialog-top-image"> <img src="images/Background.jpg" /> </div> <div class="inv-dialog-body">
+        <div class="inv-dialog-top-image"> <img src="images/Background.png" /> </div> <div class="inv-dialog-body">
             <h3>@(ShowAddDialog ? "إضافة مسوق جديد" : "تعديل بيانات المسوق")</h3>
 
             
             <div class="inv-fields-grid">
                 <div class="inv-field">
-                    <label>اسم المسوق</label>
-                    <input class="inv-input-dialog" @bind="MarketerForm.name" />
+                    <label class="inv-label">اسم المسوق</label>
+                    <input maxlength="50" class="inv-input-dialog @(string.IsNullOrEmpty(Message) ? "" : "is-invalid")"
+                           @bind="MarketerForm.name"
+                           @oninput="@((e) => { Message = ""; ShowActivatePrompt = false; MarketerForm.name = e.Value?.ToString(); })" />
+
+                    @if (!string.IsNullOrEmpty(Message))
+                    {
+                        <div class="prod-alert-curtain">
+                            <div class="prod-error-message">@Message</div>
+                            @if (ShowActivatePrompt)
+                            {
+                                <button type="button" @onclick="ActivateExisting" class="prod-btn-activate-link">
+                                    تنشيط المسوق الآن؟
+                                </button>
+                            }
+                        </div>
+                    }
                 </div>
 
                 <div class="inv-field">
-                    <label>رقم الهاتف</label>
-                    <input class="inv-input-dialog" @bind="MarketerForm.phone" />
+                    <label class="inv-label">رقم الهاتف</label>
+                    <input maxlength="10" class="inv-input-dialog @(string.IsNullOrEmpty(PhoneError) ? "" : "is-invalid")"
+                           @bind="MarketerForm.phone"
+                           @oninput="@((e) => { PhoneError = ""; MarketerForm.phone = e.Value?.ToString(); })" />
+
+                    @if (!string.IsNullOrEmpty(PhoneError))
+                    {
+                        <div class="pro-error-text">@PhoneError</div>
+                    }
                 </div>
 
                 <div class="inv-field">
-                    <label>العنوان</label>
-                    <input class="inv-input-dialog" @bind="MarketerForm.address" />
+                    <label class="inv-label">العنوان</label>
+                    <input maxlength="100" class="inv-input-dialog @(string.IsNullOrEmpty(AddressError) ? "" : "is-invalid")"
+                           @bind="MarketerForm.address"
+                           @oninput="@((e) => { AddressError = ""; MarketerForm.address = e.Value?.ToString(); })" />
+
+                    @if (!string.IsNullOrEmpty(AddressError))
+                    {
+                        <div class="pro-error-text">@AddressError</div>
+                    }
                 </div>
 
                 <div class="inv-field">
-                    <label>العمولة</label>
-                    <input type="number" class="inv-input-dialog" @bind="MarketerForm.commission_per_box" />
+                    <label class="inv-label">العمولة (دينار ليبي)</label>
+                    <input type="number" min="1" max="500" class="inv-input-dialog @(string.IsNullOrEmpty(CommissionError) ? "" : "is-invalid")"
+                           @bind="MarketerForm.commission_per_box" />
+
+                    @if (!string.IsNullOrEmpty(CommissionError))
+                    {
+                        <div class="pro-error-text">@CommissionError</div>
+                    }
                 </div>
 
                 <div class="inv-field">
-                    <label>النوع</label>
+                    <label class="inv-label">النوع</label>
                     <select class="inv-input-dialog" @bind="MarketerForm.marketer_type">
                         <option value="خارجي">خارجي</option>
                         <option value="داخلي">داخلي</option>
                     </select>
                 </div>
 
+                @if (ShowEditDialog)
+                {
+                    <div class="inv-field full-width">
+                        <label class="inv-label">حالة المسوق</label>
+
+                        <div class="status-toggle-container">
+                            <button type="button"
+                                    class="status-btn btn-active @(MarketerForm.is_active ? "selected" : "")"
+                                    @onclick="() => MarketerForm.is_active = true">
+                                نشط
+                            </button>
+
+                            <button type="button"
+                                    class="status-btn btn-inactive @(!MarketerForm.is_active ? "selected" : "")"
+                                    @onclick="() => MarketerForm.is_active = false">
+                                معطل
+                            </button>
+                        </div>
+                    </div>
+                }
+
                 <div class="inv-field" style="grid-column: span 2;">
-                    <label>ملاحظات</label>
-                    <input class="inv-input-dialog" @bind="MarketerForm.notes" />
+                    <label class="inv-label">ملاحظات</label>
+                    <textarea maxlength="200" class="inv-input-dialog" @bind="MarketerForm.notes"></textarea>
                 </div>
             </div>
 
@@ -112,10 +183,55 @@
 
 }
 
+@if (ShowDeleteDialog)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box inv-delete-dialog-box">
+            <div class="inv-dialog-top-image inv-delete-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="inv-dialog-body inv-delete-dialog-body">
+                <div class="inv-delete-icon-wrap">
+                    <div class="inv-delete-icon">!</div>
+                </div>
+
+                <h3 class="inv-delete-title">تأكيد الحذف</h3>
+
+                <p class="inv-delete-text">
+                    هل تريد حذف المسوق "@MarketerForm.name"؟
+                    <br />
+                    <span style="color:#64748b;font-size:13px;">
+                        ملاحظة: إذا كان مرتبط بسجلات أخرى سيتم تعطيله بدل حذفه
+                    </span>
+                </p>
+
+                <div class="inv-dialog-actions">
+                    <button class="inv-delete-confirm" @onclick="ConfirmDelete">
+                        حذف الآن
+                    </button>
+
+                    <button class="inv-cancel" @onclick="CloseDialogs">
+                        تراجع
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     List<SultanCups.Models.Marketer>? MarketerList;
 
-bool ShowAddDialog, ShowEditDialog;
+    bool ShowAddDialog, ShowEditDialog, ShowDeleteDialog;
+
+    string Message = "";
+    bool ShowActivatePrompt = false;
+    Marketer? DuplicateMarketer;
+
+    string PhoneError = "";
+    string AddressError = "";
+    string CommissionError = "";
 
     SultanCups.Models.Marketer MarketerForm = new();
 
@@ -126,7 +242,7 @@ bool ShowAddDialog, ShowEditDialog;
 
     void OpenAddDialog()
     {
-        MarketerForm = new();
+        MarketerForm = new() { marketer_type = "داخلي" };
         ShowAddDialog = true;
     }
 
@@ -146,28 +262,171 @@ bool ShowAddDialog, ShowEditDialog;
 
         ShowEditDialog = true;
     }
-
     async Task SaveMarketer()
     {
-        if (ShowAddDialog)
-            await SalesService.AddMarketer(MarketerForm);
-        else
-            await SalesService.UpdateMarketer(MarketerForm);
+        var name = MarketerForm.name?.Trim();
 
-        MarketerList = await SalesService.GetMarketers();
-        CloseDialogs();
+        Message = "";
+        PhoneError = AddressError = CommissionError = "";
+        ShowActivatePrompt = false;
+        bool hasError = false;
+
+        // الاسم
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            Message = "اسم المسوق مطلوب";
+            return;
+        }
+
+        if (!System.Text.RegularExpressions.Regex.IsMatch(name, @"^[\u0600-\u06FFa-zA-Z\s]+$"))
+        {
+            Message = "الاسم يجب أن يكون نص فقط";
+            return;
+        }
+        else
+        {
+            var all = await SalesService.GetMarketers();
+
+            DuplicateMarketer = all.FirstOrDefault(m =>
+                m.name != null &&
+                m.name.Trim().ToLower() == name.ToLower() &&
+                (ShowAddDialog || m.marketer_id != MarketerForm.marketer_id)
+            );
+
+            if (ShowAddDialog)
+            {
+                if (DuplicateMarketer != null)
+                {
+                    if (DuplicateMarketer.is_active)
+                    {
+                        Message = "هذا المسوق موجود مسبقاً وهو نشط";
+                        return;
+                    }
+                    else
+                    {
+                        Message = "المسوق موجود في الأرشيف";
+                        ShowActivatePrompt = true;
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                if (DuplicateMarketer != null && DuplicateMarketer.marketer_id != MarketerForm.marketer_id)
+                {
+                    Message = "لا يمكن تكرار المسوق";
+                    return;
+                }
+            }
+        }
+
+        // الهاتف
+        if (string.IsNullOrWhiteSpace(MarketerForm.phone))
+        {
+            PhoneError = "رقم الهاتف مطلوب";
+            hasError = true;
+        }
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(MarketerForm.phone, @"^09\d{8}$"))
+        {
+            PhoneError = "رقم الهاتف يجب أن يبدأ بـ 09 ويتكون من 10 خانات";
+            hasError = true;
+        }
+
+        // العنوان
+        if (string.IsNullOrWhiteSpace(MarketerForm.address))
+        {
+            AddressError = "العنوان مطلوب";
+            hasError = true;
+        }
+        else if (System.Text.RegularExpressions.Regex.IsMatch(MarketerForm.address, @"^\d+$"))
+        {
+            AddressError = "العنوان لا يمكن أن يكون أرقام فقط";
+            hasError = true;
+        }
+
+        // العمولة
+        if (MarketerForm.commission_per_box < 1 || MarketerForm.commission_per_box > 500)
+        {
+            CommissionError = "العمولة يجب أن تكون بين 1 و 500 دينار";
+            hasError = true;
+        }
+
+        if (hasError)
+            return;
+
+        
+            if (ShowAddDialog)
+            {
+                await SalesService.AddMarketer(MarketerForm);
+                ToastService.ShowToast("تم إضافة المسوق بنجاح", "success");
+            }
+            else
+            {
+                await SalesService.UpdateMarketer(MarketerForm);
+                ToastService.ShowToast("تم تحديث بيانات المسوق بنجاح", "success");
+            }
+
+            MarketerList = await SalesService.GetMarketers();
+            CloseDialogs();
+        
+        
     }
 
-    async Task ToggleMarketer(int id)
+   
+    async Task ActivateExisting()
     {
-        await SalesService.ToggleMarketer(id);
-        MarketerList = await SalesService.GetMarketers();
+        if (DuplicateMarketer != null)
+        {
+            DuplicateMarketer.is_active = true;
+            await SalesService.UpdateMarketer(DuplicateMarketer);
+
+            MarketerList = await SalesService.GetMarketers();
+            CloseDialogs();
+        }
+    }
+
+    void OpenDeleteDialog(Marketer m)
+    {
+        CloseDialogs();
+
+        MarketerForm = m;
+        ShowDeleteDialog = true;
+    }
+
+    async Task ConfirmDelete()
+    {
+        try
+        {
+            var result = await SalesService.DeleteOrDisableMarketer(MarketerForm.marketer_id);
+
+            if (result == "deleted")
+                ToastService.ShowToast("تم حذف المسوق نهائياً", "success");
+            else if (result == "disabled")
+                ToastService.ShowToast("تم تعطيل المسوق لأنه مرتبط بسجلات", "warning");
+            else
+                ToastService.ShowToast("المسوق غير موجود", "error");
+
+            MarketerList = await SalesService.GetMarketers();
+            CloseDialogs();
+        }
+        catch
+        {
+            ToastService.ShowToast("فشل تنفيذ العملية", "error");
+        }
     }
 
     void CloseDialogs()
     {
-        ShowAddDialog = ShowEditDialog = false;
-        MarketerForm = new();
+        ShowAddDialog = ShowEditDialog = ShowDeleteDialog = false;
+
+        Message = "";
+        PhoneError = "";
+        AddressError = "";
+        CommissionError = "";
+        ShowActivatePrompt = false;
+        DuplicateMarketer = null;
+
+        MarketerForm = new() { marketer_type = "داخلي" };
     }
 
 }

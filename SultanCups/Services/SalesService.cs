@@ -21,14 +21,17 @@ namespace SultanCups.Services
         // جلب جميع المسوقين
         public async Task<List<Marketer>> GetMarketers()
         {
-            return await _context.marketers.ToListAsync();
+            return await _context.marketers
+    .AsNoTracking()
+    .ToListAsync();
         }
 
         public async Task<List<Marketer>> GetActiveMarketers()
         {
             return await _context.marketers
-                .Where(m => m.is_active)
-                .ToListAsync();
+     .AsNoTracking()
+     .Where(m => m.is_active)
+     .ToListAsync();
         }
 
         // إضافة مسوق
@@ -51,8 +54,8 @@ namespace SultanCups.Services
                 return false;
 
             m.name = updated.name.Trim();
-            m.phone = updated.phone;
-            m.address = updated.address;
+            m.phone = updated.phone?.Trim();
+            m.address = updated.address?.Trim();
             m.commission_per_box = updated.commission_per_box;
             m.marketer_type = updated.marketer_type;
             m.notes = updated.notes?.Trim();
@@ -76,6 +79,29 @@ namespace SultanCups.Services
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<string> DeleteOrDisableMarketer(int id)
+        {
+            var m = await _context.marketers
+                .FirstOrDefaultAsync(x => x.marketer_id == id);
+
+            if (m == null)
+                return "not_found";
+
+            var hasOrders = await _context.orders
+                .AnyAsync(o => o.marketer_id == id);
+
+            if (hasOrders)
+            {
+                m.is_active = false;
+                await _context.SaveChangesAsync();
+                return "disabled";
+            }
+
+            _context.marketers.Remove(m);
+            await _context.SaveChangesAsync();
+            return "deleted";
         }
     }
 }
