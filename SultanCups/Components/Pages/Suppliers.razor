@@ -1,4 +1,5 @@
 ﻿@page "/Suppliers"
+@using SultanCups.Models
 @using SultanCups.Services
 @layout Layout.MainLayout
 @inject SultanCups.Services.InventoryService InventoryService
@@ -9,6 +10,19 @@
         <button type="button" class="inv-btn inv-btn-add" @onclick="OpenAddDialog">إضافة مورد</button>
         <h2 class="inv-title">إدارة الموردين</h2>
         <div></div>
+    </div>
+
+    <div class="mk-search-bar">
+        <input class="mk-search-input"
+               placeholder="ابحث باسم المورد أو رقم الهاتف"
+               @bind="SearchText"
+               @bind:event="oninput" />
+
+        <select class="mk-filter-select" @bind="StatusFilter">
+            <option value="all">الكل</option>
+            <option value="active">النشط</option>
+            <option value="inactive">المعطل</option>
+        </select>
     </div>
 
     <div class="inv-card">
@@ -47,7 +61,7 @@
                     }
                     else
                     {
-                        @foreach (var s in SuppliersList)
+                        @foreach (var s in FilteredSuppliers)
                         {
                             <tr class="st-row-item">
                                 <td class="st-col-name">@s.name</td>
@@ -188,27 +202,48 @@
 {
     <div class="inv-dialog-overlay">
         <div class="inv-dialog-box inv-delete-dialog-box">
+
             <div class="inv-dialog-top-image inv-delete-top-image">
                 <img src="images/Background.png" />
             </div>
+
             <div class="inv-dialog-body inv-delete-dialog-body">
-                <div class="inv-delete-icon-wrap"><div class="inv-delete-icon">!</div></div>
-                
-                @* تعديل العنوان *@
-                <h3 class="inv-delete-title">تأكيد إلغاء التنشيط</h3>
-                
-                @* تعديل نص السؤال *@
-                <p class="inv-delete-text">هل أنت متأكد من إلغاء تنشيط المورد "@SupplierForm.name"؟ سيتم نقله إلى الأرشيف.</p>
-                
-                <div class="inv-dialog-actions">
-                    @* تعديل نص زر التأكيد *@
-                    <button type="button" class="inv-delete-confirm" @onclick="ConfirmDelete">إلغاء التنشيط الآن</button>
-                    <button type="button" class="inv-cancel" @onclick="CloseDialogs">تراجع</button>
+
+                <div class="inv-delete-icon-wrap">
+                    <div class="inv-delete-icon">!</div>
                 </div>
+
+                <h3 class="inv-delete-title">تأكيد الحذف</h3>
+
+                <p class="inv-delete-text">
+                    هل تريد حذف المورد "@SupplierForm.name"؟
+                    <br />
+                    <span style="color:#64748b;font-size:13px;">
+                        ملاحظة: إذا كان مرتبط بمشتريات سيتم تعطيله بدل حذفه
+                    </span>
+                </p>
+
+                <div class="inv-dialog-actions">
+                    <button type="button"
+                            class="inv-delete-confirm"
+                            @onclick="ConfirmDelete">
+                        حذف الآن
+                    </button>
+
+                    <button type="button"
+                            class="inv-cancel"
+                            @onclick="CloseDialogs">
+                        إلغاء
+                    </button>
+                </div>
+
             </div>
+
         </div>
     </div>
 }
+
+
 
 
 
@@ -229,6 +264,9 @@
     string NoteError = "";
 
     string LocationError = "";
+
+    string SearchText = "";
+    string StatusFilter = "all";
 
     SultanCups.Models.Supplier SupplierForm = new();
 
@@ -424,13 +462,18 @@
     {
         try
         {
-            await InventoryService.ToggleSupplier(SupplierForm.supplier_id);
+            var result = await InventoryService.DeleteOrDisableSupplier(SupplierForm.supplier_id);
             
             // تحديث القائمة
             SuppliersList = await InventoryService.GetSuppliers();
             
             // إظهار التنبيه الأخضر عند نجاح الحذف/التعطيل
-            ToastService.ShowToast("تم تغيير حالة المورد بنجاح", "success");
+            if (result == "deleted")
+                ToastService.ShowToast("تم حذف المورد نهائياً", "success");
+            else if (result == "disabled")
+                ToastService.ShowToast("تم تعطيل المورد لأنه مرتبط بمشتريات", "warning");
+            else
+                ToastService.ShowToast("المورد غير موجود", "error");
             
             CloseDialogs();
         }
@@ -457,4 +500,18 @@
 
         SupplierForm = new SultanCups.Models.Supplier();
     }
+
+    IEnumerable<Supplier> FilteredSuppliers =>
+    (SuppliersList ?? new List<Supplier>())
+    .Where(s =>
+        (string.IsNullOrWhiteSpace(SearchText) ||
+         (s.name != null && s.name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) ||
+         (s.phone != null && s.phone.Contains(SearchText)))
+        &&
+        (StatusFilter == "all" ||
+         (StatusFilter == "active" && s.is_active) ||
+         (StatusFilter == "inactive" && !s.is_active))
+    );
+
+
 }

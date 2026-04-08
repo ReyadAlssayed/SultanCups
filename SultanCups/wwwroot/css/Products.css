@@ -109,7 +109,8 @@
 .prod-actions-cell {
     display: flex;
     gap: 10px;
-    justify-content: center; /* هذا السطر هو المسؤول عن التوسط */
+    justify-content: center; /* هذا السطر هو 
+        عن التوسط */
 }
 
 /* زر التعديل - خلفية زرقاء باهتة ونص غامق */

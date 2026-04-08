@@ -19,6 +19,8 @@
     --btn-radius: 999px;
 }
 
+
+
 .idle-alert-danger {
     position: relative;
     overflow: hidden; /* ضروري لقص الحركة الزائدة */
@@ -251,13 +253,30 @@ body {
     margin-bottom: 12px;
 }
 
+.topbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.brand-text {
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+    /* 🔥 أزرق أعمق وأكثر راحة */
+    background: linear-gradient(90deg, #1e40af, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0.95;
+}
+
     .auth-logo img {
-        width: 72px;
-        height: 72px;
-        border-radius: 16px;
-        object-fit: cover;
-        background: #fff;
-        box-shadow: 0 14px 34px rgba(2,6,23,.14);
+        width: 240px; /* 👈 تكبير */
+        height: 160px;
+        border-radius: 0; /* 👈 إزالة الدائرة */
+        object-fit: contain; /* 👈 وضوح أفضل */
+        background: transparent; /* 👈 إزالة الخلفية */
+        box-shadow: none; /* 👈 إزالة الظل */
     }
 
 .auth-title {
@@ -446,13 +465,6 @@ body {
     background: linear-gradient(135deg, #1d4ed8, #60a5fa);
 }
 
-.auth-logo img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%; /* 👈 هذا المطلوب */
-    object-fit: cover;
-    box-shadow: 0 14px 34px rgba(2,6,23,.14);
-}
 
 
 /* page enter/leave animation */
