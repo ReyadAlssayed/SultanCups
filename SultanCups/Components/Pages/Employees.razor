@@ -148,6 +148,22 @@
                     }
                 </div>
 
+                    @if (!string.IsNullOrEmpty(Message))
+                    {
+                        <div class="prod-alert-curtain">
+                            <div class="prod-error-message">@Message</div>
+
+                            @if (ShowActivatePrompt)
+                            {
+                                <button type="button"
+                                        class="prod-btn-activate-link"
+                                        @onclick="ActivateExisting">
+                                    تنشيط الموظف الآن؟
+                                </button>
+                            }
+                        </div>
+                    }
+
                 <div class="emp-field">
                     <label class="emp-label">رقم الهاتف</label>
                     <input class="emp-input @(PhoneError != null ? "emp-input-error" : "")"
@@ -346,6 +362,9 @@
     string? RankError;
     string? SalaryError;
 
+    bool ShowActivatePrompt = false;
+    Employee? DuplicateEmployee;
+
 
     private string SearchText = "";
 
@@ -408,6 +427,22 @@
         ShowDeleteDialog = true;
     }
 
+    async Task ActivateExisting()
+    {
+        if (DuplicateEmployee != null)
+        {
+            DuplicateEmployee.is_active = true;
+
+            await HrService.UpdateEmployee(DuplicateEmployee);
+
+            EmployeeList = await HrService.GetEmployees();
+
+            CloseDialogs();
+
+            await ShowToast("تم تنشيط الموظف بنجاح", "success");
+        }
+    }
+
 
     IEnumerable<Employee> FilteredEmployees =>
         (EmployeeList ?? new List<Employee>())
@@ -465,10 +500,27 @@
             hasError = true;
         }
         // قيد: منع تكرار الاسم (تطابق 100%)
-        else if (EmployeeList != null && EmployeeList.Any(e => e.full_name?.Trim().ToLower() == name.ToLower()))
+        else
         {
-            FullNameError = "هذا الاسم موجود مسبقاً، يرجى كتابة الاسم الثلاثي للتمييز";
-            hasError = true;
+            DuplicateEmployee = EmployeeList
+                .FirstOrDefault(e =>
+                    e.full_name != null &&
+                    e.full_name.Trim().ToLower() == name.ToLower());
+
+            if (DuplicateEmployee != null)
+            {
+                if (DuplicateEmployee.is_active)
+                {
+                    FullNameError = "هذا الاسم موجود مسبقاً";
+                    return;
+                }
+                else
+                {
+                    Message = "الموظف موجود في الأرشيف";
+                    ShowActivatePrompt = true;
+                    return;
+                }
+            }
         }
 
         // 3. التحقق من "رقم الهاتف"

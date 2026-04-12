@@ -103,5 +103,84 @@ namespace SultanCups.Services
             await _context.SaveChangesAsync();
             return "deleted";
         }
+
+
+        // =========================================
+        // 🔹 customers (الزبائن)
+        // =========================================
+
+        // جلب جميع الزبائن
+        public async Task<List<Customer>> GetCustomers()
+        {
+            return await _context.customers
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        // جلب الزبائن النشطين
+        public async Task<List<Customer>> GetActiveCustomers()
+        {
+            return await _context.customers
+                .AsNoTracking()
+                .Where(c => c.is_active)
+                .ToListAsync();
+        }
+
+        // إضافة زبون
+        public async Task AddCustomer(Customer customer)
+        {
+            customer.name = customer.name.Trim();
+            customer.notes = customer.notes?.Trim();
+
+            _context.customers.Add(customer);
+            await _context.SaveChangesAsync();
+        }
+
+        // تعديل زبون
+        public async Task<bool> UpdateCustomer(Customer updated)
+        {
+            var c = await _context.customers
+                .FirstOrDefaultAsync(x => x.customer_id == updated.customer_id);
+
+            if (c == null)
+                return false;
+
+            c.name = updated.name.Trim();
+            c.phone = updated.phone?.Trim();
+            c.address = updated.address?.Trim();
+            c.notes = updated.notes?.Trim();
+            c.is_active = updated.is_active;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+
+        // حذف أو تعطيل زبون
+        public async Task<string> DeleteOrDisableCustomer(int id)
+        {
+            var c = await _context.customers
+                .FirstOrDefaultAsync(x => x.customer_id == id);
+
+            if (c == null)
+                return "not_found";
+
+            var hasOrders = await _context.orders
+                .AnyAsync(o => o.customer_id == id);
+
+            if (hasOrders)
+            {
+                c.is_active = false;
+                await _context.SaveChangesAsync();
+                return "disabled";
+            }
+
+            _context.customers.Remove(c);
+            await _context.SaveChangesAsync();
+            return "deleted";
+        }
+
+
     }
 }

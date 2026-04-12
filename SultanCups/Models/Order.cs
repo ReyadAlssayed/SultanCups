@@ -11,6 +11,8 @@ namespace SultanCups.Models
 
         public int marketer_id { get; set; }
 
+        public int? customer_id { get; set; } // 👈 أضف هذا
+
         public int product_id { get; set; }
 
         public int box_count { get; set; }
