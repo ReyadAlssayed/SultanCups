@@ -87,7 +87,11 @@ namespace SultanCups.Services
             var hasSalaries = await _context.salaries
                 .AnyAsync(s => s.employee_id == employeeId);
 
-            if (hasSalaries)
+            var hasFinancialEvents = await _context.financial_events
+                .AnyAsync(f => f.employee_id == employeeId);
+
+            // 🔥 لو له أي أثر مالي → لا نحذفه
+            if (hasSalaries || hasFinancialEvents)
             {
                 employee.is_active = false;
                 await _context.SaveChangesAsync();
@@ -96,6 +100,7 @@ namespace SultanCups.Services
 
             _context.employees.Remove(employee);
             await _context.SaveChangesAsync();
+
             return "deleted";
         }
 

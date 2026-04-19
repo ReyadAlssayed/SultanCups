@@ -428,3 +428,64 @@
         padding: 10px;
     }
 }
+
+/* update Mahmoud*/
+
+.sal-dialog-modern {
+    width: 500px;
+    background: #f8fafc;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.sal-dialog-header {
+    height: 120px;
+    background: #e5e7eb;
+}
+
+.sal-title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.sal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.sal-input {
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: white;
+}
+
+    .sal-input.full {
+        grid-column: span 2;
+    }
+
+.sal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-save {
+    flex: 1;
+    background: #2563eb;
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+}
+
+.btn-cancel {
+    flex: 1;
+    background: #64748b;
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+}

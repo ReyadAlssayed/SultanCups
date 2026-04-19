@@ -22,6 +22,7 @@
                 <thead>
                     <tr>
                         <th>اسم الخزنة</th>
+                        <th>الرصيد</th>
                         <th>الحالة</th>
                         <th>الإجراءات</th>
                     </tr>
@@ -32,6 +33,7 @@
                     {
                         <tr>
                             <td class="cb-name">@c.name</td>
+                            <td>@GetBalance(c.cash_box_id)</td>
                             <td class="cb-status">
                                 <span class="@(@c.is_active ? "cb-active" : "cb-inactive")">
                                     @(@c.is_active ? "نشطة" : "غير نشطة")
@@ -210,6 +212,7 @@
 @code {
 
     List<CashBox> CashBoxes = new();
+    List<CashBoxBalance> Balances = new();
     CashBox Form = new();
 
 
@@ -226,6 +229,7 @@
     protected override async Task OnInitializedAsync()
     {
         CashBoxes = await FinanceService.GetActiveCashBoxes();
+        Balances = await FinanceService.GetCashBoxBalances();
     }
 
     void OpenAddDialog()
@@ -331,7 +335,7 @@
         else
         {
             if (DuplicateCashBox != null &&
-     DuplicateCashBox.cash_box_id != Form.cash_box_id)
+            DuplicateCashBox.cash_box_id != Form.cash_box_id)
             {
                 if (DuplicateCashBox.is_active)
                 {
@@ -351,6 +355,7 @@
         }
 
         CashBoxes = await FinanceService.GetActiveCashBoxes();
+        await RefreshBalances();
         CloseDialogs();
     }
 
@@ -363,8 +368,19 @@
             ToastService.ShowToast("تم إعادة تنشيط الخزنة بنجاح", "success");
 
             CashBoxes = await FinanceService.GetActiveCashBoxes();
+            await RefreshBalances();
             CloseDialogs();
         }
+    }
+
+    decimal GetBalance(int cashBoxId)
+    {
+        return Balances.FirstOrDefault(x => x.cash_box_id == cashBoxId)?.balance ?? 0;
+    }
+
+    async Task RefreshBalances()
+    {
+        Balances = await FinanceService.GetCashBoxBalances();
     }
 
     async Task Toggle(int id)
@@ -372,6 +388,7 @@
         await FinanceService.ToggleCashBox(id);
         ToastService.ShowToast("تم تغيير حالة الخزنة بنجاح", "success");
         CashBoxes = await FinanceService.GetActiveCashBoxes();
+        await RefreshBalances();
         CloseDialogs();
     }
 
