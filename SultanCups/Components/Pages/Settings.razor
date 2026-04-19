@@ -71,7 +71,7 @@
 @if (ShowProfileDialog)
 {
     <div class="dialog-overlay">
-        <div class="dialog-box">
+        <div class="dialog-box" dir="rtl">
             <h3>الملف الشخصي</h3>
 
             <div class="profile-grid">
@@ -125,15 +125,27 @@
                 </div>
 
                 <div class="about-box">
-                    <span class="label">اسماء المطورين</span>
-                    <strong>محمود عبد السميع</strong>
-                    <br>
-                    <strong>رياض السيد</strong>
+                    <span class="label">الفريق المطور</span>
+                    <strong>الحداثة للأنظمة الرقمية</strong>
                 </div>
 
                 <div class="about-box">
-                    <span class="label">رقم التواصل</span>
-                    <strong>0910772372</strong>
+                    <span class="label">اسماء المطورين</span>
+
+                    <div class="dev-list">
+                        <span class="dev-pill blue">محمود عبد السميع</span>
+                        <span class="dev-pill green">رياض السيد</span>
+                    </div>
+                </div>
+
+                <div class="about-box">
+                    <span class="label">واتساب</span>
+                    <strong style="color:#16a34a;">0910772372</strong>
+                </div>
+
+                <div class="about-box">
+                    <span class="label">الهاتف</span>
+                    <strong>0926276936</strong>
                 </div>
             </div>
 
@@ -148,7 +160,18 @@
 {
     <div class="dialog-overlay">
         <div class="dialog-box">
-            <p style="text-align:center">@Message</p>
+            <div class="msg-success">
+
+                <div class="msg-check">@(IsWarningMessage ? "؟" : "✔")</div>
+
+                <p>@Message</p>
+
+                @if (!IsWarningMessage)
+                {
+                    <small>سيتم التواصل معك في أقرب وقت</small>
+                }
+
+            </div>
             <button class="dialog-close" @onclick="() => Message = string.Empty">حسناً</button>
         </div>
     </div>
@@ -166,6 +189,8 @@
     string SupportNotes = "";
     string Message = "";
 
+    bool IsWarningMessage = false;
+
     // تم دمج الدوال في نسخة واحدة نظيفة لكل وجهة
     void GoToAdmins() => Nav.NavigateTo("/Admins");
     
@@ -179,6 +204,7 @@
         if (string.IsNullOrWhiteSpace(SupportNotes))
         {
             Message = "اكتب ملاحظة أولاً";
+            IsWarningMessage = true;
             return;
         }
 
@@ -189,6 +215,7 @@
         );
 
         Message = "تم إرسال الملاحظة للمطور";
+        IsWarningMessage = false;
         SupportNotes = "";
         ShowSupportDialog = false;
     }

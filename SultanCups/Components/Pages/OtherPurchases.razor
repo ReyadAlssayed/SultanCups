@@ -1,0 +1,283 @@
+﻿@page "/OtherPurchases"
+@using SultanCups.Models
+@using SultanCups.Services
+@layout Layout.MainLayout
+@inject SalesService SalesService
+
+<div class="mk-page">
+
+    <div class="mk-topbar">
+        <button class="mk-add-btn" @onclick="OpenAddDialog">إضافة مصروف</button>
+        <h2 class="mk-title-center">المصروفات الأخرى</h2>
+        <div></div>
+    </div>
+
+    <div class="inv-card">
+        <div class="mk-table-wrap">
+            <table class="st-main-table">
+                <thead>
+                    <tr>
+                        <th>الوصف</th>
+                        <th>الكمية</th>
+                        <th>المبلغ</th>
+                        <th>التاريخ</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (List == null)
+                    {
+                        <tr><td colspan="5">جاري التحميل...</td></tr>
+                    }
+                    else if (List.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="5" class="st-empty-text">
+                                <div class="empty-state">
+                                    <img src="images/Empty.jpg" class="empty-img" />
+                                    <span>لا توجد بيانات</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var p in List)
+                        {
+                            <tr class="st-row-item">
+                                <td class="st-col-name">@p.name</td>
+                                <td>@p.quantity</td>
+                                <td>@p.cost.ToString("0.00") د.ل</td>
+                                <td>@p.purchase_date.ToShortDateString()</td>
+                                <td class="mk-actions">
+                                    <button class="mk-edit" @onclick="() => OpenEditDialog(p)">تعديل</button>
+
+                                    <button class="inv-small inv-edit" @onclick="() => OpenAddAmountDialog(p)">
+                                        إضافة مبلغ
+                                    </button>
+
+                                    <button class="inv-small inv-del" @onclick="() => OpenReturnAmountDialog(p)">
+                                        استرجاع مبلغ
+                                    </button>
+
+                                    <button class="mk-delete" @onclick="() => OpenDeleteDialog(p)">حذف</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (ShowAddDialog || ShowEditDialog)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box">
+            <div class="inv-dialog-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="inv-dialog-body">
+
+                <h3>@(ShowAddDialog ? "إضافة مصروف" : "تعديل مصروف")</h3>
+
+                <div class="inv-fields-grid">   
+                    
+                    <div class="inv-field">
+                        <label class="inv-label">الوصف</label>
+                        <input maxlength="200"
+                               class="inv-input-dialog @(string.IsNullOrEmpty(Message) ? "" : "is-invalid")"
+                               @bind="Form.name"
+                               @oninput="@((e) => { Message = ""; Form.name = e.Value?.ToString(); })" />
+
+                        @if (!string.IsNullOrEmpty(Message))
+                        {
+                            <div class="pro-error-text">@Message</div>
+                        }
+                    </div>
+
+                    <div class="inv-field">
+                        <label class="inv-label">الكمية</label>
+                        <input type="number" min="1"
+                               class="inv-input-dialog"
+                               @bind="Form.quantity" />
+                    </div>
+
+                    @if (ShowAddDialog)
+                    {
+                        <div class="inv-field">
+                            <label class="inv-label">المبلغ</label>
+                            <input type="number" step="0.01"
+                                   class="inv-input-dialog @(string.IsNullOrEmpty(CostError) ? "" : "is-invalid")"
+                                   @bind="Form.cost" />
+
+                            @if (!string.IsNullOrEmpty(CostError))
+                            {
+                                <div class="pro-error-text">@CostError</div>
+                            }
+                        </div>
+                    }
+
+                    <div class="inv-field">
+                        <label class="inv-label">التاريخ</label>
+                        <input type="date"
+                               class="inv-input-dialog"
+                               @bind="Form.purchase_date" />
+                    </div>
+
+                    <div class="inv-field full-width">
+                        <label class="inv-label">ملاحظات</label>
+                        <textarea maxlength="200"
+                                  class="inv-input-dialog"
+                                  @bind="Form.notes"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="inv-dialog-actions">
+                    <button class="inv-save" @onclick="Save">حفظ</button>
+                    <button class="inv-cancel" @onclick="Close">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowDeleteDialog)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box inv-delete-dialog-box">
+
+            <div class="inv-dialog-top-image inv-delete-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="inv-dialog-body inv-delete-dialog-body">
+
+                <div class="inv-delete-icon-wrap">
+                    <div class="inv-delete-icon">!</div>
+                </div>
+
+                <h3 class="inv-delete-title">تأكيد الحذف</h3>
+
+                <p class="inv-delete-text">
+                    هل تريد حذف المصروف "@Form.name"؟
+                    <br />
+                    <span style="color:#64748b;font-size:13px;">
+                        سيتم إرجاع المبلغ إلى الخزنة في حال تأكيد الحذف
+                    </span>
+                </p>
+
+                <div class="inv-dialog-actions">
+                    <button class="inv-delete-confirm" @onclick="ConfirmDelete">حذف الآن</button>
+                    <button class="inv-cancel" @onclick="Close">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    List<OtherPurchase>? List;
+
+    OtherPurchase Form = new();
+
+    bool ShowAddDialog, ShowEditDialog, ShowDeleteDialog;
+
+    string Message = "";
+    string CostError = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        List = await SalesService.GetOtherPurchases();
+    }
+
+    void OpenAddDialog()
+    {
+        Form = new() { quantity = 1, purchase_date = DateTime.UtcNow };
+        ShowAddDialog = true;
+    }
+
+    void OpenEditDialog(OtherPurchase p)
+    {
+        Form = new OtherPurchase
+        {
+            other_purchase_id = p.other_purchase_id,
+            name = p.name,
+            quantity = p.quantity,
+            cost = p.cost,
+            purchase_date = p.purchase_date,
+            notes = p.notes,
+            cash_box_id = p.cash_box_id
+        };
+        ShowEditDialog = true;
+    }
+
+    void OpenDeleteDialog(OtherPurchase p)
+    {
+        Form = p;
+        ShowDeleteDialog = true;
+    }
+
+    async Task Save()
+    {
+        Message = "";
+        CostError = "";
+
+        if (string.IsNullOrWhiteSpace(Form.name))
+        {
+            Message = "الوصف مطلوب";
+            return;
+        }
+
+        if (Form.cost <= 0)
+        {
+            CostError = "المبلغ يجب أن يكون أكبر من صفر";
+            return;
+        }
+
+        if (ShowAddDialog)
+        {
+            Form.purchase_date = DateTime.SpecifyKind(Form.purchase_date.Date, DateTimeKind.Utc);
+            await SalesService.AddOtherPurchase(Form);
+        }
+        else
+        {
+            Form.purchase_date = DateTime.SpecifyKind(Form.purchase_date.Date, DateTimeKind.Utc);
+            await SalesService.UpdateOtherPurchase(Form);
+        }
+
+        List = await SalesService.GetOtherPurchases();
+        Close();
+    }
+
+    async Task ConfirmDelete()
+    {
+        await SalesService.DeleteOtherPurchase(Form.other_purchase_id);
+        List = await SalesService.GetOtherPurchases();
+        Close();
+    }
+
+    void OpenAddAmountDialog(OtherPurchase p)
+    {
+        // لاحقاً
+    }
+
+    void OpenReturnAmountDialog(OtherPurchase p)
+    {
+        // لاحقاً
+    }
+
+    void Close()
+    {
+        ShowAddDialog = ShowEditDialog = ShowDeleteDialog = false;
+        Message = "";
+        CostError = "";
+        Form = new();
+    }
+}

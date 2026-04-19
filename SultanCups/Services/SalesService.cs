@@ -181,6 +181,63 @@ namespace SultanCups.Services
             return "deleted";
         }
 
+        // =========================================
+        // 🔹 other_purchases (المصروفات الأخرى)
+        // =========================================
+
+        // جلب الكل
+        public async Task<List<OtherPurchase>> GetOtherPurchases()
+        {
+            return await _context.other_purchases
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        // إضافة
+        public async Task AddOtherPurchase(OtherPurchase item)
+        {
+            item.name = item.name.Trim();
+            item.notes = item.notes?.Trim();
+
+            _context.other_purchases.Add(item);
+            await _context.SaveChangesAsync();
+        }
+
+        // تعديل
+        public async Task<bool> UpdateOtherPurchase(OtherPurchase updated)
+        {
+            var p = await _context.other_purchases
+                .FirstOrDefaultAsync(x => x.other_purchase_id == updated.other_purchase_id);
+
+            if (p == null)
+                return false;
+
+            p.name = updated.name.Trim();
+            p.quantity = updated.quantity;
+            p.cost = updated.cost;
+            p.purchase_date = updated.purchase_date;
+            p.notes = updated.notes?.Trim();
+            p.cash_box_id = updated.cash_box_id;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // حذف مباشر
+        public async Task<bool> DeleteOtherPurchase(int id)
+        {
+            var p = await _context.other_purchases
+                .FirstOrDefaultAsync(x => x.other_purchase_id == id);
+
+            if (p == null)
+                return false;
+
+            _context.other_purchases.Remove(p);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
 
     }
 }

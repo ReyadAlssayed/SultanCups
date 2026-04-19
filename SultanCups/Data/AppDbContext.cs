@@ -21,5 +21,7 @@ namespace SultanCups.Data
         public DbSet<Purchase> purchases { get; set; } = null!;
 
         public DbSet<Customer> customers { get; set; } = null!;
+
+        public DbSet<OtherPurchase> other_purchases { get; set; } = null!;
     }
 }

@@ -1,0 +1,147 @@
+﻿@page "/FinancialEvents"
+@layout Layout.MainLayout
+
+<div class="pro-page">
+
+    <div class="pro-topbar">
+        <div></div>
+
+        <h2 class="pro-title">
+            الحركات المالية
+            <span class="mg-readonly">قراءة فقط 🔒</span>
+        </h2>
+
+        <div></div>
+    </div>
+
+    <div class="pro-card">
+        <div class="pro-table-wrap">
+
+            <table class="pro-table">
+                <thead>
+                    <tr>
+                        <th>رقم</th>
+                        <th>النوع</th>
+                        <th>الاتجاه</th>
+                        <th>المبلغ</th>
+                        <th>الخزنة</th>
+                        <th>بواسطة</th>
+                        <th>المرجع</th>
+                        <th>الكود</th>
+                        <th style="text-align:center;">التاريخ</th>
+                        <th>ملاحظات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Logs.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="10" class="pro-empty">لا توجد بيانات حالياً</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Logs)
+                        {
+                            <tr>
+                                <td>@item.event_id</td>
+                                <td>@item.event_type</td>
+
+                                <td>
+                                    @if (item.direction == "داخل")
+                                    {
+                                        <span class="pro-total">داخل</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="pro-status-tag">خارج</span>
+                                    }
+                                </td>
+
+                                <td class="pro-money">@item.amount.ToString("0.00") د.ل</td>
+                                <td>@item.cash_box_id</td>
+                                <td>@item.performed_by</td>
+                                <td>@item.ref_table</td>
+                                <td>@item.ref_code</td>
+
+                                <td class="mg-date-cell">
+                                    <span class="mg-time">@item.event_date.ToString("HH:mm")</span>
+                                    <span class="mg-date">@item.event_date.ToString("yyyy-MM-dd")</span>
+                                </td>
+
+                                <td>@item.notes</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    List<FinancialRow> Logs = new()
+    {
+        new FinancialRow
+        {
+            event_id = 1,
+            event_type = "بيع",
+            direction = "داخل",
+            amount = 450,
+            cash_box_id = 1,
+            performed_by = "رياض",
+            ref_table = "sales",
+            ref_code = "INV-1001",
+            event_date = DateTime.Now.AddMinutes(-50),
+            notes = "سداد فاتورة عميل"
+        },
+
+        new FinancialRow
+        {
+            event_id = 2,
+            event_type = "شراء خامات",
+            direction = "خارج",
+            amount = 220,
+            cash_box_id = 1,
+            performed_by = "محمود",
+            ref_table = "purchases",
+            ref_code = "PUR-220",
+            event_date = DateTime.Now.AddMinutes(-25),
+            notes = "شراء مواد تصنيع"
+        },
+
+        new FinancialRow
+        {
+            event_id = 3,
+            event_type = "راتب",
+            direction = "خارج",
+            amount = 900,
+            cash_box_id = 2,
+            performed_by = "رياض",
+            ref_table = "salaries",
+            ref_code = "SAL-03",
+            event_date = DateTime.Now.AddMinutes(-10),
+            notes = "صرف راتب موظف"
+        }
+    };
+
+    public class FinancialRow
+    {
+        public int event_id { get; set; }
+        public string event_type { get; set; } = "";
+        public string direction { get; set; } = "";
+        public decimal amount { get; set; }
+        public int cash_box_id { get; set; }
+        public string performed_by { get; set; } = "";
+        public string ref_table { get; set; } = "";
+        public string ref_code { get; set; } = "";
+        public DateTime event_date { get; set; }
+        public string notes { get; set; } = "";
+    }
+
+}

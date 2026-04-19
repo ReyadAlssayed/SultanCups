@@ -37,7 +37,7 @@
                 <div class="nav-children @(OpenKey == "buying" ? "open" : "")">
                     <button type="button" class="nav-child" @onclick='@(() => Go("/Suppliers"))'>الموردين</button>
                     <button type="button" class="nav-child" @onclick='@(() => Go("/Raw"))'>المواد الخام</button>
-                    <button type="button" class="nav-child" @onclick='@(() => Go("/Purchases"))'>فواتير الشراء</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/Purchases"))'>المشتريات</button>
                 </div>
             </div>
 
@@ -58,9 +58,9 @@
                     <span class="chev">@(OpenKey == "sales" ? "▾" : "▸")</span>
                 </button>
                 <div class="nav-children @(OpenKey == "sales" ? "open" : "")">
-                    <button type="button" class="nav-child" @onclick='@(() => Go("/Orders"))'>فواتير المبيعات</button>
-                    <button type="button" class="nav-child" @onclick='@(() => Go("/sales-payments"))'>تحصيل الأموال</button>
-                    <button type="button" class="nav-child" @onclick='@(() => Go("/debts"))'>ديون الزبائن</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/Orders"))'>الفواتير</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/sales-payments"))'>المبيعات</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/debts"))'>ديون الفواتير</button>
                     <button type="button" class="nav-child" @onclick='@(() => Go("/returns"))'>المرجوعات</button>
                     <button type="button" class="nav-child" @onclick='@(() => Go("/marketers"))'>المسوقين</button>
                     <button type="button" class="nav-child" @onclick='@(() => Go("/customers"))'>الزبائن</button>
@@ -75,8 +75,8 @@
                 <div class="nav-children @(OpenKey == "finance" ? "open" : "")">
                     <button type="button" class="nav-child" @onclick='@(() => Go("/CashBoxes"))'>إدارة الخزنات</button>
                     <button type="button" class="nav-child" @onclick='@(() => Go("/Salaries"))'>رواتب الموظفين</button>
-                    <button type="button" class="nav-child" @onclick='@(() => Go("/OtherExpenses"))'>مصاريف متنوعة</button>
-                    <button type="button" class="nav-child" @onclick='@(() => Go("/financial-events"))'>الحركات المالية</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/OtherPurchases"))'>مصاريف أخرى</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/FinancialEvents"))'>الحركات المالية</button>
                 </div>
             </div>
 
@@ -86,8 +86,8 @@
                     <span class="chev">@(OpenKey == "hr" ? "▾" : "▸")</span>
                 </button>
                 <div class="nav-children @(OpenKey == "hr" ? "open" : "")">
-                    <button type="button" class="nav-child" @onclick='@(() => Go("/employees"))'>قائمة الموظفين</button>
-                    <button type="button" class="nav-child" @onclick='@(() => Go("/employee-events"))'>الأحداث الوظيفية</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/Employees"))'>قائمة الموظفين</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/ManagementEvents"))'>الأحداث الإدارية</button>
                 </div>
             </div>
 
@@ -98,7 +98,6 @@
                 </button>
                 <div class="nav-children @(OpenKey == "admin" ? "open" : "")">
                     <button type="button" class="nav-child" @onclick='@(() => Go("/Admins"))'>المسؤولين</button>
-                    <button type="button" class="nav-child" @onclick='@(() => Go("/AuditLog"))'>سجل العمليات</button>
                     <button type="button" class="nav-child" @onclick='@(() => Go("/Settings"))'>الإعدادات</button>
                    
                 </div>
@@ -124,9 +123,13 @@
                     </div>
                 </div>
 
-                <div class="topbar-center">
-                    <span class="brand-text">مصنع السلطان للأكواب الورقية</span>
-                </div>
+   <div class="topbar-center">
+    <span class="brand-text">مصنع السلطان للأكواب الورقية</span>
+
+   <button class="system-info-btn" @onclick='() => ShowSystemInfo = true'>
+        معلومات النظام
+    </button>
+</div>
 
                 <div class="top-datetime">
                     <div class="time-display">@CurrentTime</div>
@@ -144,6 +147,32 @@
         </div>
     </div>
 
+    @if (ShowSystemInfo)
+{
+    <div class="pro-dialog-overlay">
+        <div class="pro-dialog-box">
+
+            <div class="pro-dialog-body">
+
+                <div class="sys-head">
+    <img src="images/Info.png" class="sys-title-icon" />
+    <h3 class="sys-info-title">معلومات النظام</h3>
+</div>
+
+               <div class="sys-info-list">
+    <div class="sys-note money">• الملاحظة المالية: يمنع دفع أي مبلغ زائد عن المستحق.</div>
+    <div class="sys-note job">• الملاحظة الوظيفية: يجب تسجيل أي تغيير وظيفي مباشرة داخل النظام.</div>
+</div>
+
+                <div class="pro-dialog-actions">
+                    <button class="pro-cancel" @onclick="() => ShowSystemInfo = false">إغلاق</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
 </div>
 
 @code {
@@ -154,6 +183,8 @@
     string CurrentTime = "";
     string CurrentDate = "";
     private Timer? _timer;
+
+    bool ShowSystemInfo = false;
 
     protected override void OnInitialized()
     {
