@@ -277,9 +277,56 @@
     margin-top: 4px;
 }
 
+.dev-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.dev-pill {
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+    .dev-pill.blue {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .dev-pill.green {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
     .about-box strong:first-of-type {
         margin-top: 6px;
     }
+
+.msg-success {
+    text-align: center;
+}
+
+.msg-check {
+    font-size: 34px;
+    color: #16a34a;
+    margin-bottom: 6px;
+    font-weight: 900;
+}
+
+.msg-success p {
+    margin: 0;
+    font-weight: 900;
+    color: #111827;
+}
+
+.msg-success small {
+    color: #64748b;
+    display: block;
+    margin-top: 6px;
+}
 
 @keyframes dialogFade {
     from {

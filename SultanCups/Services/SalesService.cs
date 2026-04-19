@@ -103,5 +103,141 @@ namespace SultanCups.Services
             await _context.SaveChangesAsync();
             return "deleted";
         }
+
+
+        // =========================================
+        // 🔹 customers (الزبائن)
+        // =========================================
+
+        // جلب جميع الزبائن
+        public async Task<List<Customer>> GetCustomers()
+        {
+            return await _context.customers
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        // جلب الزبائن النشطين
+        public async Task<List<Customer>> GetActiveCustomers()
+        {
+            return await _context.customers
+                .AsNoTracking()
+                .Where(c => c.is_active)
+                .ToListAsync();
+        }
+
+        // إضافة زبون
+        public async Task AddCustomer(Customer customer)
+        {
+            customer.name = customer.name.Trim();
+            customer.notes = customer.notes?.Trim();
+
+            _context.customers.Add(customer);
+            await _context.SaveChangesAsync();
+        }
+
+        // تعديل زبون
+        public async Task<bool> UpdateCustomer(Customer updated)
+        {
+            var c = await _context.customers
+                .FirstOrDefaultAsync(x => x.customer_id == updated.customer_id);
+
+            if (c == null)
+                return false;
+
+            c.name = updated.name.Trim();
+            c.phone = updated.phone?.Trim();
+            c.address = updated.address?.Trim();
+            c.notes = updated.notes?.Trim();
+            c.is_active = updated.is_active;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+
+        // حذف أو تعطيل زبون
+        public async Task<string> DeleteOrDisableCustomer(int id)
+        {
+            var c = await _context.customers
+                .FirstOrDefaultAsync(x => x.customer_id == id);
+
+            if (c == null)
+                return "not_found";
+
+            var hasOrders = await _context.orders
+                .AnyAsync(o => o.customer_id == id);
+
+            if (hasOrders)
+            {
+                c.is_active = false;
+                await _context.SaveChangesAsync();
+                return "disabled";
+            }
+
+            _context.customers.Remove(c);
+            await _context.SaveChangesAsync();
+            return "deleted";
+        }
+
+        // =========================================
+        // 🔹 other_purchases (المصروفات الأخرى)
+        // =========================================
+
+        // جلب الكل
+        public async Task<List<OtherPurchase>> GetOtherPurchases()
+        {
+            return await _context.other_purchases
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        // إضافة
+        public async Task AddOtherPurchase(OtherPurchase item)
+        {
+            item.name = item.name.Trim();
+            item.notes = item.notes?.Trim();
+
+            _context.other_purchases.Add(item);
+            await _context.SaveChangesAsync();
+        }
+
+        // تعديل
+        public async Task<bool> UpdateOtherPurchase(OtherPurchase updated)
+        {
+            var p = await _context.other_purchases
+                .FirstOrDefaultAsync(x => x.other_purchase_id == updated.other_purchase_id);
+
+            if (p == null)
+                return false;
+
+            p.name = updated.name.Trim();
+            p.quantity = updated.quantity;
+            p.cost = updated.cost;
+            p.purchase_date = updated.purchase_date;
+            p.notes = updated.notes?.Trim();
+            p.cash_box_id = updated.cash_box_id;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // حذف مباشر
+        public async Task<bool> DeleteOtherPurchase(int id)
+        {
+            var p = await _context.other_purchases
+                .FirstOrDefaultAsync(x => x.other_purchase_id == id);
+
+            if (p == null)
+                return false;
+
+            _context.other_purchases.Remove(p);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+
     }
 }

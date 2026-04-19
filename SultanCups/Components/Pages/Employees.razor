@@ -1,6 +1,7 @@
 ﻿
 @page "/Employees"
 @using System.Text.RegularExpressions
+@using SultanCups.Models
 @layout Layout.MainLayout
 @inject NavigationManager Nav
 @inject SultanCups.Services.HrService HrService
@@ -25,30 +26,14 @@
         <input class="emp-search-input"
                placeholder="ابحث باسم الموظف أو رقم الهاتف"
                @bind="SearchText"
-               @bind:event="oninput"
-               @onkeydown="HandleEnterSearch"/>
-
-        <button type="button"
-                class="emp-search-btn"
-                @onclick="SearchEmployees"
-                disabled="@IsSearching">
-            @(IsSearching ? "جاري البحث..." : "بحث")
-        </button>
+               @bind:event="oninput" />
 
 
-        <select class="emp-filter-select" value="@EmployeeStatusFilter" @onchange="OnFilterChanged">
+        <select class="emp-filter-select" @bind="EmployeeStatusFilter">
             <option value="all">الكل</option>
             <option value="active">النشط</option>
             <option value="inactive">المعطل</option>
         </select>
-
-
-        <button type="button"
-                class="emp-reset-btn"
-                @onclick="ResetSearch"
-                disabled="@IsSearching">
-            عرض الكل
-        </button>
 
        
     </div>
@@ -89,12 +74,20 @@
                     else if (EmployeeList.Count == 0)
                     {
                         <tr>
-                            <td colspan="6">لا توجد بيانات</td>
+                            <td colspan="6" class="st-empty-text">
+                                <div class="empty-state">
+                
+                                    <img src="images/Empty.jpg" class="empty-img" />
+
+                                    <span>لا توجد بيانات</span>
+
+                                </div>
+                            </td>
                         </tr>
                     }
                     else
                     {
-                        @foreach (var e in EmployeeList)
+                        @foreach (var e in FilteredEmployees)
                         {
                             <tr>
                                 <td class="emp-name">@e.full_name</td>
@@ -154,6 +147,22 @@
                         <div class="emp-error">@FullNameError</div>
                     }
                 </div>
+
+                    @if (!string.IsNullOrEmpty(Message))
+                    {
+                        <div class="prod-alert-curtain">
+                            <div class="prod-error-message">@Message</div>
+
+                            @if (ShowActivatePrompt)
+                            {
+                                <button type="button"
+                                        class="prod-btn-activate-link"
+                                        @onclick="ActivateExisting">
+                                    تنشيط الموظف الآن؟
+                                </button>
+                            }
+                        </div>
+                    }
 
                 <div class="emp-field">
                     <label class="emp-label">رقم الهاتف</label>
@@ -344,6 +353,7 @@
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
 
+    string EmployeeStatusFilter = "all";
     string? Message;
     string MessageType = "";
 
@@ -352,8 +362,9 @@
     string? RankError;
     string? SalaryError;
 
-    bool IsSearching = false;
-    string EmployeeStatusFilter = "all";
+    bool ShowActivatePrompt = false;
+    Employee? DuplicateEmployee;
+
 
     private string SearchText = "";
 
@@ -361,45 +372,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        EmployeeList = await HrService.GetEmployees();
-    }
-
-    async Task SearchEmployees()
-    {
-        if (IsSearching) return;
-
-        IsSearching = true;
-
-        try
-        {
-            bool? isActive = EmployeeStatusFilter switch
-            {
-                "active" => true,
-                "inactive" => false,
-                _ => null
-            };
-
-            EmployeeList = await HrService.SearchEmployees(SearchText, isActive);
-        }
-        finally
-        {
-            IsSearching = false;
-        }
-    }
-
-
-    async Task HandleEnterSearch(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter" && !IsSearching)
-        {
-            await SearchEmployees();
-        }
-    }
-
-    async Task ResetSearch()
-    {
-        SearchText = "";
-        EmployeeStatusFilter = "all";
         EmployeeList = await HrService.GetEmployees();
     }
 
@@ -455,13 +427,34 @@
         ShowDeleteDialog = true;
     }
 
+    async Task ActivateExisting()
+    {
+        if (DuplicateEmployee != null)
+        {
+            DuplicateEmployee.is_active = true;
 
-    async Task OnFilterChanged(ChangeEventArgs e)
-{
-    EmployeeStatusFilter = e.Value?.ToString() ?? "all";
-    await SearchEmployees();
-}
+            await HrService.UpdateEmployee(DuplicateEmployee);
 
+            EmployeeList = await HrService.GetEmployees();
+
+            CloseDialogs();
+
+            await ShowToast("تم تنشيط الموظف بنجاح", "success");
+        }
+    }
+
+
+    IEnumerable<Employee> FilteredEmployees =>
+        (EmployeeList ?? new List<Employee>())
+        .Where(e =>
+            (string.IsNullOrWhiteSpace(SearchText) ||
+                (e.full_name != null && e.full_name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) ||
+                (e.phone != null && e.phone.Contains(SearchText)))
+            &&
+            (EmployeeStatusFilter == "all" ||
+             (EmployeeStatusFilter == "active" && e.is_active) ||
+             (EmployeeStatusFilter == "inactive" && !e.is_active))
+        );
 
     async Task ShowToast(string msg, string type)
     {
@@ -507,10 +500,27 @@
             hasError = true;
         }
         // قيد: منع تكرار الاسم (تطابق 100%)
-        else if (EmployeeList != null && EmployeeList.Any(e => e.full_name?.Trim().ToLower() == name.ToLower()))
+        else
         {
-            FullNameError = "هذا الاسم موجود مسبقاً، يرجى كتابة الاسم الثلاثي للتمييز";
-            hasError = true;
+            DuplicateEmployee = EmployeeList
+                .FirstOrDefault(e =>
+                    e.full_name != null &&
+                    e.full_name.Trim().ToLower() == name.ToLower());
+
+            if (DuplicateEmployee != null)
+            {
+                if (DuplicateEmployee.is_active)
+                {
+                    FullNameError = "هذا الاسم موجود مسبقاً";
+                    return;
+                }
+                else
+                {
+                    Message = "الموظف موجود في الأرشيف";
+                    ShowActivatePrompt = true;
+                    return;
+                }
+            }
         }
 
         // 3. التحقق من "رقم الهاتف"

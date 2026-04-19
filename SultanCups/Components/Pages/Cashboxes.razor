@@ -6,25 +6,24 @@
 @inject FinanceService FinanceService
 @inject ToastService ToastService
 
-<div class="cb-page">
+<div class="pro-page">
 
-    <div class="cb-topbar">
-        <button class="cb-add-btn" @onclick="OpenAddDialog">إضافة خزنة</button>
-        <h2 class="cb-title-center">الخزنات</h2>
+    <div class="pro-topbar">
+        <button type="button" class="pro-btn-add" @onclick="OpenAddDialog">إضافة خزنة</button>
+        <h2 class="pro-title">الخزنات</h2>
         <div></div>
     </div>
 
-    <div class="cb-card">
+    <div class="pro-card">
+        <div class="pro-table-wrap">
 
-        <div class="cb-table-wrap">
-            <table class="cb-table">
-
+            <table class="pro-table">
                 <thead>
                     <tr>
                         <th>اسم الخزنة</th>
                         <th>الرصيد</th>
                         <th>الحالة</th>
-                        <th>الإجراءات</th>
+                        <th style="text-align:center">الإجراءات</th>
                     </tr>
                 </thead>
 
@@ -33,178 +32,146 @@
                     {
                         <tr>
                             <td class="cb-name">@c.name</td>
-                            <td>@GetBalance(c.cash_box_id)</td>
                             <td class="cb-status">
                                 <span class="@(@c.is_active ? "cb-active" : "cb-inactive")">
                                     @(@c.is_active ? "نشطة" : "غير نشطة")
                                 </span>
                             </td>
 
-                            <td class="cb-actions">
-                                <button class="cb-edit" @onclick="() => OpenEditDialog(c)">تعديل</button>
-                                <button class="cb-delete1" @onclick="() => OpenDeleteDialog(c)">حذف</button>
-                            </td>
-                        </tr>
+                                <td style="text-align:center;">
+                                    <button type="button" class="inv-small inv-edit" @onclick ="() => OpenEditDialog(c)">تعديل</button>
+                                    <button type="button" class="inv-small inv-del" @onclick="() => OpenDeleteDialog(c)">حذف</button>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
-
             </table>
-        </div>
 
+        </div>
     </div>
 
 </div>
 
-@if (ShowAddDialog)
+@if (ShowAddDialog || ShowEditDialog)
 {
-    <div class="cb-dialog-overlay">
-        <div class="cb-dialog-box">
+    <div class="pro-dialog-overlay">
 
-            <div class="cb-dialog-top-image">
+        <div class="pro-dialog-box">
+
+            <div class="pro-dialog-top-image">
                 <img src="images/Background.png" />
             </div>
 
-            <div class="cb-dialog-body">
-                <h3>إضافة خزنة</h3>
+            <div class="pro-dialog-body">
 
-                <div class="cb-field">
-                    <label class="cb-label">اسم الخزنة</label>
-                    <input class="cb-input @(string.IsNullOrEmpty(NameError) ? "" : "is-invalid")"
+                <h3>@(ShowAddDialog ? "إضافة خزنة" : "تعديل الخزنة")</h3>
+
+                <div class="pro-field">
+                    <label class="pro-label">اسم الخزنة</label>
+
+                    <input class="pro-input @(string.IsNullOrEmpty(NameError) ? "" : "is-invalid")"
                            @bind="Form.name"
                            maxlength="50"
-                           @oninput="@((e) => {
-                               NameError = ""; // تصفير الخطأ عند الكتابة
-                               Message = "";
-                               ShowActivatePrompt = false;
-                               Form.name = e.Value?.ToString();
-                           })" />
+                           @oninput="@((e) =>
+                                               {
+                                                   NameError = "";
+                                                   Message = "";
+                                                   ShowActivatePrompt = false;
+                                                   Form.name = e.Value?.ToString();
+                                               })" />
 
-                @* استبدل هذا في نافذة الإضافة *@
-                @if (!string.IsNullOrEmpty(NameError))
-                {
-                    <span class="pro-error-text">@NameError</span>
-                }
+                    @if (!string.IsNullOrEmpty(NameError))
+                    {
+                        <div class="pro-error-text">@NameError</div>
+                    }
 
-                @* هذا الجزء مخصص لرسائل التكرار أو التنشيط *@
-                @if (!string.IsNullOrEmpty(Message))
+                    @if (!string.IsNullOrEmpty(Message))
+                    {
+                        <div class="prod-alert-curtain">
+                            <div class="prod-error-message">@Message</div>
+
+                            @if (ShowActivatePrompt)
+                            {
+                                <button type="button"
+                                        class="pro-btn-add"
+                                        style="margin-top:10px"
+                                        @onclick="ActivateExisting">
+                                    تنشيط الخزنة المؤرشفة الآن؟
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+
+                @if (ShowEditDialog)
                 {
-                    <div class="prod-alert-curtain">
-                        <div class="prod-error-message">@Message</div>
-                        @if (ShowActivatePrompt)
-                        {
-                            <button type="button" @onclick="ActivateExisting" class="prod-btn-activate-link">
-                                تنشيط الخزنة المؤرشفة الآن؟
+                    <div class="pro-field" style="margin-top:15px;">
+                        <label class="pro-label">الحالة</label>
+
+                        <div class="cb-status-buttons">
+
+                            <button type="button"
+                                    class="cb-status-btn @(Form.is_active ? "cb-active-selected" : "")"
+                                    @onclick="() => Form.is_active = true">
+                                نشطة
                             </button>
-                        }
+
+                            <button type="button"
+                                    class="cb-status-btn @(!Form.is_active ? "cb-inactive-selected" : "")"
+                                    @onclick="() => Form.is_active = false">
+                                غير نشطة
+                            </button>
+
+                        </div>
                     </div>
                 }
-            </div>
 
-                <div class="cb-dialog-actions">
-                    <button type="button" class="cb-save" @onclick="Save">حفظ</button>
-                    <button type="button" class="cb-cancel" @onclick="CloseDialogs">إلغاء</button>
+                <div class="pro-dialog-actions">
+                    <button type="button" class="pro-save" @onclick="Save">حفظ</button>
+                    <button type="button" class="pro-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
-}
-
-@if (ShowEditDialog)
-{
-    <div class="cb-dialog-overlay">
-        <div class="cb-dialog-box">
-
-            <div class="cb-dialog-top-image">
-                <img src="images/Background.png" />
-            </div>
-
-            <div class="cb-dialog-body">
-                <h3>تعديل الخزنة</h3>
-
-                <div class="cb-field">
-                    <label class="cb-label">اسم الخزنة</label>
-                    <input class="cb-input @(string.IsNullOrEmpty(NameError) && string.IsNullOrEmpty(Message) ? "" : "is-invalid")"
-                           @bind="Form.name"
-                           @oninput="@((e) => {
-                                               Message = "";
-                                               NameError = ""; // تصفير الخطأ عند البدء بالكتابة
-                                               ShowActivatePrompt = false;
-                                               Form.name = e.Value?.ToString();
-                                           })" />
-
-                @if (!string.IsNullOrEmpty(Message))
-                {
-                    <div class="prod-alert-curtain">
-                        <div class="prod-error-message">@Message</div>
-                        @if (ShowActivatePrompt)
-                        {
-                            <button type="button" @onclick="ActivateExisting" class="prod-btn-activate-link">
-                                تنشيط الخزنة المؤرشفة الآن؟
-                            </button>
-                        }
-                    </div>
-                }
-            </div>
-
-            @* --- قسم رسالة الخطأ (اسم الخزنة مطلوب) --- *@
-            @if (!string.IsNullOrEmpty(NameError))
-            {
-                <span class="pro-error-text">@NameError</span>
-            }
-
-            @* --- قسم أزرار الحالة في التعديل --- *@
-            <div class="cb-field">
-                <label class="cb-label">الحالة</label>
-                <div class="cb-status-buttons">
-                    <button type="button"
-                            class="cb-status-btn @(Form.is_active ? "cb-active-selected" : "")"
-                            @onclick="() => Form.is_active = true">
-                        نشطة
-                    </button>
-                    <button type="button"
-                            class="cb-status-btn @(!Form.is_active ? "cb-inactive-selected" : "")"
-                            @onclick="() => Form.is_active = false">
-                        غير نشطة
-                    </button>
-                </div>
-            </div>
-
-            <div class="cb-dialog-actions">
-                <button type="button" class="cb-save" @onclick="Save">حفظ</button>
-                <button type="button" class="cb-cancel" @onclick="CloseDialogs">إلغاء</button>
-            </div>
-        </div>
-
-    </div>
-</div>
 }
 
 @if (ShowDeleteDialog)
 {
-    <div class="cb-dialog-overlay">
-        <div class="cb-dialog-box cb-delete-dialog-box">
+    <div class="pro-dialog-overlay">
 
-            <div class="cb-dialog-top-image cb-delete-top-image">
+        <div class="pro-dialog-box">
+
+            <div class="pro-dialog-top-image">
                 <img src="images/Background.png" />
             </div>
 
-            <div class="cb-dialog-body cb-delete-dialog-body">
+            <div class="pro-dialog-body">
 
-                <div class="cb-delete-icon-wrap">
-                    <div class="cb-delete-icon">!</div>
-                </div>
+                <div class="pro-delete-icon">!</div>
 
-                <h3 class="cb-delete-title">تأكيد إلغاء التنشيط</h3>
-                <p class="cb-delete-text">هل تريد إلغاء تنشيط هذه الخزنة؟</p>
+                <h3 class="pro-delete-title">تأكيد إلغاء التنشيط</h3>
 
-                <div class="cb-dialog-actions">
-                    <button class="cb-delete" @onclick="() => Toggle(Form.cash_box_id)">تعطيل</button>
-                    <button class="cb-cancel" @onclick="CloseDialogs">إلغاء</button>
+                <p class="pro-delete-text text-center-delete">
+                    هل تريد إلغاء تنشيط هذه الخزنة؟
+                </p>
+
+                <div class="pro-dialog-actions">
+                    <button type="button"
+                            class="pro-delete-confirm"
+                            @onclick="() => Toggle(Form.cash_box_id)">
+                        تعطيل
+                    </button>
+
+                    <button type="button"
+                            class="pro-cancel"
+                            @onclick="CloseDialogs">
+                        إلغاء
+                    </button>
                 </div>
 
             </div>
-
         </div>
     </div>
 }
@@ -215,16 +182,15 @@
     List<CashBoxBalance> Balances = new();
     CashBox Form = new();
 
-
     string Message = "";
+    string NameError = "";
+
     bool ShowActivatePrompt = false;
     CashBox? DuplicateCashBox;
 
     bool ShowAddDialog = false;
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
-
-    string NameError = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -309,8 +275,7 @@
         DuplicateCashBox = all.FirstOrDefault(c =>
             c.name != null &&
             c.name.Trim().ToLower() == name.ToLower() &&
-            (ShowAddDialog || c.cash_box_id != Form.cash_box_id)
-        );
+            (ShowAddDialog || c.cash_box_id != Form.cash_box_id));
 
         if (ShowAddDialog)
         {
@@ -335,7 +300,7 @@
         else
         {
             if (DuplicateCashBox != null &&
-            DuplicateCashBox.cash_box_id != Form.cash_box_id)
+     DuplicateCashBox.cash_box_id != Form.cash_box_id)
             {
                 if (DuplicateCashBox.is_active)
                 {
@@ -344,7 +309,7 @@
                 }
                 else
                 {
-                    Message = "هذا الاسم يعود لخزنة غير نشطة، إذا كنت تريد إعادة تنشيطها توجه إلى زر إضافة خزنة";
+                    Message = "هذا الاسم يعود لخزنة غير نشطة";
                     ShowActivatePrompt = true;
                     return;
                 }
@@ -364,11 +329,12 @@
         if (DuplicateCashBox != null)
         {
             DuplicateCashBox.is_active = true;
+
             await FinanceService.UpdateCashBox(DuplicateCashBox);
+
             ToastService.ShowToast("تم إعادة تنشيط الخزنة بنجاح", "success");
 
             CashBoxes = await FinanceService.GetActiveCashBoxes();
-            await RefreshBalances();
             CloseDialogs();
         }
     }
@@ -386,9 +352,10 @@
     async Task Toggle(int id)
     {
         await FinanceService.ToggleCashBox(id);
+
         ToastService.ShowToast("تم تغيير حالة الخزنة بنجاح", "success");
+
         CashBoxes = await FinanceService.GetActiveCashBoxes();
-        await RefreshBalances();
         CloseDialogs();
     }
 
@@ -403,4 +370,5 @@
         ShowActivatePrompt = false;
         DuplicateCashBox = null;
     }
+
 }

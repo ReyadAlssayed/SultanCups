@@ -20,11 +20,16 @@
     }
 
     <div class="stats-content-main @(isDataVisible ? "show-content-smooth" : "hide-content")">
-        
-        <div class="stats-header">
+
+        <div class="stats-header d-flex justify-content-between align-items-center">
             <h1>إحصائيات مصنع السلطان</h1>
             <p>نظرة شاملة على الأداء المالي والإنتاجي للمصنع</p>
         </div>
+
+        <button class="hide-btn-top" @onclick="() => isDataVisible = false">
+            <i class="bi bi-eye-slash"></i> إخفاء الإحصائيات
+        </button>
+        
 
         <div class="summary-row">
             <div class="summary-card net-profit">

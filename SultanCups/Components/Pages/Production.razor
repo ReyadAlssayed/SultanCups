@@ -37,7 +37,17 @@
                     }
                     else if (ProductionList.Count == 0)
                     {
-                        <tr><td colspan="6" class="pro-empty">لا توجد بيانات إنتاج حالية</td></tr>
+                        <tr>
+                            <td colspan="6" class="pro-empty">
+                                <div class="empty-state">
+                
+                                    <img src="images/Empty.jpg" class="empty-img" />
+
+                                    <span>لا توجد بيانات إنتاج حالية</span>
+
+                                </div>
+                            </td>
+                        </tr>
                     }
                     else
                     {
@@ -56,7 +66,7 @@
                                 <td class="pro-money"><span class="pro-total">@Fmt(p.total_cost)</span></td>
                                 <td class="pro-date">@p.production_date.ToString("yyyy-MM-dd")</td>
 
-                                <td class="pro-actions-cell">
+                                <td style="text-align:center;">
                                     <button type="button" class="pro-small pro-edit" @onclick="() => OpenEditDialog(p)">تعديل</button>
                                     <button type="button" class="pro-small pro-del" @onclick="() => OpenDeleteDialog(p)">حذف</button>
                                 </td>
@@ -162,7 +172,9 @@
                 </div>
 
                 <h3 class="pro-delete-title">تأكيد الحذف</h3>
-                <p class="pro-delete-text">هل تريد حذف سجل إنتاج "@DeleteProductName"؟</p>
+                    <p class="pro-delete-text text-center-delete">
+                        هل تريد حذف سجل إنتاج "@DeleteProductName"؟
+                    </p>
 
                 <div class="pro-dialog-actions">
                     <button type="button" class="pro-delete-confirm" @onclick="ConfirmDelete">حذف</button>

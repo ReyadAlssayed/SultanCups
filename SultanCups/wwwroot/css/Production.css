@@ -81,6 +81,8 @@
 .pro-table-wrap {
     width: 100%;
     overflow: auto;
+    padding: 0;
+    background: #ffffff;
 }
 
 .pro-table {
@@ -128,7 +130,7 @@
         color: var(--pro-text);
         vertical-align: middle;
         /* هذا هو الخط الفاصل Smooth بين السجلات */
-        border-bottom: 1.5px solid #e2e8f0 !important; /* درجة أغمق وأوضح */
+        border-bottom: 1.5px solid #ffffff !important; /* درجة أغمق وأوضح */
     }
 
     /* إزالة الخط السفلـي من السجل الأخير تماماً */
@@ -414,6 +416,36 @@ textarea.pro-input {
     animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+.cb-status-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.cb-status-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .3s;
+    color: #64748b;
+}
+
+    .cb-status-btn.cb-active-selected {
+        border-color: #22c55e;
+        background: #f0fdf4;
+        color: #166534;
+    }
+
+    .cb-status-btn.cb-inactive-selected {
+        border-color: #ef4444;
+        background: #fef2f2;
+        color: #991b1b;
+    }
+
     /* التلوين الجانبي الذكي */
     .prod-toast.success {
         border-right: 6px solid #22c55e; /* أخضر للنجاح */
@@ -422,6 +454,134 @@ textarea.pro-input {
 
     .prod-toast.error {
         border-right: 6px solid #ef4444; /* أحمر للحذف */
+        color: #991b1b;
+    }
+
+.mg-time {
+    display: inline-block;
+    background: #fff7ed;
+    color: #c2410c;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-weight: 900;
+    margin-left: 6px;
+}
+
+.mg-date {
+    color: #16a34a;
+    font-weight: 800;
+}
+
+.text-center-delete {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #334155;
+    margin: 10px 0 22px;
+    line-height: 1.8;
+}
+
+.pro-alert-curtain {
+    margin-top: 10px;
+    min-height: 72px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    animation: fadeSoft .25s ease;
+}
+
+.mg-readonly {
+    font-size: 14px;
+    margin-right: 10px;
+    background: #fef2f2;
+    color: #dc2626;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 800;
+    vertical-align: middle;
+}
+
+.mg-date {
+    color: #16a34a;
+    font-weight: 800;
+}
+
+@keyframes fadeSoft {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes curtainDrop {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 220px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+}
+
+.pro-btn-link {
+    margin-top: 10px;
+    border: none;
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.pro-status-container {
+    margin-top: 14px;
+}
+
+.pro-status-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.pro-status-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    background: #fff;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .2s;
+    color: #64748b;
+}
+
+    .pro-status-btn.pro-active-selected {
+        border-color: #22c55e;
+        background: #f0fdf4;
+        color: #166534;
+    }
+
+    .pro-status-btn.pro-inactive-selected {
+        border-color: #ef4444;
+        background: #fef2f2;
         color: #991b1b;
     }
 

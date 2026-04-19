@@ -134,7 +134,6 @@ namespace SultanCups.Services
         {
             return await _context.suppliers
                 .AsNoTracking()
-                .Where(s => s.is_active)
                 .ToListAsync();
         }
 
@@ -168,18 +167,28 @@ namespace SultanCups.Services
         }
 
         // حذف مورد
-        public async Task<bool> ToggleSupplier(int id)
+        public async Task<string> DeleteOrDisableSupplier(int id)
         {
             var supplier = await _context.suppliers
                 .FirstOrDefaultAsync(s => s.supplier_id == id);
 
             if (supplier == null)
-                return false;
+                return "not_found";
 
-            supplier.is_active = !supplier.is_active;
+            // ✅ الربط الصحيح هنا
+            var hasPurchases = await _context.purchases
+                .AnyAsync(p => p.supplier_id == id);
 
+            if (hasPurchases)
+            {
+                supplier.is_active = false;
+                await _context.SaveChangesAsync();
+                return "disabled";
+            }
+
+            _context.suppliers.Remove(supplier);
             await _context.SaveChangesAsync();
-            return true;
+            return "deleted";
         }
 
         public async Task<List<Supplier>> GetAllSuppliers()
