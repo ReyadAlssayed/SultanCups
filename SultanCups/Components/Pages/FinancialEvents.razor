@@ -1,5 +1,7 @@
 ﻿@page "/FinancialEvents"
 @layout Layout.MainLayout
+@using SultanCups.Models
+@inject SultanCups.Services.FinanceService FinanceService
 
 <div class="pro-page">
 
@@ -14,63 +16,125 @@
         <div></div>
     </div>
 
+    <div class="emp-search-bar">
+
+        <input class="emp-search-input"
+               placeholder="بحث بالنوع أو المسؤول أو الشخص المرتبط أو الخزنة"
+               @bind="SearchText"
+               @bind:event="oninput" />
+
+        <select class="emp-filter-select" @bind="DayFilter">
+            <option value="0">كل الأيام</option>
+
+            @for (int d = 1; d <= 31; d++)
+            {
+                <option value="@d">@d</option>
+            }
+        </select>
+
+        <select class="emp-filter-select" @bind="MonthFilter">
+            <option value="0">كل الشهور</option>
+
+            @for (int m = 1; m <= 12; m++)
+            {
+                <option value="@m">@m</option>
+            }
+        </select>
+
+        <select class="emp-filter-select" @bind="YearFilter">
+            <option value="0">كل السنين</option>
+
+            @for (int y = 2026; y <= 2040; y++)
+            {
+                <option value="@y">@y</option>
+            }
+        </select>
+
+        <select class="emp-filter-select" @bind="DirectionFilter">
+            <option value="all">كل الإتجاهات</option>
+            <option value="IN">داخل</option>
+            <option value="OUT">خارج</option>
+        </select>
+
+    </div>
+
     <div class="pro-card">
         <div class="pro-table-wrap">
 
             <table class="pro-table">
                 <thead>
                     <tr>
-                        <th>رقم</th>
                         <th>النوع</th>
-                        <th>الاتجاه</th>
                         <th>المبلغ</th>
+                        <th>الاتجاه</th>
                         <th>الخزنة</th>
-                        <th>بواسطة</th>
-                        <th>المرجع</th>
-                        <th>الكود</th>
-                        <th style="text-align:center;">التاريخ</th>
-                        <th>ملاحظات</th>
+                        <th>المسؤول</th>
+                        <th>الشخص المرتبط بالعملية</th>
+                        <th>التاريخ</th>
+                        <th>التفاصيل</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @if (Logs.Count == 0)
+                    @if (Logs == null)
                     {
                         <tr>
-                            <td colspan="10" class="pro-empty">لا توجد بيانات حالياً</td>
+                            <td colspan="8" class="pro-empty">جاري التحميل...</td>
+                        </tr>
+                    }
+                    else if (!FilteredLogs.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="pro-empty">لا توجد بيانات حالياً</td>
                         </tr>
                     }
                     else
                     {
-                        @foreach (var item in Logs)
+                        @foreach (var item in FilteredLogs)
                         {
                             <tr>
-                                <td>@item.event_id</td>
                                 <td>@item.event_type</td>
 
+                                <td class="pro-money">
+                                    @item.amount.ToString("0.00") د.ل
+                                </td>
+
                                 <td>
-                                    @if (item.direction == "داخل")
+                                    @if (item.direction == "IN")
                                     {
-                                        <span class="pro-total">داخل</span>
+                                        <span class="pro-total1">داخل</span>
                                     }
                                     else
                                     {
-                                        <span class="pro-status-tag">خارج</span>
+                                        <span class="pro-status-tag1">خارج</span>
                                     }
                                 </td>
 
-                                <td class="pro-money">@item.amount.ToString("0.00") د.ل</td>
-                                <td>@item.cash_box_id</td>
-                                <td>@item.performed_by</td>
-                                <td>@item.ref_table</td>
-                                <td>@item.ref_code</td>
+                                <td>@item.CashBox?.name</td>
 
-                                <td class="mg-date-cell">
-                                    <span class="mg-time">@item.event_date.ToString("HH:mm")</span>
-                                    <span class="mg-date">@item.event_date.ToString("yyyy-MM-dd")</span>
+                                <td>@item.Admin?.full_name</td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.person_name_snapshot)
+                                        ? "-"
+                                        : item.person_name_snapshot)
                                 </td>
 
-                                <td>@item.notes</td>
+                                <td class="mg-date-cell">
+                                    <span class="mg-time">
+                                        @item.event_date.ToLocalTime().ToString("HH:mm")
+                                    </span>
+                                    <span class="mg-date">
+                                        @item.event_date.ToLocalTime().ToString("yyyy-MM-dd")
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <button class="pro-btn-info"
+                                            @onclick="() => OpenDetails(item)">
+                                        تفاصيل
+                                    </button>
+                                </td>
                             </tr>
                         }
                     }
@@ -83,65 +147,166 @@
 
 </div>
 
+@if (ShowDetailsDialog && SelectedItem != null)
+{
+    <div class="sal-dialog-overlay">
+
+        <div class="sal-dialog-box">
+
+            <div class="sal-dialog-top"></div>
+
+            <div class="sal-dialog-body">
+
+                <h3>تفاصيل الحركة المالية</h3>
+
+                <div class="details-list">
+
+                    <div class="row">
+                        <span>رقم الحركة</span>
+                        <span>@SelectedItem.event_id</span>
+                    </div>
+
+                    <div class="row">
+                        <span>النوع</span>
+                        <span>@SelectedItem.event_type</span>
+                    </div>
+
+                    <div class="row">
+                        <span>المبلغ</span>
+                        <span>@SelectedItem.amount.ToString("0.00") د.ل</span>
+                    </div>
+
+                    <div class="row">
+                        <span>الاتجاه</span>
+                        <span>@(SelectedItem.direction == "IN" ? "داخل" : "خارج")</span>
+                    </div>
+
+                    <div class="row">
+                        <span>الخزنة</span>
+                        <span>@SelectedItem.CashBox?.name</span>
+                    </div>
+
+                    <div class="row">
+                        <span>المسؤول</span>
+                        <span>@SelectedItem.Admin?.full_name</span>
+                    </div>
+
+                    <div class="row">
+                        <span>الشخص المرتبط بالعملية</span>
+                        <span>
+                            @(string.IsNullOrWhiteSpace(SelectedItem.person_name_snapshot)
+                                ? "-"
+                                : SelectedItem.person_name_snapshot)
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span>التاريخ</span>
+                        <span>@SelectedItem.event_date.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</span>
+                    </div>
+
+                    <div class="row">
+                        <span>الملاحظات</span>
+                        <span>
+                            @(string.IsNullOrWhiteSpace(SelectedItem.notes)
+                                ? "-"
+                                : SelectedItem.notes)
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <span>المرجع</span>
+                        <span>
+                            @(string.IsNullOrWhiteSpace(SelectedItem.ref_table)
+                                ? "-"
+                                : $"{SelectedItem.ref_table} - {SelectedItem.ref_id}")
+                        </span>
+                    </div>
+
+                </div>
+
+                <button class="btn-cancel" @onclick="CloseDetails">
+                    إغلاق
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
 @code {
 
-    List<FinancialRow> Logs = new()
+    List<FinancialEvent>? Logs;
+
+    bool ShowDetailsDialog = false;
+
+    FinancialEvent? SelectedItem;
+
+    protected override async Task OnInitializedAsync()
     {
-        new FinancialRow
-        {
-            event_id = 1,
-            event_type = "بيع",
-            direction = "داخل",
-            amount = 450,
-            cash_box_id = 1,
-            performed_by = "رياض",
-            ref_table = "sales",
-            ref_code = "INV-1001",
-            event_date = DateTime.Now.AddMinutes(-50),
-            notes = "سداد فاتورة عميل"
-        },
-
-        new FinancialRow
-        {
-            event_id = 2,
-            event_type = "شراء خامات",
-            direction = "خارج",
-            amount = 220,
-            cash_box_id = 1,
-            performed_by = "محمود",
-            ref_table = "purchases",
-            ref_code = "PUR-220",
-            event_date = DateTime.Now.AddMinutes(-25),
-            notes = "شراء مواد تصنيع"
-        },
-
-        new FinancialRow
-        {
-            event_id = 3,
-            event_type = "راتب",
-            direction = "خارج",
-            amount = 900,
-            cash_box_id = 2,
-            performed_by = "رياض",
-            ref_table = "salaries",
-            ref_code = "SAL-03",
-            event_date = DateTime.Now.AddMinutes(-10),
-            notes = "صرف راتب موظف"
-        }
-    };
-
-    public class FinancialRow
-    {
-        public int event_id { get; set; }
-        public string event_type { get; set; } = "";
-        public string direction { get; set; } = "";
-        public decimal amount { get; set; }
-        public int cash_box_id { get; set; }
-        public string performed_by { get; set; } = "";
-        public string ref_table { get; set; } = "";
-        public string ref_code { get; set; } = "";
-        public DateTime event_date { get; set; }
-        public string notes { get; set; } = "";
+        Logs = await FinanceService.GetFinancialEvents();
     }
+
+    void OpenDetails(FinancialEvent item)
+    {
+        SelectedItem = item;
+        ShowDetailsDialog = true;
+    }
+
+    void CloseDetails()
+    {
+        ShowDetailsDialog = false;
+        SelectedItem = null;
+    }
+
+    string SearchText = "";
+    
+    string DirectionFilter = "all";
+
+    int DayFilter = 0;
+    int MonthFilter = 0;
+    int YearFilter = 0;
+
+    IEnumerable<FinancialEvent> FilteredLogs =>
+        (Logs ?? new List<FinancialEvent>())
+        .Where(x =>
+
+            (string.IsNullOrWhiteSpace(SearchText) ||
+
+             x.event_type.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+
+             (x.Admin != null &&
+              x.Admin.full_name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) ||
+
+             (!string.IsNullOrWhiteSpace(x.person_name_snapshot) &&
+ x.person_name_snapshot.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+
+||
+
+(x.CashBox != null &&
+ x.CashBox.name.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+            )
+
+            &&
+
+            (DirectionFilter == "all" || x.direction == DirectionFilter)
+
+          &&
+
+(DayFilter == 0 ||
+ x.event_date.ToLocalTime().Day == DayFilter)
+
+&&
+
+(MonthFilter == 0 ||
+ x.event_date.ToLocalTime().Month == MonthFilter)
+
+&&
+
+(YearFilter == 0 ||
+ x.event_date.ToLocalTime().Year == YearFilter)
+        );
 
 }

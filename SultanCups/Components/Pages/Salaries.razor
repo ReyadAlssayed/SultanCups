@@ -351,7 +351,7 @@
             SalaryForm.salary_date,
             DateTimeKind.Utc);
 
-        await FinanceService.AddSalary(SalaryForm, 1);
+        await FinanceService.AddSalary(SalaryForm, 20);
 
         Salarie = await FinanceService.GetSalaries();
         CloseDialogs();
@@ -391,7 +391,7 @@
         SalaryForm.employee_id = SelectedEmployeeId;
         SalaryForm.cash_box_id = selectedCashBoxId;
 
-        await FinanceService.UpdateSalary(SalaryForm, 1);
+        await FinanceService.UpdateSalary(SalaryForm, 20);
 
         Salarie = await FinanceService.GetSalaries();
 
@@ -407,7 +407,7 @@
 
     async Task AddPaymentAction()
     {
-        await FinanceService.AddSalaryPayment(SalaryForm.salary_id, PaymentAmount, 1);
+        await FinanceService.AddSalaryPayment(SalaryForm.salary_id, PaymentAmount, 20);
         Salarie = await FinanceService.GetSalaries();
         CloseDialogs();
     }
@@ -421,14 +421,14 @@
 
     async Task ReversePaymentAction()
     {
-        await FinanceService.ReverseSalary(SalaryForm.salary_id, PaymentAmount, 1);
+        await FinanceService.ReverseSalary(SalaryForm.salary_id, PaymentAmount, 20);
         Salarie = await FinanceService.GetSalaries();
         CloseDialogs();
     }
 
     async Task DeleteSalaryAction()
     {
-        await FinanceService.DeleteSalary(DeleteSalaryId, 1);
+        await FinanceService.DeleteSalary(DeleteSalaryId, 20);
 
         Salarie = await FinanceService.GetSalaries();
 

@@ -454,6 +454,18 @@ namespace SultanCups.Services
                 .Select(x => x.balance)
                 .FirstOrDefaultAsync();
         }
+
+        //جلب السجلات المالية كاملة
+
+        public async Task<List<FinancialEvent>> GetFinancialEvents()
+        {
+            return await _context.financial_events
+                .AsNoTracking()
+                .Include(x => x.CashBox)
+                .Include(x => x.Admin)
+                .OrderByDescending(x => x.event_date)
+                .ToListAsync();
+        }
     }
 
 }

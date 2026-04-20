@@ -1,0 +1,154 @@
+﻿/* زر تفاصيل */
+.pro-btn-info {
+    padding: 7px 14px;
+    border: none;
+    background: #60a5fa;
+    color: white;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+    .pro-btn-info:hover {
+        background: #3b82f6;
+    }
+
+    .pro-btn-info:active {
+        transform: scale(0.97);
+    }
+
+.sal-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.sal-dialog-box {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px 28px;
+    width: 420px;
+    max-width: 95%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    animation: fadeIn 0.2s ease;
+}
+
+.sal-dialog-body h3 {
+    text-align: center;
+    margin-bottom: 18px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.sal-dialog-body div {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 14px;
+    border-bottom: 1px dashed #f1f5f9;
+}
+
+    .sal-dialog-body div:last-child {
+        border-bottom: none;
+    }
+
+.sal-dialog-body b {
+    color: #475569;
+    font-weight: 500;
+}
+
+.sal-dialog-body span {
+    color: #0f172a;
+    font-weight: 500;
+}
+
+.btn-cancel {
+    margin-top: 18px;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: #d1d5db;
+    color: #111827;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+    .btn-cancel:hover {
+        background: #9ca3af;
+    }
+
+.details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+    .details-list .row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px dashed #f1f5f9;
+        font-size: 14px;
+    }
+
+        .details-list .row span:first-child {
+            color: #64748b;
+        }
+
+        .details-list .row span:last-child {
+            color: #0f172a;
+            font-weight: 500;
+        }
+
+
+.sal-dialog-top {
+    height: 6px;
+    background: #1d4ed8;
+    border-radius: 14px 14px 0 0;
+    margin: -24px -28px 18px -28px;
+}
+
+
+/* داخل / خارج بدون خلفية */
+.pro-total1,
+.pro-status-tag1 {
+    background: none !important;
+    min-width: auto;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 0;
+}
+
+.pro-total1 {
+    color: #16a34a;
+}
+
+.pro-status-tag1 {
+    color: #dc2626;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
