@@ -15,7 +15,8 @@ namespace SultanCups.Models
 
         public decimal base_salary { get; set; }
 
-        public List<Salary> Salaries { get; set; } = new();
+        public string salary_mode { get; set; } = "راتب أساسي";
         public bool is_active { get; set; } = true;
+        public List<Salary> Salaries { get; set; } = new();
     }
 }

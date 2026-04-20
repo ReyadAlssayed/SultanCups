@@ -67,6 +67,7 @@ namespace SultanCups.Services
             employee.phone = updatedEmployee.phone;
             employee.rank = updatedEmployee.rank;
             employee.base_salary = updatedEmployee.base_salary;
+            employee.salary_mode = updatedEmployee.salary_mode;
             employee.is_active = updatedEmployee.is_active;
 
             await _context.SaveChangesAsync();

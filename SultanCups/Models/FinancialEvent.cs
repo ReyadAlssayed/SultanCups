@@ -39,6 +39,6 @@ namespace SultanCups.Models
         [ForeignKey("performed_by")]
         public Admain Admin { get; set; } = null!;
         public int? employee_id { get; set; }
-        public string? employee_name_snapshot { get; set; }
+        public string? person_name_snapshot { get; set; }
     }
 }

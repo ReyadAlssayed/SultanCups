@@ -57,7 +57,7 @@ namespace SultanCups.Services
                 ref_table = "salaries",
                 ref_id = refId,
                 employee_id = employeeId,
-                employee_name_snapshot = employeeName,
+                person_name_snapshot = employeeName,
                 event_date = DateTime.UtcNow,
                 notes = notes
             });
@@ -127,10 +127,11 @@ namespace SultanCups.Services
             var existing = await _context.salaries
                 .FirstOrDefaultAsync(s =>
                     s.employee_id == salary.employee_id &&
-                    s.status != "خالص");
+                    s.salary_date.Year == salary.salary_date.Year &&
+                    s.salary_date.Month == salary.salary_date.Month);
 
             if (existing != null)
-                throw new Exception("يوجد راتب غير مكتمل لهذا الموظف");
+                throw new Exception("يوجد راتب لهذا الموظف في نفس الشهر");
 
             UpdateSalaryStatus(salary);
 
@@ -240,6 +241,23 @@ namespace SultanCups.Services
 
             if (salary == null) return;
 
+            // 🔥 منع تكرار راتب لنفس الموظف في نفس الشهر عند تغيير الموظف
+            if (salary.employee_id != updated.employee_id)
+            {
+                var year = salary.salary_date.Year;
+                var month = salary.salary_date.Month;
+
+                var exists = await _context.salaries
+                    .AnyAsync(s =>
+                        s.employee_id == updated.employee_id &&
+                        s.salary_id != salary.salary_id &&
+                        s.salary_date.Year == year &&
+                        s.salary_date.Month == month);
+
+                if (exists)
+                    throw new Exception("هذا الموظف لديه راتب في نفس الشهر");
+            }
+
             var oldData = new Dictionary<string, object>();
             var newData = new Dictionary<string, object>();
 
@@ -273,6 +291,42 @@ namespace SultanCups.Services
                     oldData,
                     newData,
                     adminId
+                );
+            }
+
+            // 🔥 نقل الراتب بين الخزن
+            if (salary.cash_box_id != updated.cash_box_id && salary.paid_amount > 0)
+            {
+                var balance = await GetBalanceFromView(updated.cash_box_id);
+
+                if (salary.paid_amount > balance)
+                    throw new Exception("رصيد الخزنة الجديدة غير كافي");
+
+                var employee = await _context.employees
+                    .FirstOrDefaultAsync(e => e.employee_id == salary.employee_id);
+
+                AddFinancialEvent(
+                    "استرجاع راتب",
+                    "IN",
+                    salary.paid_amount,
+                    salary.cash_box_id,
+                    adminId,
+                    salary.salary_id,
+                    salary.employee_id,
+                    employee?.full_name,
+                    "نقل الراتب من خزنة قديمة"
+                );
+
+                AddFinancialEvent(
+                    "دفع راتب",
+                    "OUT",
+                    salary.paid_amount,
+                    updated.cash_box_id,
+                    adminId,
+                    salary.salary_id,
+                    salary.employee_id,
+                    employee?.full_name,
+                    "نقل الراتب إلى خزنة جديدة"
                 );
             }
 

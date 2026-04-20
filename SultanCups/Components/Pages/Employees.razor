@@ -188,6 +188,14 @@
                         <div class="emp-error">@RankError</div>
                     }
                 </div>
+                    <div class="emp-field">
+                        <label class="emp-label">نوع الراتب</label>
+
+                        <select class="emp-input" @bind="EmployeeForm.salary_mode">
+                            <option value="راتب أساسي">راتب أساسي</option>
+                            <option value="طلعة">طلعة</option>
+                        </select>
+                    </div>
 
                 <div class="emp-field">
                     <label class="emp-label">الراتب الأساسي</label>
@@ -255,6 +263,14 @@
                         </select>
                     </div>
                 </div>
+                    <div class="emp-field">
+                        <label class="emp-label">نوع الراتب</label>
+
+                        <select class="emp-input" @bind="EmployeeForm.salary_mode">
+                            <option value="راتب أساسي">راتب أساسي</option>
+                            <option value="طلعة">طلعة</option>
+                        </select>
+                    </div>
                     <div class="emp-field">
                         <label class="emp-label">الراتب الأساسي</label>
 
@@ -386,10 +402,13 @@
     void OpenAddDialog()
     {
         CloseDialogs();
+
         EmployeeForm = new SultanCups.Models.Employee
         {
-            is_active = true
+            is_active = true,
+            salary_mode = "راتب أساسي"
         };
+
         ShowAddDialog = true;
     }
 
@@ -404,6 +423,7 @@
             phone = e.phone,
             rank = e.rank,
             base_salary = e.base_salary,
+            salary_mode = e.salary_mode,
             is_active = e.is_active
         };
 
@@ -421,6 +441,7 @@
             phone = e.phone,
             rank = e.rank,
             base_salary = e.base_salary,
+            salary_mode = e.salary_mode,
             is_active = e.is_active
         };
 
@@ -560,6 +581,11 @@
         {
             SalaryError = "الحد الأقصى للراتب هو 20,000 د.ل";
             hasError = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(EmployeeForm.salary_mode))
+        {
+            EmployeeForm.salary_mode = "راتب أساسي";
         }
 
         // توقف في حال وجود أي خطأ

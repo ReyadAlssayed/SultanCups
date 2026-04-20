@@ -86,7 +86,7 @@
 
                     <select @bind="SalaryForm.salary_type" class="sal-input">
                         <option value="راتب أساسي">راتب أساسي</option>
-                        <option value="مكافأة">مكافأة</option>
+                        <option value="طلعة">طلعة</option>
                     </select>
 
                     <select @bind="SelectedEmployeeId" class="sal-input">
@@ -134,33 +134,73 @@
 @if (ShowEditDialog)
 {
     <div class="sal-dialog-overlay">
-        <div class="sal-dialog-box">
+        <div class="sal-dialog-modern">
+
+            <div class="sal-dialog-header"></div>
+
             <div class="sal-dialog-body">
 
-                <h3>تعديل الراتب</h3>
+                <h3 class="sal-title">تعديل الراتب</h3>
 
-                <!-- الموظف -->
-                <select @bind="SelectedEmployeeId">
-                    @foreach (var e in Employees)
-                    {
-                        <option value="@e.employee_id">@e.full_name</option>
-                    }
-                </select>
+                <div class="sal-grid">
 
-                <!-- المستحق -->
-                <input @bind="SalaryForm.amount" placeholder="المستحق" />
+                    <!-- نوع الراتب -->
+                    <select @bind="SalaryForm.salary_type" class="sal-input">
+                        <option value="راتب أساسي">راتب أساسي</option>
+                        <option value="طلعة">طلعة</option>
+                    </select>
 
-                <!-- المدفوع (عرض فقط) -->
-                <input value="@SalaryForm.paid_amount" disabled />
+                    <!-- الموظف -->
+                    <select @bind="SelectedEmployeeId" class="sal-input">
+                        @foreach (var e in Employees)
+                        {
+                            <option value="@e.employee_id">@e.full_name</option>
+                        }
+                    </select>
 
-                <!-- التاريخ -->
-                <input type="date" @bind="SalaryForm.salary_date" />
+                    <!-- المستحق -->
+                    <input class="sal-input"
+                           @bind="SalaryForm.amount"
+                           placeholder="القيمة المستحقة" />
 
-                <!-- الملاحظة -->
-                <input @bind="SalaryForm.notes" placeholder="ملاحظة" />
+                    <!-- المدفوع -->
+                    <input class="sal-input"
+                           value="@SalaryForm.paid_amount"
+                           disabled />
 
-                <button @onclick="UpdateSalaryAction">حفظ</button>
-                <button @onclick="CloseDialogs">إلغاء</button>
+                    <!-- المتبقي -->
+                    <input class="sal-input"
+                           value="@(SalaryForm.amount - SalaryForm.paid_amount)"
+                           disabled />
+
+                    <select @bind="selectedCashBoxId" class="sal-input">
+                        @foreach (var c in CashBoxes)
+                        {
+                            <option value="@c.cash_box_id">@c.name</option>
+                        }
+                    </select>
+
+                    <!-- الحالة -->
+                    <select class="sal-input" disabled>
+                        <option>@SalaryForm.status</option>
+                    </select>
+
+                    <!-- التاريخ -->
+                    <input type="date"
+                           class="sal-input"
+                           @bind="SalaryForm.salary_date" />
+
+                    <!-- الملاحظة -->
+                    <input class="sal-input"
+                           @bind="SalaryForm.notes"
+                           placeholder="ملاحظة" />
+
+                </div>
+
+                <div class="sal-actions">
+                    <button class="btn-cancel" @onclick="CloseDialogs">إلغاء</button>
+                    <button class="btn-save" @onclick="UpdateSalaryAction">حفظ</button>
+                </div>
 
             </div>
         </div>
@@ -283,6 +323,7 @@
 
         ShowAddDialog = true;
     }
+
     void OpenDeleteDialog(Salary s)
     {
         DeleteSalaryId = s.salary_id;
@@ -310,11 +351,12 @@
             SalaryForm.salary_date,
             DateTimeKind.Utc);
 
-        await FinanceService.AddSalary(SalaryForm, 20);
+        await FinanceService.AddSalary(SalaryForm, 1);
 
         Salarie = await FinanceService.GetSalaries();
         CloseDialogs();
     }
+
     void OpenEditDialog(Salary s)
     {
         IsEditMode = true;
@@ -328,10 +370,12 @@
             paid_amount = s.paid_amount,
             salary_date = s.salary_date,
             cash_box_id = s.cash_box_id,
-            notes = s.notes
+            notes = s.notes,
+            status = s.status
         };
 
         SelectedEmployeeId = s.employee_id;
+        selectedCashBoxId = s.cash_box_id;
 
         ShowEditDialog = true;
     }
@@ -345,8 +389,9 @@
             return;
 
         SalaryForm.employee_id = SelectedEmployeeId;
+        SalaryForm.cash_box_id = selectedCashBoxId;
 
-        await FinanceService.UpdateSalary(SalaryForm, 20);
+        await FinanceService.UpdateSalary(SalaryForm, 1);
 
         Salarie = await FinanceService.GetSalaries();
 
@@ -362,7 +407,7 @@
 
     async Task AddPaymentAction()
     {
-        await FinanceService.AddSalaryPayment(SalaryForm.salary_id, PaymentAmount, 20);
+        await FinanceService.AddSalaryPayment(SalaryForm.salary_id, PaymentAmount, 1);
         Salarie = await FinanceService.GetSalaries();
         CloseDialogs();
     }
@@ -376,14 +421,14 @@
 
     async Task ReversePaymentAction()
     {
-        await FinanceService.ReverseSalary(SalaryForm.salary_id, PaymentAmount, 20);
+        await FinanceService.ReverseSalary(SalaryForm.salary_id, PaymentAmount, 1);
         Salarie = await FinanceService.GetSalaries();
         CloseDialogs();
     }
 
     async Task DeleteSalaryAction()
     {
-        await FinanceService.DeleteSalary(DeleteSalaryId, 20);
+        await FinanceService.DeleteSalary(DeleteSalaryId, 1);
 
         Salarie = await FinanceService.GetSalaries();
 
