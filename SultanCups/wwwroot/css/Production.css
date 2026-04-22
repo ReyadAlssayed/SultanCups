@@ -602,6 +602,48 @@ textarea.pro-input:focus {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
+/* ===== Restore Money Image + Alerts ===== */
+
+.money-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+    .money-head img {
+        width: 42px;
+        height: 42px;
+        object-fit: cover;
+        border-radius: 10px;
+        position: relative;
+        top: -3px;
+    }
+
+    .money-head h3 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 900;
+    }
+
+.money-note {
+    text-align: center;
+    color: #64748b;
+    font-size: 17px;
+    font-weight: 700;
+    margin: 10px 0 18px;
+    line-height: 1.8;
+}
+
+.payment-error {
+    color: #dc2626;
+    font-size: 14px;
+    font-weight: 800;
+    margin-top: 8px;
+    text-align: right;
+}
+
 @media (max-width: 600px) {
     .pro-dialog-box {
         width: 95%;

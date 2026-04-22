@@ -723,7 +723,7 @@
         }
 
         EmployeeList = await HrService.GetEmployees();
-        CloseDialogs();
+        CloseDialogs(); 
         
         // التعديل هنا: تمرير النتيجة لدالة الـ Toast
         await ShowToast(msg, type);

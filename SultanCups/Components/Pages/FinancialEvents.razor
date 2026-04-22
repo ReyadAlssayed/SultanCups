@@ -123,9 +123,30 @@
                                 <td>@item.Admin?.full_name</td>
 
                                 <td>
-                                    @(string.IsNullOrWhiteSpace(item.person_name_snapshot)
-                                        ? "-"
-                                        : item.person_name_snapshot)
+                                    @{
+                                        var salary = Salaries.FirstOrDefault(x => x.salary_id == item.ref_id);
+                                        var emp = Employees.FirstOrDefault(x => x.employee_id == salary?.employee_id);
+                                        var currentName = emp?.full_name;
+                                    }
+
+                                    @if (string.IsNullOrWhiteSpace(item.person_name_snapshot))
+                                    {
+                                        <span>-</span>
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(currentName) &&
+                                             currentName != item.person_name_snapshot)
+                                    {
+                                        <span>
+                                            @item.person_name_snapshot
+                                            <span class="name-change-green">
+                                                ← تغير إلى: @currentName
+                                            </span>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.person_name_snapshot</span>
+                                    }
                                 </td>
 
                                 <td class="mg-date-cell">
@@ -252,9 +273,14 @@
 
     FinancialEvent? SelectedItem;
 
+    List<Employee> Employees = new();
+    List<Salary> Salaries = new();
+
     protected override async Task OnInitializedAsync()
     {
         Logs = await FinanceService.GetFinancialEvents();
+        Employees = await FinanceService.GetActiveEmployees();
+        Salaries = await FinanceService.GetSalaries();
     }
 
     void OpenDetails(FinancialEvent item)

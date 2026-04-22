@@ -102,7 +102,7 @@
 
                                     <button class="emp-edit"
                                             @onclick="() => OpenReverseDialog(s)">
-                                         إلغاءدفعة
+                                         إلغاء دفعة
                                     </button>
 
                                     <button class="emp-edit"
@@ -114,6 +114,18 @@
                                             @onclick="() => OpenDeleteDialog(s)">
                                         حذف
                                     </button>
+
+
+
+
+
+
+
+
+
+
+
+
 
                                 </td>
                             </tr>
@@ -139,7 +151,10 @@
 
             <div class="pro-dialog-body">
 
-                <h3>إضافة راتب</h3>
+                <div class="money-head">
+                    <h3>إضافة راتب</h3>
+                    <img src="images/Money.jpg" />
+                </div>
 
                 <div class="pro-fields-grid">
 
@@ -361,7 +376,17 @@
 
             <div class="pro-dialog-body">
 
-                <h3>إضافة دفعة</h3>
+               
+                <div class="money-head">
+                    
+                    <h3>إضافة دفعة</h3>
+                    <img src="images/Money.jpg" />
+                </div>
+
+                <p class="money-note">
+                    سيتم خصم المبلغ من خزنة:
+                    @CashBoxes.FirstOrDefault(x => x.cash_box_id == SalaryForm.cash_box_id)?.name
+                </p>
 
                 <div class="pro-field">
                     <label class="pro-label">المبلغ</label>
@@ -379,17 +404,8 @@
                 </div>
 
                 <div class="pro-dialog-actions">
-
-                    <button class="pro-save"
-                            @onclick="AddPaymentAction">
-                        حفظ
-                    </button>
-
-                    <button class="pro-cancel"
-                            @onclick="CloseDialogs">
-                        إلغاء
-                    </button>
-
+                    <button class="pro-save" @onclick="AddPaymentAction">حفظ</button>
+                    <button class="pro-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
 
             </div>
@@ -402,9 +418,23 @@
 {
     <div class="pro-dialog-overlay">
         <div class="pro-dialog-box">
+
+                <div class="pro-dialog-top-image">
+                    <img src="images/Background.png" />
+                </div>
+
             <div class="pro-dialog-body">
 
-                <h3>إلغاء دفعة</h3>
+                <div class="money-head">
+                    
+                    <h3>إلغاء دفعة</h3>
+                    <img src="images/Money.jpg" />
+                </div>
+
+                <p class="money-note">
+                    سيتم إرجاع المبلغ إلى خزنة:
+                    @CashBoxes.FirstOrDefault(x => x.cash_box_id == SalaryForm.cash_box_id)?.name
+                </p>
 
                 <div class="pro-field">
                     <label class="pro-label">المبلغ</label>
@@ -422,15 +452,8 @@
                 </div>
 
                 <div class="pro-dialog-actions">
-                    <button class="pro-save"
-                            @onclick="ReversePaymentAction">
-                        حفظ
-                    </button>
-
-                    <button class="pro-cancel"
-                            @onclick="CloseDialogs">
-                        إلغاء
-                    </button>
+                    <button class="pro-save" @onclick="ReversePaymentAction">حفظ</button>
+                    <button class="pro-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
 
             </div>
@@ -452,10 +475,14 @@
 
                 <div class="pro-delete-icon">!</div>
 
-                <h3 class="pro-delete-title">تأكيد الحذف</h3>
+                <h3 class="pro-delete-title money-head">
+                    تأكيد الحذف
+                    <img src="images/Money.jpg" />
+                </h3>
 
-                <p class="pro-delete-text text-center-delete">
-                    هل تريد حذف هذا الراتب؟
+                <p class="pro-delete-text text-center-delete money-note">
+                    سيتم حذف الراتب وإرجاع المدفوع إلى خزنة:
+                    @CashBoxes.FirstOrDefault(x => x.cash_box_id == SalaryForm.cash_box_id)?.name
                 </p>
 
                 <div class="pro-dialog-actions">
@@ -577,25 +604,25 @@
                 hasError = true;
             }
 
-            if (SalaryForm.paid_amount <= 0)
+            if (SalaryForm.amount <= 0)
             {
-                PaidError = "المبلغ يجب أن يكون أكبر من 0";
+                PaidError = "المبلغ المستحق يجب أن يكون أكبر من 0";
                 hasError = true;
             }
 
-            if (hasError) return;
-
-            if (SalaryForm.amount <= 0)
-            {
-                ToastService.ShowToast("المبلغ المستحق غير صحيح", "error");
-                return;
-            }
-
             if (SalaryForm.paid_amount <= 0)
             {
-                ToastService.ShowToast("أدخل مبلغ مدفوع صحيح", "error");
-                return;
+                PaidError = "أدخل قيمة أكبر من 0";
+                hasError = true;
             }
+            else if (SalaryForm.paid_amount > SalaryForm.amount)
+            {
+                PaidError = "المدفوع لا يمكن أن يكون أكبر من المستحق";
+                hasError = true;
+            }
+
+            if (hasError)
+                return;
 
             SalaryForm.employee_id = SelectedEmployeeId;
             SalaryForm.cash_box_id = selectedCashBoxId;
@@ -612,9 +639,9 @@
 
             ToastService.ShowToast("تم إضافة الراتب بنجاح", "success");
         }
-        catch (Exception ex)
+        catch
         {
-            CashBoxError = ex.Message;
+            ToastService.ShowToast("تعذر حفظ الراتب، تحقق من البيانات المدخلة", "error");
         }
     }
 
@@ -704,7 +731,7 @@
 
         if (PaymentAmount <= 0)
         {
-            PaymentError = "أدخل مبلغ صحيح";
+            PaymentError = "أدخل قيمة أكبر من 0";
             return;
         }
 
@@ -716,10 +743,16 @@
 
         try
         {
-            await FinanceService.AddSalaryPayment(
+            var ok = await FinanceService.AddSalaryPayment(
                 SalaryForm.salary_id,
                 PaymentAmount,
                 20);
+
+            if (!ok)
+            {
+                PaymentError = "تعذر إضافة الدفعة: تحقق من رصيد الخزنة أو قيمة المبلغ";
+                return;
+            }
 
             Salarie = await FinanceService.GetSalaries();
 
@@ -729,7 +762,9 @@
         }
         catch (Exception ex)
         {
-            PaymentError = ex.Message;
+            ToastService.ShowToast(
+                ex.InnerException?.Message ?? ex.Message,
+                "error");
         }
     }
 
@@ -746,7 +781,7 @@
 
         if (PaymentAmount <= 0)
         {
-            PaymentError = "أدخل مبلغ صحيح";
+            PaymentError = "أدخل قيمة أكبر من 0";
             return;
         }
 

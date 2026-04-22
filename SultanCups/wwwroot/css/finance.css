@@ -141,6 +141,12 @@
     color: #dc2626;
 }
 
+.name-change-green {
+    color: #16a34a;
+    font-weight: 800;
+    margin-right: 6px;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
