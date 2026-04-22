@@ -131,7 +131,7 @@ namespace SultanCups.Services
                     s.salary_date.Month == salary.salary_date.Month);
 
             if (existing != null)
-                throw new Exception("يوجد راتب لهذا الموظف في نفس الشهر");
+                throw new Exception("تم صرف راتب لهذا الموظف خلال هذا الشهر، استخدم إضافة دفعة إذا كان هناك مبلغ متبقٍ");
 
             UpdateSalaryStatus(salary);
 
@@ -142,7 +142,7 @@ namespace SultanCups.Services
             var balance = await GetBalanceFromView(salary.cash_box_id);
 
             if (salary.paid_amount > balance)
-                throw new Exception("الرصيد غير كافي في الخزنة");
+                throw new Exception("رصيد الخزنة غير كافٍ");
 
             _context.salaries.Add(salary);
             await _context.SaveChangesAsync();
@@ -255,7 +255,7 @@ namespace SultanCups.Services
                         s.salary_date.Month == month);
 
                 if (exists)
-                    throw new Exception("هذا الموظف لديه راتب في نفس الشهر");
+                    throw new Exception("لا يمكن إضافة راتب لهذا الموظف، لديه راتب أساسي في نفس الشهر");
             }
 
             var oldData = new Dictionary<string, object>();
