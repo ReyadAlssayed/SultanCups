@@ -20,17 +20,17 @@ namespace SultanCups.Services
         // =========================================
 
         private void AddFinancialEvent(
-            string type,
-            string direction,
-            decimal amount,
-            int cashBoxId,
-            int adminId,
-            int refId,
-            int? employeeId,
-            string? employeeName,
-            string notes)
+      string type,
+      string direction,
+      decimal amount,
+      int cashBoxId,
+      int adminId,
+      int refId,
+      string refTable,
+      int? employeeId,
+      string? employeeName,
+      string notes)
         {
-            // 🔥 العمليات التي تحتاج موظف
             var employeeEvents = new[]
             {
         "دفع راتب",
@@ -40,7 +40,6 @@ namespace SultanCups.Services
         "استخدام رصيد"
     };
 
-            // 🔥 تحقق
             if (employeeEvents.Contains(type))
             {
                 if (employeeId == null || string.IsNullOrWhiteSpace(employeeName))
@@ -54,7 +53,7 @@ namespace SultanCups.Services
                 amount = amount,
                 cash_box_id = cashBoxId,
                 performed_by = adminId,
-                ref_table = "salaries",
+                ref_table = refTable,
                 ref_id = refId,
                 employee_id = employeeId,
                 person_name_snapshot = employeeName,
@@ -135,9 +134,7 @@ namespace SultanCups.Services
 
             UpdateSalaryStatus(salary);
 
-            salary.salary_date = DateTime.SpecifyKind(
-                salary.salary_date,
-                DateTimeKind.Utc);
+            salary.salary_date = DateTime.SpecifyKind(salary.salary_date, DateTimeKind.Utc);
 
             var balance = await GetBalanceFromView(salary.cash_box_id);
 
@@ -158,6 +155,7 @@ namespace SultanCups.Services
                 salary.cash_box_id,
                 adminId,
                 salary.salary_id,
+                "salaries",
                 salary.employee_id,
                 employee.full_name,
                 "دفع راتب عند الإنشاء"
@@ -165,6 +163,7 @@ namespace SultanCups.Services
 
             await _context.SaveChangesAsync();
         }
+
 
         public async Task<bool> AddSalaryPayment(int salaryId, decimal amount, int adminId)
         {
@@ -177,11 +176,9 @@ namespace SultanCups.Services
             var remaining = salary.amount - salary.paid_amount;
 
             var balance = await GetBalanceFromView(salary.cash_box_id);
-            if (amount > balance)
-                return false;
+            if (amount > balance) return false;
 
-            if (amount <= 0 || amount > remaining)
-                return false;
+            if (amount <= 0 || amount > remaining) return false;
 
             salary.paid_amount += amount;
 
@@ -194,6 +191,7 @@ namespace SultanCups.Services
                 salary.cash_box_id,
                 adminId,
                 salary.salary_id,
+                "salaries",
                 salary.employee_id,
                 salary.Employee.full_name,
                 "إضافة دفعة راتب"
@@ -211,8 +209,7 @@ namespace SultanCups.Services
 
             if (salary == null) return false;
 
-            if (amount <= 0 || amount > salary.paid_amount)
-                return false;
+            if (amount <= 0 || amount > salary.paid_amount) return false;
 
             salary.paid_amount -= amount;
 
@@ -225,6 +222,7 @@ namespace SultanCups.Services
                 salary.cash_box_id,
                 adminId,
                 salary.salary_id,
+                "salaries",
                 salary.employee_id,
                 salary.Employee.full_name,
                 "استرجاع راتب"
@@ -312,6 +310,7 @@ namespace SultanCups.Services
                     salary.cash_box_id,
                     adminId,
                     salary.salary_id,
+                    "salaries",
                     salary.employee_id,
                     employee?.full_name,
                     "نقل الراتب من خزنة قديمة"
@@ -324,6 +323,7 @@ namespace SultanCups.Services
                     updated.cash_box_id,
                     adminId,
                     salary.salary_id,
+                    "salaries",
                     salary.employee_id,
                     employee?.full_name,
                     "نقل الراتب إلى خزنة جديدة"
@@ -359,6 +359,7 @@ namespace SultanCups.Services
                     salary.cash_box_id,
                     adminId,
                     salary.salary_id,
+                    "salaries",
                     salary.employee_id,
                     salary.Employee.full_name,
                     "حذف راتب - استرجاع كامل"
@@ -466,6 +467,222 @@ namespace SultanCups.Services
                 .OrderByDescending(x => x.event_date)
                 .ToListAsync();
         }
+
+
+
+        // =========================================
+        // 🔹 other_purchases (المصروفات الأخرى)
+        // =========================================
+
+        // جلب الكل
+        public async Task<List<OtherPurchase>> GetOtherPurchases()
+        {
+            return await _context.other_purchases
+                .AsNoTracking()
+                .OrderByDescending(x => x.purchase_date)
+                .ToListAsync();
+        }
+
+        // إضافة مصروف جديد
+        public async Task AddOtherPurchase(OtherPurchase item, int adminId)
+        {
+            item.name = item.name.Trim();
+            item.notes = item.notes?.Trim();
+            item.purchase_date = DateTime.SpecifyKind(
+                item.purchase_date,
+                DateTimeKind.Utc);
+
+            if (item.cost <= 0)
+                throw new Exception("المبلغ يجب أن يكون أكبر من صفر");
+
+            if (item.cash_box_id <= 0)
+                throw new Exception("اختر الخزنة");
+
+            var balance = await GetBalanceFromView(item.cash_box_id);
+
+            if (item.cost > balance)
+                throw new Exception("رصيد الخزنة غير كافٍ");
+
+            _context.other_purchases.Add(item);
+            await _context.SaveChangesAsync();
+
+            AddFinancialEvent(
+                "صرف مصروف جديد",
+                "OUT",
+                item.cost,
+                item.cash_box_id,
+                adminId,
+               item.other_purchase_id,
+"other_purchases",
+null,
+null,
+item.name
+            );
+
+            await _context.SaveChangesAsync();
+        }
+
+        // تعديل (بدون تعديل المبلغ مباشرة)
+        public async Task<bool> UpdateOtherPurchase(OtherPurchase updated, int adminId)
+        {
+            var p = await _context.other_purchases
+                .FirstOrDefaultAsync(x => x.other_purchase_id == updated.other_purchase_id);
+
+            if (p == null)
+                return false;
+
+            updated.purchase_date = DateTime.SpecifyKind(
+                updated.purchase_date,
+                DateTimeKind.Utc);
+
+            // تغيير الخزنة = سجلين
+            if (p.cash_box_id != updated.cash_box_id && p.cost > 0)
+            {
+                if (updated.cash_box_id <= 0)
+                    throw new Exception("اختر الخزنة الجديدة");
+
+                var balance = await GetBalanceFromView(updated.cash_box_id);
+
+                if (p.cost > balance)
+                    throw new Exception("رصيد الخزنة الجديدة غير كافٍ");
+
+                AddFinancialEvent(
+                    "نقل المصروف من خزنة قديمة",
+                    "IN",
+                    p.cost,
+                    p.cash_box_id,
+                    adminId,
+                   p.other_purchase_id,
+"other_purchases",
+null,
+null,
+p.name
+                );
+
+                AddFinancialEvent(
+                    "نقل المصروف إلى خزنة جديدة",
+                    "OUT",
+                    p.cost,
+                    updated.cash_box_id,
+                    adminId,
+                   p.other_purchase_id,
+"other_purchases",
+null,
+null,
+p.name
+                );
+            }
+
+            p.name = updated.name.Trim();
+            p.quantity = updated.quantity;
+            p.purchase_date = updated.purchase_date;
+            p.notes = updated.notes?.Trim();
+            p.cash_box_id = updated.cash_box_id;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // زيادة مبلغ على المصروف
+        public async Task<bool> AddOtherPurchasePayment(int id, decimal amount, int adminId)
+        {
+            var p = await _context.other_purchases
+                .FirstOrDefaultAsync(x => x.other_purchase_id == id);
+
+            if (p == null)
+                return false;
+
+            if (amount <= 0)
+                return false;
+
+
+            var balance = await GetBalanceFromView(p.cash_box_id);
+
+            if (amount > balance)
+                return false;
+
+            p.cost += amount;
+
+            AddFinancialEvent(
+                "زيادة مبلغ على المصروف",
+                "OUT",
+                amount,
+                p.cash_box_id,
+                adminId,
+               p.other_purchase_id,
+"other_purchases",
+null,
+null,
+p.name
+            );
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // استرجاع مبلغ من المصروف
+        public async Task<bool> ReverseOtherPurchasePayment(int id, decimal amount, int adminId)
+        {
+            var p = await _context.other_purchases
+                .FirstOrDefaultAsync(x => x.other_purchase_id == id);
+
+            if (p == null)
+                return false;
+
+            if (amount <= 0 || amount > p.cost)
+                return false;
+
+
+            p.cost -= amount;
+
+            AddFinancialEvent(
+                "استرجاع مبلغ من المصروف",
+                "IN",
+                amount,
+                p.cash_box_id,
+                adminId,
+                p.other_purchase_id,
+"other_purchases",
+null,
+null,
+p.name
+            );
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // حذف مصروف وإرجاع المبلغ
+        public async Task<bool> DeleteOtherPurchase(int id, int adminId)
+        {
+            var p = await _context.other_purchases
+                .FirstOrDefaultAsync(x => x.other_purchase_id == id);
+
+            if (p == null)
+                return false;
+
+            if (p.cost > 0)
+            {
+                AddFinancialEvent(
+                    "حذف مصروف وإرجاع المبلغ",
+                    "IN",
+                    p.cost,
+                    p.cash_box_id,
+                    adminId,
+                   p.other_purchase_id,
+"other_purchases",
+null,
+null,
+p.name
+                );
+            }
+
+            _context.other_purchases.Remove(p);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
     }
 
 }

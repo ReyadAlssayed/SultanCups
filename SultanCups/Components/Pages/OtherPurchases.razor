@@ -2,7 +2,8 @@
 @using SultanCups.Models
 @using SultanCups.Services
 @layout Layout.MainLayout
-@inject SalesService SalesService
+@inject FinanceService FinanceService
+@inject ToastService ToastService
 
 <div class="mk-page">
 
@@ -121,6 +122,26 @@
                     }
 
                     <div class="inv-field">
+                        <label class="inv-label">الخزنة</label>
+
+                        <select class="inv-input-dialog @(string.IsNullOrEmpty(CashBoxError) ? "" : "is-invalid")"
+                                @bind="Form.cash_box_id">
+
+                            <option value="0">اختر الخزنة</option>
+
+                            @foreach (var c in CashBoxes)
+                            {
+                                <option value="@c.cash_box_id">@c.name</option>
+                            }
+
+                        </select>
+                        @if (!string.IsNullOrEmpty(CashBoxError))
+                        {
+                            <div class="pro-error-text">@CashBoxError</div>
+                        }
+                    </div>
+
+                    <div class="inv-field">
                         <label class="inv-label">التاريخ</label>
                         <input type="date"
                                class="inv-input-dialog"
@@ -181,26 +202,117 @@
     </div>
 }
 
+@if (ShowAddAmountDialogBox)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box">
+
+            <div class="inv-dialog-body">
+
+                <h3>إضافة مبلغ</h3>
+
+                <div class="inv-field">
+                    <label class="inv-label">المصروف</label>
+                    <input class="inv-input-dialog" value="@Form.name" readonly />
+                </div>
+
+                <div class="inv-field">
+                    <label class="inv-label">المبلغ</label>
+                    <input type="number"
+                           step="0.01"
+                           class="inv-input-dialog @(string.IsNullOrEmpty(Message) ? "" : "is-invalid")"
+                           @bind="ExtraAmount" />
+
+                    @if (!string.IsNullOrEmpty(Message))
+                    {
+                        <div class="pro-error-text">@Message</div>
+                    }
+                </div>
+
+                <div class="inv-dialog-actions">
+                    <button class="inv-save" @onclick="SaveAddAmount">حفظ</button>
+                    <button class="inv-cancel" @onclick="Close">إلغاء</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@if (ShowReturnAmountDialogBox)
+{
+    <div class="inv-dialog-overlay">
+        <div class="inv-dialog-box">
+            <div class="inv-dialog-body">
+
+                <h3>استرجاع مبلغ</h3>
+
+                <div class="inv-field">
+                    <label class="inv-label">المصروف</label>
+                    <input class="inv-input-dialog" value="@Form.name" readonly />
+                </div>
+
+                <div class="inv-field">
+                    <label class="inv-label">المبلغ</label>
+                    <input type="number"
+                           step="0.01"
+                           class="inv-input-dialog @(string.IsNullOrEmpty(Message) ? "" : "is-invalid")"
+                           @bind="ReturnAmount" />
+
+                    @if (!string.IsNullOrEmpty(Message))
+                    {
+                        <div class="pro-error-text">@Message</div>
+                    }
+                </div>
+
+                <div class="inv-dialog-actions">
+                    <button class="inv-save" @onclick="SaveReturnAmount">حفظ</button>
+                    <button class="inv-cancel" @onclick="Close">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
 @code {
 
     List<OtherPurchase>? List;
 
     OtherPurchase Form = new();
+    List<CashBox> CashBoxes = new();
 
     bool ShowAddDialog, ShowEditDialog, ShowDeleteDialog;
 
     string Message = "";
     string CostError = "";
 
+    string CashBoxError = "";
+
+    bool ShowAddAmountDialogBox;
+    decimal ExtraAmount;
+
+    bool ShowReturnAmountDialogBox;
+    decimal ReturnAmount;
+
+
+    int adminId = 20;
+
     protected override async Task OnInitializedAsync()
     {
-        List = await SalesService.GetOtherPurchases();
+        List = await FinanceService.GetOtherPurchases();
+        CashBoxes = await FinanceService.GetActiveCashBoxes();
     }
 
     void OpenAddDialog()
     {
         Form = new() { quantity = 1, purchase_date = DateTime.UtcNow };
         ShowAddDialog = true;
+        Message = "";
+        CostError = "";
+        CashBoxError = "";
     }
 
     void OpenEditDialog(OtherPurchase p)
@@ -215,7 +327,12 @@
             notes = p.notes,
             cash_box_id = p.cash_box_id
         };
+
         ShowEditDialog = true;
+
+        Message = "";
+        CostError = "";
+        CashBoxError = "";
     }
 
     void OpenDeleteDialog(OtherPurchase p)
@@ -226,58 +343,133 @@
 
     async Task Save()
     {
-        Message = "";
-        CostError = "";
-
-        if (string.IsNullOrWhiteSpace(Form.name))
+        try
         {
-            Message = "الوصف مطلوب";
-            return;
-        }
+            Message = "";
+            CostError = "";
+            CashBoxError = "";
 
-        if (Form.cost <= 0)
-        {
-            CostError = "المبلغ يجب أن يكون أكبر من صفر";
-            return;
-        }
+            if (string.IsNullOrWhiteSpace(Form.name))
+            {
+                Message = "الوصف مطلوب";
+                return;
+            }
 
-        if (ShowAddDialog)
-        {
-            Form.purchase_date = DateTime.SpecifyKind(Form.purchase_date.Date, DateTimeKind.Utc);
-            await SalesService.AddOtherPurchase(Form);
-        }
-        else
-        {
-            Form.purchase_date = DateTime.SpecifyKind(Form.purchase_date.Date, DateTimeKind.Utc);
-            await SalesService.UpdateOtherPurchase(Form);
-        }
+            if (ShowAddDialog && Form.cost <= 0)
+            {
+                CostError = "المبلغ يجب أن يكون أكبر من صفر";
+                return;
+            }
 
-        List = await SalesService.GetOtherPurchases();
-        Close();
+            if (Form.cash_box_id <= 0)
+            {
+                CashBoxError = "اختر الخزنة";
+                return;
+            }
+
+            Form.purchase_date =
+                DateTime.SpecifyKind(Form.purchase_date.Date, DateTimeKind.Utc);
+
+            bool isAdd = ShowAddDialog;
+
+            if (isAdd)
+                await FinanceService.AddOtherPurchase(Form, adminId);
+            else
+                await FinanceService.UpdateOtherPurchase(Form, adminId);
+
+            List = await FinanceService.GetOtherPurchases();
+
+            Close();
+
+            ToastService.ShowToast(
+                isAdd ? "تم إضافة المصروف بنجاح" : "تم تعديل المصروف بنجاح",
+                "success");
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowToast(ex.Message, "error");
+        }
     }
 
     async Task ConfirmDelete()
     {
-        await SalesService.DeleteOtherPurchase(Form.other_purchase_id);
-        List = await SalesService.GetOtherPurchases();
+        await FinanceService.DeleteOtherPurchase(Form.other_purchase_id,adminId);
+        List = await FinanceService.GetOtherPurchases();
         Close();
+        ToastService.ShowToast("تم حذف المصروف بنجاح", "success");
+    }
+
+    async Task SaveAddAmount()
+    {
+        if (ExtraAmount <= 0)
+        {
+            Message = "أدخل مبلغ أكبر من 0";
+            return;
+        }
+
+        await FinanceService.AddOtherPurchasePayment(
+            Form.other_purchase_id,
+            ExtraAmount,
+            adminId);
+
+        List = await FinanceService.GetOtherPurchases();
+        Close();
+        ToastService.ShowToast("تمت إضافة الدفعة بنجاح", "success");
     }
 
     void OpenAddAmountDialog(OtherPurchase p)
     {
-        // لاحقاً
+        Form = p;
+        ExtraAmount = 0;
+        ShowAddAmountDialogBox = true;
     }
 
     void OpenReturnAmountDialog(OtherPurchase p)
     {
-        // لاحقاً
+        Form = p;
+        ReturnAmount = 0;
+        ShowReturnAmountDialogBox = true;
+    }
+
+    async Task SaveReturnAmount()
+    {
+        if (ReturnAmount <= 0)
+        {
+            Message = "أدخل مبلغ أكبر من 0";
+            return;
+        }
+
+        if (ReturnAmount > Form.cost)
+        {
+            Message = "المبلغ أكبر من قيمة المصروف";
+            return;
+        }
+
+        await FinanceService.ReverseOtherPurchasePayment(
+            Form.other_purchase_id,
+            ReturnAmount,
+            adminId);
+
+        List = await FinanceService.GetOtherPurchases();
+        Close();
+        ToastService.ShowToast("تم استرجاع المبلغ بنجاح", "success");
     }
 
     void Close()
     {
-        ShowAddDialog = ShowEditDialog = ShowDeleteDialog = false;
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowDeleteDialog = false;
+        ShowAddAmountDialogBox = false;
+        ShowReturnAmountDialogBox = false;
+
         Message = "";
         CostError = "";
+        CashBoxError = "";
+
+        ExtraAmount = 0;
+        ReturnAmount = 0;
+
         Form = new();
     }
 }

@@ -97,26 +97,30 @@
                 <h3>@(ShowAddDialog ? "إضافة زبون" : "تعديل زبون")</h3>
 
                 <div class="inv-fields-grid">
+                
 
-                    <div class="inv-field">
+                <div class="inv-field">
                         <label class="inv-label">الاسم</label>
                         <input class="inv-input-dialog @(string.IsNullOrEmpty(Message) ? "" : "is-invalid")"
                                @bind="CustomerForm.name"
                                @oninput="@((e) => { Message = ""; ShowActivatePrompt = false; CustomerForm.name = e.Value?.ToString(); })" />
 
-                        @if (!string.IsNullOrEmpty(Message))
-                        {
-                            <div class="prod-alert-curtain">
-                                <div class="prod-error-message">@Message</div>
+                    @if (!string.IsNullOrEmpty(Message))
+                    {
+                        <div class="restore-box">
+                            <div class="restore-text">@Message</div>
 
-                                @if (ShowActivatePrompt)
-                                {
-                                    <button @onclick="ActivateExisting" class="prod-btn-activate-link">
-                                        تنشيط الزبون الآن؟
-                                    </button>
-                                }
-                            </div>
-                        }
+                            @if (ShowActivatePrompt)
+                            {
+                                <button type="button"
+                                        class="restore-btn"
+                                        @onclick="ActivateExisting">
+                                    تنشيط الزبون الآن؟
+                                </button>
+                            }
+                        </div>
+                    }
+
                     </div>
 
                     <div class="inv-field">

@@ -150,13 +150,13 @@
 
                     @if (!string.IsNullOrEmpty(Message))
                     {
-                        <div class="prod-alert-curtain">
-                            <div class="prod-error-message">@Message</div>
+                        <div class="restore-box">
+                            <div class="restore-text">@Message</div>
 
                             @if (ShowActivatePrompt)
                             {
                                 <button type="button"
-                                        class="prod-btn-activate-link"
+                                        class="restore-btn"
                                         @onclick="ActivateExisting">
                                     تنشيط الموظف الآن؟
                                 </button>

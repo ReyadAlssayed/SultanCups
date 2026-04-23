@@ -21,6 +21,62 @@
     min-height: 100vh; /* تم تعديله لضمان ظهور الخلفية */
 }
 
+.restore-box {
+    margin-top: 10px;
+    padding: 12px;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    border-radius: 10px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(-14px) scale(.96);
+    filter: blur(3px);
+    animation: restoreFade .75s cubic-bezier(.22,1,.36,1) forwards;
+}
+
+.restore-text {
+    color: #9a3412;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.restore-btn {
+    border: none;
+    background: #2563eb;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all .30s ease;
+}
+
+    .restore-btn:hover {
+        transform: translateY(-2px) scale(1.02);
+        opacity: .94;
+    }
+
+@keyframes restoreFade {
+    0% {
+        opacity: 0;
+        transform: translateY(-14px) scale(.96);
+        filter: blur(3px);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateY(2px) scale(1.01);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
 .emp-topbar {
     display: flex;
     align-items: center;

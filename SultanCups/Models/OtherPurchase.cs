@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SultanCups.Models
 {
@@ -17,6 +18,9 @@ namespace SultanCups.Models
 
         public string? notes { get; set; }
 
-        public int? cash_box_id { get; set; }
+        public int cash_box_id { get; set; }
+
+        [ForeignKey("cash_box_id")]
+        public CashBox CashBox { get; set; } = null!;
     }
 }

@@ -124,9 +124,19 @@
 
                                 <td>
                                     @{
-                                        var salary = Salaries.FirstOrDefault(x => x.salary_id == item.ref_id);
-                                        var emp = Employees.FirstOrDefault(x => x.employee_id == salary?.employee_id);
-                                        var currentName = emp?.full_name;
+                                        string? currentName = null;
+
+                                        if (item.ref_table == "salaries")
+                                        {
+                                            var salary = Salaries.FirstOrDefault(x => x.salary_id == item.ref_id);
+                                            var emp = Employees.FirstOrDefault(x => x.employee_id == salary?.employee_id);
+                                            currentName = emp?.full_name;
+                                        }
+                                        else if (item.ref_table == "other_purchases")
+                                        {
+                                            var purchase = OtherPurchases.FirstOrDefault(x => x.other_purchase_id == item.ref_id);
+                                            currentName = purchase?.name;
+                                        }
                                     }
 
                                     @if (string.IsNullOrWhiteSpace(item.person_name_snapshot))
@@ -275,12 +285,15 @@
 
     List<Employee> Employees = new();
     List<Salary> Salaries = new();
+    List<OtherPurchase> OtherPurchases = new();
+
 
     protected override async Task OnInitializedAsync()
     {
         Logs = await FinanceService.GetFinancialEvents();
         Employees = await FinanceService.GetActiveEmployees();
         Salaries = await FinanceService.GetSalaries();
+        OtherPurchases = await FinanceService.GetOtherPurchases();
     }
 
     void OpenDetails(FinancialEvent item)
