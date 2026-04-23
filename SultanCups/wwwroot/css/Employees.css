@@ -78,15 +78,30 @@
 }
 
 .emp-topbar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
     margin-bottom: 25px;
     background: white;
     padding: 15px 25px;
     border-radius: 16px;
     box-shadow: var(--emp-shadow);
-    border-right: 6px solid var(--emp-primary); /* إضافة الخط الجانبي للمطابقة */
+    border-right: 6px solid var(--emp-primary);
+}
+
+.emp-title-center {
+    text-align: center;
+    justify-self: center;
+}
+
+.emp-topbar .emp-add-btn {
+    justify-self: start;
+    width: auto;
+    min-width: 140px;
+}
+
+.emp-topbar .pro-btn-excel {
+    justify-self: end;
 }
 
 .emp-title-center {

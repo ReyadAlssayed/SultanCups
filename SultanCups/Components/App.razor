@@ -7,6 +7,8 @@
     <base href="/" />
     <ResourcePreloader />
 
+    
+
     <link rel="preload" href="images/Background.png" as="image">
     <link rel="preload" href="images/Modren.png" as="image">
 
@@ -32,6 +34,8 @@
     <link rel="stylesheet" href="@Assets["css/Suppliers.css"]" />
     <link rel="stylesheet" href="@Assets["css/finance.css"]" />
 
+
+
     <ImportMap />
     <HeadOutlet />
 </head>
@@ -54,8 +58,13 @@
         const events = ['mousedown', 'mousemove', 'keypress', 'touchstart'];
         events.forEach(e => document.addEventListener(e, () => resetTimer(helper)));
         resetTimer(helper);
+
+
+
         };
     </script>
+
+    <script src="js/site.js"></script>
 
 </body>
 

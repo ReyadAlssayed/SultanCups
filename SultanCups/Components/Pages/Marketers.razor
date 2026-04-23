@@ -5,14 +5,24 @@
 @inject SultanCups.Services.SalesService SalesService
 @inject SultanCups.Services.ToastService ToastService
 
+@using ClosedXML.Excel
+@inject IJSRuntime JS
+
 <div class="mk-page">
 
     
-    <div class="mk-topbar">
+    <div class="pro-topbar">
         <button class="mk-add-btn" @onclick="OpenAddDialog">إضافة مسوق</button>
+
         <h2 class="mk-title-center">المسوقين</h2>
-        <div></div>
+
+        <button class="pro-btn-excel"
+                @onclick="ExportToExcel"
+                disabled="@IsExporting">
+            أرشفة Excel
+        </button>
     </div>
+
 
     <div class="mk-search-bar">
         <input class="mk-search-input"
@@ -246,6 +256,15 @@
     </div>
 }
 
+@if (IsExporting)
+{
+    <div class="excel-loading-overlay">
+        <div class="excel-loading-box">
+            جاري الأرشفة...
+        </div>
+    </div>
+}
+
 @code {
     List<SultanCups.Models.Marketer>? MarketerList;
 
@@ -256,6 +275,8 @@
     string Message = "";
     bool ShowActivatePrompt = false;
     Marketer? DuplicateMarketer;
+
+    bool IsExporting = false;
 
     string PhoneError = "";
     string AddressError = "";
@@ -456,6 +477,64 @@
         catch
         {
             ToastService.ShowToast("فشل تنفيذ العملية", "error");
+        }
+    }
+
+    async Task ExportToExcel()
+    {
+        if (IsExporting) return;
+
+        IsExporting = true;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(300);
+
+        try
+        {
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("المسوقين");
+
+            ws.Cell(1, 1).Value = "رقم";
+            ws.Cell(1, 2).Value = "الاسم";
+            ws.Cell(1, 3).Value = "الهاتف";
+            ws.Cell(1, 4).Value = "العنوان";
+            ws.Cell(1, 5).Value = "العمولة";
+            ws.Cell(1, 6).Value = "النوع";
+            ws.Cell(1, 7).Value = "الحالة";
+            ws.Cell(1, 8).Value = "ملاحظات";
+
+            int row = 2;
+
+            foreach (var m in FilteredMarketers)
+            {
+                ws.Cell(row, 1).Value = m.marketer_id;
+                ws.Cell(row, 2).Value = m.name;
+                ws.Cell(row, 3).Value = m.phone;
+                ws.Cell(row, 4).Value = m.address;
+                ws.Cell(row, 5).Value = m.commission_per_box;
+                ws.Cell(row, 6).Value = m.marketer_type;
+                ws.Cell(row, 7).Value = m.is_active ? "نشط" : "معطل";
+                ws.Cell(row, 8).Value = m.notes;
+                row++;
+            }
+
+            ws.Row(1).Style.Font.Bold = true;
+            ws.Row(1).Style.Fill.BackgroundColor = XLColor.LightGreen;
+            ws.Columns().AdjustToContents();
+            ws.RightToLeft = true;
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+
+            await JS.InvokeVoidAsync(
+                "downloadFile",
+                $"Marketers_{DateTime.Now:yyyyMMddHHmmss}.xlsx",
+                Convert.ToBase64String(stream.ToArray())
+            );
+        }
+        finally
+        {
+            IsExporting = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 

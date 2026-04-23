@@ -5,12 +5,21 @@
 @inject SalesService SalesService
 @inject ToastService ToastService
 
+@using ClosedXML.Excel
+@inject IJSRuntime JS
+
 <div class="mk-page">
 
-    <div class="mk-topbar">
+    <div class="pro-topbar">
         <button class="mk-add-btn" @onclick="OpenAddDialog">إضافة زبون</button>
+
         <h2 class="mk-title-center">الزبائن</h2>
-        <div></div>
+
+        <button class="pro-btn-excel"
+                @onclick="ExportToExcel"
+                disabled="@IsExporting">
+            أرشفة Excel
+        </button>
     </div>
 
     <div class="mk-search-bar">
@@ -214,6 +223,15 @@
     </div>
 }
 
+@if (IsExporting)
+{
+    <div class="excel-loading-overlay">
+        <div class="excel-loading-box">
+            جاري الأرشفة...
+        </div>
+    </div>
+}
+
 @code {
 
     List<Customer>? CustomersList;
@@ -226,6 +244,8 @@
     string Message = "";
     bool ShowActivatePrompt = false;
     Customer? DuplicateCustomer;
+
+    bool IsExporting = false;
 
     string PhoneError = "";
     string AddressError = "";
@@ -363,6 +383,58 @@
         await SalesService.DeleteOrDisableCustomer(CustomerForm.customer_id);
         CustomersList = await SalesService.GetCustomers();
         CloseDialogs();
+    }
+
+    async Task ExportToExcel()
+    {
+        if (IsExporting) return;
+
+        IsExporting = true;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(300);
+
+        try
+        {
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("الزبائن");
+
+            ws.Cell(1, 1).Value = "رقم";
+            ws.Cell(1, 2).Value = "الاسم";
+            ws.Cell(1, 3).Value = "الهاتف";
+            ws.Cell(1, 4).Value = "العنوان";
+            ws.Cell(1, 5).Value = "الحالة";
+
+            int row = 2;
+
+            foreach (var c in FilteredCustomers)
+            {
+                ws.Cell(row, 1).Value = c.customer_id;
+                ws.Cell(row, 2).Value = c.name;
+                ws.Cell(row, 3).Value = c.phone;
+                ws.Cell(row, 4).Value = c.address;
+                ws.Cell(row, 5).Value = c.is_active ? "نشط" : "معطل";
+                row++;
+            }
+
+            ws.Row(1).Style.Font.Bold = true;
+            ws.Row(1).Style.Fill.BackgroundColor = XLColor.LightGreen;
+            ws.Columns().AdjustToContents();
+            ws.RightToLeft = true;
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+
+            await JS.InvokeVoidAsync(
+                "downloadFile",
+                $"Customers_{DateTime.Now:yyyyMMddHHmmss}.xlsx",
+                Convert.ToBase64String(stream.ToArray())
+            );
+        }
+        finally
+        {
+            IsExporting = false;
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     void CloseDialogs()

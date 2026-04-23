@@ -147,6 +147,80 @@
     margin-right: 6px;
 }
 
+.pro-btn-excel:disabled {
+    opacity: .85;
+    cursor: not-allowed;
+}
+
+.pro-topbar {
+    display: flex;
+    align-items: center;
+}
+
+.pro-btn-excel {
+    margin-right: auto;
+    background: #22c55e;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .15s;
+}
+
+    .pro-btn-excel:hover {
+        opacity: .92;
+    }
+
+    .pro-btn-excel:disabled {
+        opacity: .75;
+        cursor: not-allowed;
+    }
+
+.excel-loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .22);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.excel-loading-box {
+    min-width: 220px;
+    background: linear-gradient(135deg,#2563eb,#1d4ed8);
+    color: white;
+    padding: 18px 26px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 18px 40px rgba(37,99,235,.28);
+}
+
+    .excel-loading-box::before {
+        content: "";
+        width: 22px;
+        height: 22px;
+        border: 3px solid rgba(255,255,255,.35);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: excelSpin .8s linear infinite;
+    }
+
+@keyframes excelSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
 @keyframes fadeIn {
     from {
         opacity: 0;
