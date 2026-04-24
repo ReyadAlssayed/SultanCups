@@ -5,11 +5,20 @@
 @inject SultanCups.Services.InventoryService InventoryService
 @inject SultanCups.Services.ToastService ToastService
 
+@using ClosedXML.Excel
+@inject IJSRuntime JS
+
 <div class="inv-page">
-    <div class="inv-topbar">
+    <div class="pro-topbar">
         <button type="button" class="inv-btn inv-btn-add" @onclick="OpenAddDialog">إضافة مورد</button>
-        <h2 class="inv-title">إدارة الموردين</h2>
-        <div></div>
+
+        <h2 class="pro-title">إدارة الموردين</h2>
+
+        <button class="pro-btn-excel"
+                @onclick="ExportToExcel"
+                disabled="@IsExporting">
+            أرشفة Excel
+        </button>
     </div>
 
     <div class="mk-search-bar">
@@ -243,9 +252,14 @@
     </div>
 }
 
-
-
-
+@if (IsExporting)
+{
+    <div class="excel-loading-overlay">
+        <div class="excel-loading-box">
+            جاري الأرشفة...
+        </div>
+    </div>
+}
 
 @code {
     List<SultanCups.Models.Supplier>? SuppliersList;
@@ -262,6 +276,8 @@
     string PhoneError = "";
     string EmailError = "";
     string NoteError = "";
+
+    bool IsExporting = false;
 
     Employee? DuplicateEmployee;
 
@@ -457,6 +473,62 @@
         catch (Exception)
         {
             ToastService.ShowToast("حدث خطأ أثناء الاتصال", "error");
+        }
+    }
+
+    async Task ExportToExcel()
+    {
+        if (IsExporting) return;
+
+        IsExporting = true;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(300);
+
+        try
+        {
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("الموردين");
+
+            ws.Cell(1, 1).Value = "رقم";
+            ws.Cell(1, 2).Value = "اسم المورد";
+            ws.Cell(1, 3).Value = "الهاتف";
+            ws.Cell(1, 4).Value = "الموقع";
+            ws.Cell(1, 5).Value = "البريد الإلكتروني";
+            ws.Cell(1, 6).Value = "الحالة";
+            ws.Cell(1, 7).Value = "ملاحظات";
+
+            int row = 2;
+
+            foreach (var s in FilteredSuppliers)
+            {
+                ws.Cell(row, 1).Value = s.supplier_id;
+                ws.Cell(row, 2).Value = s.name;
+                ws.Cell(row, 3).Value = s.phone;
+                ws.Cell(row, 4).Value = s.location;
+                ws.Cell(row, 5).Value = s.email;
+                ws.Cell(row, 6).Value = s.is_active ? "نشط" : "معطل";
+                ws.Cell(row, 7).Value = s.notes;
+                row++;
+            }
+
+            ws.Row(1).Style.Font.Bold = true;
+            ws.Row(1).Style.Fill.BackgroundColor = XLColor.LightGreen;
+            ws.Columns().AdjustToContents();
+            ws.RightToLeft = true;
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+
+            await JS.InvokeVoidAsync(
+                "downloadFile",
+                $"Suppliers_{DateTime.Now:yyyyMMddHHmmss}.xlsx",
+                Convert.ToBase64String(stream.ToArray())
+            );
+        }
+        finally
+        {
+            IsExporting = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 

@@ -87,8 +87,7 @@
 }
 
 /* أزرار */
-.rm-add-btn,
-.rm-save {
+.rm-add-btn{
     background: var(--inv-primary);
     color: white;
     border: 0;
@@ -96,6 +95,16 @@
     border-radius: 10px;
     font-weight: 950;
     cursor: pointer;
+}
+
+.rm-save {
+    flex: 2;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 900;
 }
 
 .rm-edit {

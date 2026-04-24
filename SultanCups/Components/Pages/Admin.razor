@@ -4,12 +4,21 @@
 @inject NavigationManager Nav
 @inject SultanCups.Services.AdminService AdminService
 
+@using ClosedXML.Excel
+@inject IJSRuntime JS
+
 <div class="ad-page">
 
-    <div class="ad-header-top">
+    <div class="pro-topbar">
         <div></div>
-        <h2 class="ad-title">مسؤولي النظام</h2>
-        <div></div>
+
+        <h2 class="pro-title">مسؤولي النظام</h2>
+
+        <button class="pro-btn-excel"
+                @onclick="ExportToExcel"
+                disabled="@IsExporting">
+            أرشفة Excel
+        </button>
     </div>
 
     <div class="ad-card">
@@ -208,6 +217,15 @@
     </div>
 }
 
+@if (IsExporting)
+{
+    <div class="excel-loading-overlay">
+        <div class="excel-loading-box">
+            جاري الأرشفة...
+        </div>
+    </div>
+}
+
 
 @code {
     List<SultanCups.Models.Admain>? Admins;
@@ -226,6 +244,8 @@
 
     SultanCups.Models.Admain? EditAdmin;
     SultanCups.Models.Admain? DeleteAdminItem;
+
+    bool IsExporting = false;
 
     void OpenEditDialog(SultanCups.Models.Admain a)
     {
@@ -346,6 +366,62 @@
         else
         {
             _ = ShowToast("عذراً، تعذر حذف المسؤول", true); // إشعار فشل
+        }
+    }
+
+    async Task ExportToExcel()
+    {
+        if (IsExporting) return;
+
+        IsExporting = true;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(300);
+
+        try
+        {
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("المسؤولين");
+
+            ws.Cell(1, 1).Value = "رقم";
+            ws.Cell(1, 2).Value = "الاسم";
+            ws.Cell(1, 3).Value = "اسم المستخدم";
+            ws.Cell(1, 4).Value = "الهاتف";
+            ws.Cell(1, 5).Value = "الدور";
+            ws.Cell(1, 6).Value = "الحالة";
+            ws.Cell(1, 7).Value = "تاريخ الإنشاء";
+
+            int row = 2;
+
+            foreach (var a in Admins ?? new())
+            {
+                ws.Cell(row, 1).Value = a.admin_id;
+                ws.Cell(row, 2).Value = a.full_name;
+                ws.Cell(row, 3).Value = a.username;
+                ws.Cell(row, 4).Value = a.phone;
+                ws.Cell(row, 5).Value = a.role;
+                ws.Cell(row, 6).Value = a.is_active ? "نشط" : "معطل";
+                ws.Cell(row, 7).Value = a.created_at.ToString("yyyy-MM-dd HH:mm");
+                row++;
+            }
+
+            ws.Row(1).Style.Font.Bold = true;
+            ws.Row(1).Style.Fill.BackgroundColor = XLColor.LightGreen;
+            ws.Columns().AdjustToContents();
+            ws.RightToLeft = true;
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+
+            await JS.InvokeVoidAsync(
+                "downloadFile",
+                $"Admins_{DateTime.Now:yyyyMMddHHmmss}.xlsx",
+                Convert.ToBase64String(stream.ToArray())
+            );
+        }
+        finally
+        {
+            IsExporting = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 
