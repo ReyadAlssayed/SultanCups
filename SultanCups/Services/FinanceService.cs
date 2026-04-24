@@ -683,6 +683,269 @@ p.name
             return true;
         }
 
+
+        // =========================================
+        // 🔹 purchases (المشتريات)
+        // =========================================
+
+        // جلب جميع المشتريات
+        public async Task<List<Purchase>> GetPurchases()
+        {
+            return await _context.purchases
+                .AsNoTracking()
+                .OrderByDescending(x => x.purchase_date)
+                .ToListAsync();
+        }
+
+        // حساب إجمالي الشراء
+        private decimal GetPurchaseTotal(Purchase p)
+        {
+            return (p.quantity * p.unit_price) + p.customs_cost + p.transport_cost;
+        }
+
+        // إضافة شراء جديد
+        public async Task AddPurchase(Purchase item, int adminId)
+        {
+            item.notes = item.notes?.Trim();
+            item.purchase_date = DateTime.SpecifyKind(item.purchase_date, DateTimeKind.Utc);
+
+            if (item.quantity <= 0)
+                throw new Exception("الكمية يجب أن تكون أكبر من صفر");
+
+            if (item.unit_price <= 0)
+                throw new Exception("سعر الوحدة يجب أن يكون أكبر من صفر");
+
+            if (item.cash_box_id == null || item.cash_box_id <= 0)
+                throw new Exception("اختر الخزنة");
+
+            decimal total = GetPurchaseTotal(item);
+
+            var balance = await GetBalanceFromView(item.cash_box_id.Value);
+
+            if (total > balance)
+                throw new Exception("رصيد الخزنة غير كافٍ");
+
+            _context.purchases.Add(item);
+            await _context.SaveChangesAsync();
+
+            AddFinancialEvent(
+                "صرف شراء جديد",
+                "OUT",
+                total,
+                item.cash_box_id.Value,
+                adminId,
+                item.purchase_id,
+                "purchases",
+                null,
+                null,
+                "شراء جديد"
+            );
+
+            await _context.SaveChangesAsync();
+        }
+
+        // تعديل شراء
+        public async Task<bool> UpdatePurchase(Purchase updated, int adminId)
+        {
+            var p = await _context.purchases
+                .FirstOrDefaultAsync(x => x.purchase_id == updated.purchase_id);
+
+            if (p == null)
+                return false;
+
+            decimal oldTotal = GetPurchaseTotal(p);
+            decimal newTotal = GetPurchaseTotal(updated);
+            decimal diff = newTotal - oldTotal;
+
+            updated.purchase_date = DateTime.SpecifyKind(
+                updated.purchase_date,
+                DateTimeKind.Utc);
+
+            // تغيير الخزنة
+            if (p.cash_box_id != updated.cash_box_id &&
+                p.cash_box_id != null &&
+                updated.cash_box_id != null)
+            {
+                var balance = await GetBalanceFromView(updated.cash_box_id.Value);
+
+                if (newTotal > balance)
+                    throw new Exception("رصيد الخزنة الجديدة غير كافٍ");
+
+                AddFinancialEvent(
+                    "نقل مبلغ الشراء من الخزنة القديمة",
+                    "IN",
+                    oldTotal,
+                    p.cash_box_id.Value,
+                    adminId,
+                    p.purchase_id,
+                    "purchases",
+                    null, null,
+                    "نقل شراء"
+                );
+
+                AddFinancialEvent(
+                    "نقل مبلغ الشراء إلى الخزنة الجديدة",
+                    "OUT",
+                    newTotal,
+                    updated.cash_box_id.Value,
+                    adminId,
+                    p.purchase_id,
+                    "purchases",
+                    null, null,
+                    "نقل شراء"
+                );
+            }
+            else if (diff > 0 && p.cash_box_id != null)
+            {
+                var balance = await GetBalanceFromView(p.cash_box_id.Value);
+
+                if (diff > balance)
+                    throw new Exception("رصيد الخزنة غير كافٍ لتغطية الزيادة");
+
+                AddFinancialEvent(
+                    "زيادة قيمة شراء بعد تعديل",
+                    "OUT",
+                    diff,
+                    p.cash_box_id.Value,
+                    adminId,
+                    p.purchase_id,
+                    "purchases",
+                    null, null,
+                    "فرق تعديل شراء"
+                );
+            }
+            else if (diff < 0 && p.cash_box_id != null)
+            {
+                AddFinancialEvent(
+                    "استرجاع فرق شراء بعد تعديل",
+                    "IN",
+                    Math.Abs(diff),
+                    p.cash_box_id.Value,
+                    adminId,
+                    p.purchase_id,
+                    "purchases",
+                    null, null,
+                    "فرق تعديل شراء"
+                );
+            }
+
+            p.raw_material_id = updated.raw_material_id;
+            p.supplier_id = updated.supplier_id;
+            p.quantity = updated.quantity;
+            p.unit_price = updated.unit_price;
+            p.customs_cost = updated.customs_cost;
+            p.transport_cost = updated.transport_cost;
+            p.purchase_date = updated.purchase_date;
+            p.arrival_date = updated.arrival_date;
+            p.cash_box_id = updated.cash_box_id;
+            p.notes = updated.notes?.Trim();
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // إضافة دفعة
+        public async Task<bool> AddPurchasePayment(int id, decimal amount, int adminId)
+        {
+            var p = await _context.purchases
+                .FirstOrDefaultAsync(x => x.purchase_id == id);
+
+            if (p == null || p.cash_box_id == null)
+                return false;
+
+            if (amount <= 0)
+                return false;
+
+            var balance = await GetBalanceFromView(p.cash_box_id.Value);
+
+            if (amount > balance)
+                return false;
+
+            p.transport_cost += amount;
+
+            AddFinancialEvent(
+                "زيادة مبلغ على الشراء",
+                "OUT",
+                amount,
+                p.cash_box_id.Value,
+                adminId,
+                p.purchase_id,
+                "purchases",
+                null,
+                null,
+                "إضافة دفعة شراء"
+            );
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // إلغاء دفعة
+        public async Task<bool> ReversePurchasePayment(int id, decimal amount, int adminId)
+        {
+            var p = await _context.purchases
+                .FirstOrDefaultAsync(x => x.purchase_id == id);
+
+            if (p == null || p.cash_box_id == null)
+                return false;
+
+            if (amount <= 0 || amount > p.transport_cost)
+                return false;
+
+            p.transport_cost -= amount;
+
+            AddFinancialEvent(
+                "استرجاع مبلغ من الشراء",
+                "IN",
+                amount,
+                p.cash_box_id.Value,
+                adminId,
+                p.purchase_id,
+                "purchases",
+                null,
+                null,
+                "إلغاء دفعة شراء"
+            );
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // حذف شراء
+        public async Task<bool> DeletePurchase(int id, int adminId)
+        {
+            var p = await _context.purchases
+                .FirstOrDefaultAsync(x => x.purchase_id == id);
+
+            if (p == null)
+                return false;
+
+            if (p.cash_box_id != null)
+            {
+                decimal total = GetPurchaseTotal(p);
+
+                AddFinancialEvent(
+                    "حذف شراء وإرجاع المبلغ",
+                    "IN",
+                    total,
+                    p.cash_box_id.Value,
+                    adminId,
+                    p.purchase_id,
+                    "purchases",
+                    null,
+                    null,
+                    "حذف شراء"
+                );
+            }
+
+            _context.purchases.Remove(p);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+
     }
 
 }

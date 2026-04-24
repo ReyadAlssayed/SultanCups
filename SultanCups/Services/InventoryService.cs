@@ -198,6 +198,15 @@ namespace SultanCups.Services
                 .ToListAsync();
         }
 
+        public async Task<List<Supplier>> GetActiveSuppliers()
+        {
+            return await _context.suppliers
+                .AsNoTracking()
+                .Where(x => x.is_active)
+                .OrderBy(x => x.name)
+                .ToListAsync();
+        }
+
         // =========================================
         // 🔹 raw_materials (المواد الخام)
         // =========================================

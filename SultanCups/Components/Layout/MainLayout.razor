@@ -152,7 +152,7 @@
     @if (ShowSystemInfo)
 {
     <div class="pro-dialog-overlay">
-        <div class="pro-dialog-box">
+            <div class="pro-dialog-box sys-info-dialog">
 
             <div class="pro-dialog-body">
 
@@ -165,9 +165,16 @@
                         <div class="sys-note money">
                             • إذا رأيت شعار 💵 داخل أي مربع حوار في النظام، فاعلم أن العملية مرتبطة بحركة مالية فعلية (دخول أو خروج مبلغ).
                         </div>
+                        <div class="sys-note money sys-note-flex">
 
-                        <div class="sys-note job">
-                            • الملاحظة الوظيفية: يجب تسجيل أي تغيير وظيفي مباشرة داخل النظام.
+                            <div class="sys-note-text">
+                                • في صفحة المشتريات: عند تعديل الكمية أو سعر الوحدة أو تكلفة النقل أو الجمرك، يتم إعادة حساب المبلغ الكلي تلقائيًا، وإذا أصبح المبلغ الجديد أكبر يتم خصم فرق القيمة من الخزنة، وإذا أصبح أقل يتم إرجاع الفرق إلى الخزنة بشكل تلقائي.
+                            </div>
+
+                            <button class="sys-go-btn" @onclick="GoPurchases">
+                                الانتقال إلى المشتريات
+                            </button>
+
                         </div>
                     </div>
                 <div class="pro-dialog-actions">
@@ -222,6 +229,12 @@
     public void Logout()
     {
         Nav.NavigateTo("/?reason=idle");
+    }
+
+    void GoPurchases()
+    {
+        ShowSystemInfo = false;
+        Nav.NavigateTo("/Purchases");
     }
 
     // للخروج اليدوي (من الزر) - نذهب للرئيسية مباشرة بدون سبب

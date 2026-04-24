@@ -644,6 +644,69 @@ textarea.pro-input:focus {
     text-align: right;
 }
 
+
+.pro-fields-grid label {
+    display: block;
+    margin-bottom: 6px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.pro-readonly-money {
+    background: #f8fafc;
+    color: #16a34a;
+    font-weight: 800;
+    cursor: not-allowed;
+}
+
+.diff-title {
+    text-align: center;
+    margin-bottom: 18px;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.diff-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+}
+
+    .diff-row span {
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .diff-row b {
+        font-size: 18px;
+    }
+
+.diff-out {
+    color: #dc2626;
+}
+
+.diff-in {
+    color: #16a34a;
+}
+
+.diff-note {
+    text-align: center;
+    margin: 16px 0 6px;
+    padding: 12px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.8;
+}
+
 @media (max-width: 600px) {
     .pro-dialog-box {
         width: 95%;

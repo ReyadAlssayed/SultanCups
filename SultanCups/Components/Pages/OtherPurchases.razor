@@ -178,32 +178,45 @@
 
 @if (ShowDeleteDialog)
 {
-    <div class="inv-dialog-overlay">
-        <div class="inv-dialog-box inv-delete-dialog-box">
+    <div class="pro-dialog-overlay">
+        <div class="pro-dialog-box inv-delete-dialog-box">
 
-            <div class="inv-dialog-top-image inv-delete-top-image">
+            <div class="pro-dialog-top-image inv-delete-top-image">
                 <img src="images/Background.png" />
             </div>
 
-            <div class="inv-dialog-body inv-delete-dialog-body">
+            <div class="pro-dialog-body inv-delete-dialog-body">
 
                 <div class="inv-delete-icon-wrap">
                     <div class="inv-delete-icon">!</div>
                 </div>
 
-                <h3 class="inv-delete-title">تأكيد الحذف</h3>
+                <h3 class="inv-delete-title">تأكيد حذف المصروف</h3>
 
                 <p class="inv-delete-text">
                     هل تريد حذف المصروف "@Form.name"؟
+                    <br /><br />
+
+                    <span style="color:#16a34a;font-weight:800;">
+                        سيتم إرجاع مبلغ
+                        @Form.cost.ToString("0.00") د.ل
+                    </span>
+
                     <br />
+
                     <span style="color:#64748b;font-size:13px;">
-                        سيتم إرجاع المبلغ إلى الخزنة في حال تأكيد الحذف
+                        إلى خزنة @GetCashBoxName(Form.cash_box_id)
                     </span>
                 </p>
 
-                <div class="inv-dialog-actions">
-                    <button class="inv-delete-confirm" @onclick="ConfirmDelete">حذف الآن</button>
-                    <button class="inv-cancel" @onclick="Close">إلغاء</button>
+                <div class="pro-dialog-actions">
+                    <button class="pro-delete-confirm" @onclick="ConfirmDelete">
+                        حذف الآن
+                    </button>
+
+                    <button class="pro-cancel" @onclick="Close">
+                        إلغاء
+                    </button>
                 </div>
 
             </div>
@@ -452,6 +465,11 @@
         ShowReturnAmountDialogBox = true;
     }
 
+    string GetCashBoxName(int id)
+    {
+        return CashBoxes.FirstOrDefault(x => x.cash_box_id == id)?.name ?? "-";
+    }
+
     async Task SaveReturnAmount()
     {
         if (ReturnAmount <= 0)
@@ -506,7 +524,7 @@
                 ws.Cell(row, 3).Value = p.quantity;
                 ws.Cell(row, 4).Value = p.cost;
                 ws.Cell(row, 5).Value = p.purchase_date.ToString("yyyy-MM-dd");
-                ws.Cell(row, 6).Value = CashBoxes.FirstOrDefault(x => x.cash_box_id == p.cash_box_id)?.name;
+                ws.Cell(row, 6).Value = GetCashBoxName(p.cash_box_id);
                 ws.Cell(row, 7).Value = p.notes;
                 row++;
             }
@@ -530,6 +548,7 @@
             IsExporting = false;
             await InvokeAsync(StateHasChanged);
         }
+
     }
 
     void Close()
