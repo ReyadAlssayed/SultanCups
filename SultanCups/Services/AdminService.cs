@@ -108,5 +108,25 @@ namespace SultanCups.Services
 
             return (Math.Round(usedDbMb, 2), Math.Round(freeGb, 2));
         }
+
+        public async Task<bool> UsernameExists(string username)
+        {
+            return await _context.admins
+                .AnyAsync(x => x.username.ToLower() == username.ToLower());
+        }
+
+        public async Task<bool> PhoneExists(string phone)
+        {
+            return await _context.admins
+                .AnyAsync(x => x.phone == phone);
+        }
+
+        public async Task<bool> CreateAdmin(Admain model)
+        {
+            _context.admins.Add(model);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

@@ -118,8 +118,10 @@
 
                 <div class="top-user">
                     <div class="user-info">
-                        <span class="user-name">رياض</span>
-                        <span class="user-status">نشط</span>
+                        <span class="user-name greet-user">
+                            <span class="greet-text">@Greeting</span>
+                            <span class="greet-name">رياض</span>
+                        </span>
                     </div>
                 </div>
 
@@ -186,6 +188,9 @@
 
     string CurrentTime = "";
     string CurrentDate = "";
+
+    string Greeting = "";
+
     private Timer? _timer;
 
     bool ShowSystemInfo = false;
@@ -228,6 +233,8 @@
     private void UpdateTime(object? sender, ElapsedEventArgs? e)
     {
         var now = DateTime.Now;
+
+        Greeting = now.Hour < 12 ? "صباح الخير" : "مساء الخير";
         CurrentTime = now.ToString("hh:mm:ss tt"); // تنسيق 12 ساعة مع ثواني
         CurrentDate = now.ToString("dddd, dd MMMM yyyy"); // يوم، رقم، شهر، سنة
         

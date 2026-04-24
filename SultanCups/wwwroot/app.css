@@ -503,6 +503,27 @@ body {
     }
 
 
+.greet-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+}
+
+.greet-text {
+    color: #2563eb;
+    font-size: 14px;
+}
+
+.greet-name {
+    background: #eff6ff;
+    color: #0f172a;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid #dbeafe;
+    font-size: 14px;
+}
+
 /* ================== Responsive ================== */
 
 @media (max-width: 740px) {
