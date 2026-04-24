@@ -658,7 +658,7 @@
                 SalaryForm.salary_date,
                 DateTimeKind.Utc);
 
-            await FinanceService.AddSalary(SalaryForm, 20);
+            await FinanceService.AddSalary(SalaryForm, 1);
 
             Salarie = await FinanceService.GetSalaries();
 
@@ -715,7 +715,7 @@
             SalaryForm.employee_id = SelectedEmployeeId;
             SalaryForm.cash_box_id = selectedCashBoxId;
 
-            await FinanceService.UpdateSalary(SalaryForm, 20);
+            await FinanceService.UpdateSalary(SalaryForm, 1);
 
             Salarie = await FinanceService.GetSalaries();
 
@@ -773,7 +773,7 @@
             var ok = await FinanceService.AddSalaryPayment(
                 SalaryForm.salary_id,
                 PaymentAmount,
-                20);
+                1);
 
             if (!ok)
             {
@@ -823,7 +823,7 @@
             await FinanceService.ReverseSalary(
                 SalaryForm.salary_id,
                 PaymentAmount,
-                20);
+                1);
 
             Salarie = await FinanceService.GetSalaries();
 
@@ -841,7 +841,7 @@
     {
         try
         {
-            await FinanceService.DeleteSalary(DeleteSalaryId, 20);
+            await FinanceService.DeleteSalary(DeleteSalaryId, 1);
 
             Salarie = await FinanceService.GetSalaries();
 
