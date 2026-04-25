@@ -216,6 +216,117 @@
         animation: excelSpin .8s linear infinite;
     }
 
+/* تحسين أعمدة الحركات المالية */
+.pro-table td,
+.pro-table th {
+    white-space: normal;
+}
+
+    .pro-table td:nth-child(6),
+    .pro-table th:nth-child(6) {
+        max-width: 220px;
+        width: 220px;
+    }
+
+    .pro-table td:nth-child(7),
+    .pro-table th:nth-child(7) {
+        max-width: 280px;
+        width: 280px;
+    }
+
+.change-legend {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+    margin: 10px 4px 14px 0;
+}
+
+    .change-legend .name-change-dot {
+        margin-right: 0;
+    }
+
+.dt-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.dt-day {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.dt-time {
+    background: #dcfce7;
+    color: #15803d;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    min-width: 58px;
+    text-align: center;
+}
+
+.name-change-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f59e0b;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.change-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.arrow-change {
+    color: #f59e0b;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.change-inline {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+    .change-inline b {
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+.arrow-change {
+    color: #f59e0b;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+
+    .change-row:last-child {
+        border-bottom: none;
+    }
+
+    .change-row span {
+        color: #64748b;
+    }
+
+    .change-row b {
+        color: #0f172a;
+    }
+
 @keyframes excelSpin {
     to {
         transform: rotate(360deg);

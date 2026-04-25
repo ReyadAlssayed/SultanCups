@@ -20,18 +20,20 @@ namespace SultanCups.Services
         // =========================================
 
         private void AddFinancialEvent(
-      string type,
-      string direction,
-      decimal amount,
-      int cashBoxId,
-      int adminId,
-      int refId,
-      string refTable,
-      int? employeeId,
-      string? employeeName,
-      string notes)
+     string type,
+     string direction,
+     decimal amount,
+     int cashBoxId,
+     int adminId,
+     int refId,
+     string refTable,
+     int? personId,
+     string? personName,
+     string notes = "",
+int? itemId = null,
+string? itemName = null)
         {
-            var employeeEvents = new[]
+            var personEvents = new[]
             {
         "دفع راتب",
         "استرجاع راتب",
@@ -40,10 +42,10 @@ namespace SultanCups.Services
         "استخدام رصيد"
     };
 
-            if (employeeEvents.Contains(type))
+            if (personEvents.Contains(type))
             {
-                if (employeeId == null || string.IsNullOrWhiteSpace(employeeName))
-                    throw new Exception("هذا النوع من العمليات يتطلب موظف");
+                if (personId == null || string.IsNullOrWhiteSpace(personName))
+                    throw new Exception("هذا النوع من العمليات يتطلب شخص");
             }
 
             _context.financial_events.Add(new FinancialEvent
@@ -55,8 +57,13 @@ namespace SultanCups.Services
                 performed_by = adminId,
                 ref_table = refTable,
                 ref_id = refId,
-                employee_id = employeeId,
-                person_name_snapshot = employeeName,
+
+                person_id = personId,
+                person_name_snapshot = personName,
+
+                item_id = itemId,
+                item_name_snapshot = itemName,
+
                 event_date = DateTime.UtcNow,
                 notes = notes
             });
@@ -700,7 +707,10 @@ p.name
         // حساب إجمالي الشراء
         private decimal GetPurchaseTotal(Purchase p)
         {
-            return (p.quantity * p.unit_price) + p.customs_cost + p.transport_cost;
+            return (p.quantity * p.unit_price)
+                + p.customs_cost
+                + p.shipping_cost
+                + p.local_transport_cost;
         }
 
         // إضافة شراء جديد
@@ -728,6 +738,14 @@ p.name
             _context.purchases.Add(item);
             await _context.SaveChangesAsync();
 
+            var supplier = await _context.suppliers
+    .AsNoTracking()
+    .FirstOrDefaultAsync(x => x.supplier_id == item.supplier_id);
+
+            var material = await _context.raw_materials
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.raw_material_id == item.raw_material_id);
+
             AddFinancialEvent(
                 "صرف شراء جديد",
                 "OUT",
@@ -736,9 +754,11 @@ p.name
                 adminId,
                 item.purchase_id,
                 "purchases",
-                null,
-                null,
-                "شراء جديد"
+                item.supplier_id,
+                supplier?.name,
+                "شراء جديد",
+                item.raw_material_id,
+                material?.name
             );
 
             await _context.SaveChangesAsync();
@@ -761,6 +781,14 @@ p.name
                 updated.purchase_date,
                 DateTimeKind.Utc);
 
+            var supplier = await _context.suppliers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.supplier_id == updated.supplier_id);
+
+            var material = await _context.raw_materials
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.raw_material_id == updated.raw_material_id);
+
             // تغيير الخزنة
             if (p.cash_box_id != updated.cash_box_id &&
                 p.cash_box_id != null &&
@@ -779,8 +807,11 @@ p.name
                     adminId,
                     p.purchase_id,
                     "purchases",
-                    null, null,
-                    "نقل شراء"
+                    updated.supplier_id,
+                    supplier?.name,
+                    "نقل شراء",
+                    updated.raw_material_id,
+                    material?.name
                 );
 
                 AddFinancialEvent(
@@ -791,8 +822,11 @@ p.name
                     adminId,
                     p.purchase_id,
                     "purchases",
-                    null, null,
-                    "نقل شراء"
+                    updated.supplier_id,
+                    supplier?.name,
+                    "نقل شراء",
+                    updated.raw_material_id,
+                    material?.name
                 );
             }
             else if (diff > 0 && p.cash_box_id != null)
@@ -800,7 +834,7 @@ p.name
                 var balance = await GetBalanceFromView(p.cash_box_id.Value);
 
                 if (diff > balance)
-                    throw new Exception("رصيد الخزنة غير كافٍ لتغطية الزيادة");
+                    return false;
 
                 AddFinancialEvent(
                     "زيادة قيمة شراء بعد تعديل",
@@ -810,8 +844,11 @@ p.name
                     adminId,
                     p.purchase_id,
                     "purchases",
-                    null, null,
-                    "فرق تعديل شراء"
+                    updated.supplier_id,
+                    supplier?.name,
+                    "فرق تعديل شراء",
+                    updated.raw_material_id,
+                    material?.name
                 );
             }
             else if (diff < 0 && p.cash_box_id != null)
@@ -824,8 +861,11 @@ p.name
                     adminId,
                     p.purchase_id,
                     "purchases",
-                    null, null,
-                    "فرق تعديل شراء"
+                    updated.supplier_id,
+                    supplier?.name,
+                    "فرق تعديل شراء",
+                    updated.raw_material_id,
+                    material?.name
                 );
             }
 
@@ -834,78 +874,13 @@ p.name
             p.quantity = updated.quantity;
             p.unit_price = updated.unit_price;
             p.customs_cost = updated.customs_cost;
-            p.transport_cost = updated.transport_cost;
+            p.local_transport_cost = updated.local_transport_cost;
+            p.shipping_cost = updated.shipping_cost;
             p.purchase_date = updated.purchase_date;
             p.arrival_date = updated.arrival_date;
             p.cash_box_id = updated.cash_box_id;
             p.notes = updated.notes?.Trim();
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        // إضافة دفعة
-        public async Task<bool> AddPurchasePayment(int id, decimal amount, int adminId)
-        {
-            var p = await _context.purchases
-                .FirstOrDefaultAsync(x => x.purchase_id == id);
-
-            if (p == null || p.cash_box_id == null)
-                return false;
-
-            if (amount <= 0)
-                return false;
-
-            var balance = await GetBalanceFromView(p.cash_box_id.Value);
-
-            if (amount > balance)
-                return false;
-
-            p.transport_cost += amount;
-
-            AddFinancialEvent(
-                "زيادة مبلغ على الشراء",
-                "OUT",
-                amount,
-                p.cash_box_id.Value,
-                adminId,
-                p.purchase_id,
-                "purchases",
-                null,
-                null,
-                "إضافة دفعة شراء"
-            );
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        // إلغاء دفعة
-        public async Task<bool> ReversePurchasePayment(int id, decimal amount, int adminId)
-        {
-            var p = await _context.purchases
-                .FirstOrDefaultAsync(x => x.purchase_id == id);
-
-            if (p == null || p.cash_box_id == null)
-                return false;
-
-            if (amount <= 0 || amount > p.transport_cost)
-                return false;
-
-            p.transport_cost -= amount;
-
-            AddFinancialEvent(
-                "استرجاع مبلغ من الشراء",
-                "IN",
-                amount,
-                p.cash_box_id.Value,
-                adminId,
-                p.purchase_id,
-                "purchases",
-                null,
-                null,
-                "إلغاء دفعة شراء"
-            );
+            p.purchase_type = updated.purchase_type;
 
             await _context.SaveChangesAsync();
             return true;
@@ -920,6 +895,14 @@ p.name
             if (p == null)
                 return false;
 
+            var supplier = await _context.suppliers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.supplier_id == p.supplier_id);
+
+            var material = await _context.raw_materials
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.raw_material_id == p.raw_material_id);
+
             if (p.cash_box_id != null)
             {
                 decimal total = GetPurchaseTotal(p);
@@ -932,9 +915,11 @@ p.name
                     adminId,
                     p.purchase_id,
                     "purchases",
-                    null,
-                    null,
-                    "حذف شراء"
+                    p.supplier_id,
+                    supplier?.name,
+                    "حذف شراء",
+                    p.raw_material_id,
+                    material?.name
                 );
             }
 
@@ -945,6 +930,19 @@ p.name
         }
 
 
+        public async Task<List<Supplier>> GetSuppliers()
+        {
+            return await _context.suppliers
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<List<RawMaterial>> GetRawMaterials()
+        {
+            return await _context.raw_materials
+                .AsNoTracking()
+                .ToListAsync();
+        }
 
     }
 

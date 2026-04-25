@@ -24,7 +24,37 @@
         </button>
     </div>
 
+
+    <div class="pro-search-bar">
+
+        <select class="pro-filter-select" @bind="TypeFilter">
+            <option value="all">الكل</option>
+            <option value="local">داخلي</option>
+            <option value="import">خارجي</option>
+        </select>
+
+        <select class="pro-filter-select" @bind="YearFilter">
+            <option value="0">كل السنوات</option>
+            @foreach (var y in Years)
+            {
+                <option value="@y">@y</option>
+            }
+        </select>
+
+        <select class="pro-filter-select" @bind="MonthFilter">
+            <option value="0">كل الشهور</option>
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option value="@i">@i</option>
+            }
+        </select>
+
+    </div>
+
+
     <div class="pro-card">
+
+
         <div class="pro-table-wrap">
 
             <table class="pro-table">
@@ -32,9 +62,11 @@
                     <tr>
                         <th>المادة</th>
                         <th>المورد</th>
+                        <th>النوع</th>
                         <th>الكمية</th>
                         <th>سعر الوحدة</th>
                         <th>جمرك</th>
+                        <th>شحن</th>
                         <th>نقل</th>
                         <th>الإجمالي</th>
                         <th>الخزنة</th>
@@ -48,26 +80,35 @@
                     @if (List == null)
                     {
                         <tr>
-                            <td colspan="9">جاري التحميل...</td>
+                            <td colspan="12">جاري التحميل...</td>
                         </tr>
                     }
                     else if (List.Count == 0)
                     {
                         <tr>
-                            <td colspan="9">لا توجد بيانات</td>
+                            <td colspan="12" class="st-empty-text">
+                                <div class="empty-state">
+                                    <img src="images/Empty.jpg" class="empty-img" />
+                                    <span>لا توجد بيانات</span>
+                                </div>
+                            </td>
                         </tr>
                     }
                     else
                     {
-                        @foreach (var p in List)
+                        @foreach (var p in FilteredPurchases)
                         {
                             <tr>
                                 <td class="pro-name">@GetMaterialName(p.raw_material_id)</td>
                                 <td>@GetSupplierName(p.supplier_id)</td>
+                                <td>
+                                    @(p.purchase_type == "import" ? "خارجي" : "داخلي")
+                                </td>
                                 <td>@p.quantity</td>
                                 <td>@p.unit_price.ToString("0.00")</td>
                                 <td>@p.customs_cost.ToString("0.00")</td>
-                                <td>@p.transport_cost.ToString("0.00")</td>
+                                <td>@p.shipping_cost.ToString("0.00")</td>
+                                <td>@p.local_transport_cost.ToString("0.00")</td>
                                 <td>
                                     <span class="pro-total">
                                         @GetTotal(p).ToString("0.00") د.ل
@@ -107,12 +148,22 @@
                     <img src="images/Money.jpg" />
                 </div>
 
+                <div class="purchase-mode-box">
+                    <label>نوع الشراء</label>
+
+                    <select class="pro-input" @bind="PurchaseMode">
+                        <option value="local">شراء داخلي</option>
+                        <option value="import">استيراد خارجي</option>
+                    </select>
+                </div>
+
                 <div class="pro-fields-grid">
 
                     <div>
                         <label>المادة الخام</label>
                         <select class="pro-input @(RawError == "" ? "" : "is-invalid")"
-                                @bind="Form.raw_material_id">
+                                value="@Form.raw_material_id"
+                                @onchange="FillMaterialPrice">
                             <option value="0">اختر المادة</option>
                             @foreach (var r in RawMaterials)
                             {
@@ -125,21 +176,25 @@
                         }
                     </div>
 
-                    <div>
-                        <label>المورد</label>
-                        <select class="pro-input @(SupplierError == "" ? "" : "is-invalid")"
-                                @bind="Form.supplier_id">
-                            <option value="0">اختر المورد</option>
-                            @foreach (var s in Suppliers)
+                    <div class="smooth-field @(PurchaseMode == "import" ? "" : "hide-field")">
+                            <label>المورد</label>
+
+                            <select class="pro-input @(SupplierError == "" ? "" : "is-invalid")"
+                                    @bind="Form.supplier_id">
+                                <option value="0">اختر المورد</option>
+
+                                @foreach (var s in Suppliers)
+                                {
+                                    <option value="@s.supplier_id">@s.name</option>
+                                }
+                            </select>
+
+                            @if (SupplierError != "")
                             {
-                                <option value="@s.supplier_id">@s.name</option>
+                                <div class="pro-error-text">@SupplierError</div>
                             }
-                        </select>
-                        @if (SupplierError != "")
-                        {
-                            <div class="pro-error-text">@SupplierError</div>
-                        }
-                    </div>
+                        </div>
+                    
 
                     <div>
                         <label>الكمية</label>
@@ -167,21 +222,34 @@
                         }
                     </div>
 
-                    <div>
-                        <label>الجمرك</label>
-                        <input type="number"
-                               step="0.01"
-                               class="pro-input"
-                               @bind-value="Form.customs_cost"
-                               @bind-value:event="oninput" />
-                    </div>
+                    <div class="smooth-field @(PurchaseMode == "import" ? "" : "hide-field")">
+                            <label>الجمرك</label>
+
+                            <input type="number"
+                                   step="0.01"
+                                   class="pro-input"
+                                   @bind-value="Form.customs_cost"
+                                   @bind-value:event="oninput" />
+                        </div>
+                    
+
+                    <div class="smooth-field @(PurchaseMode == "import" ? "" : "hide-field")">
+                            <label>الشحن الخارجي</label>
+
+                            <input type="number"
+                                   step="0.01"
+                                   class="pro-input"
+                                   @bind-value="Form.shipping_cost"
+                                   @bind-value:event="oninput" />
+                        </div>
+                    
 
                     <div>
-                        <label>النقل</label>
+                        <label>النقل الداخلي</label>
                         <input type="number"
                                step="0.01"
                                class="pro-input"
-                               @bind-value="Form.transport_cost"
+                               @bind-value="Form.local_transport_cost"
                                @bind-value:event="oninput" />
                     </div>
 
@@ -215,17 +283,20 @@
                                @bind="Form.purchase_date" />
                     </div>
 
-                    <div>
-                        <label>تاريخ الوصول</label>
-                        <input type="date"
-                               class="pro-input"
-                               @bind="Form.arrival_date" />
-                    </div>
+                    <div class="smooth-field @(PurchaseMode == "import" ? "" : "hide-field")">
+                            <label>تاريخ الوصول</label>
 
-                    <div style="grid-column: span 2;">
+                            <input type="date"
+                                   class="pro-input"
+                                   @bind="Form.arrival_date" />
+                        </div>
+                    
+
+
+                    <div class="pur-notes-box">
                         <label>ملاحظات</label>
                         <textarea maxlength="200"
-                                  class="pro-input"
+                                  class="pro-input pur-notes-input"
                                   @bind="Form.notes"></textarea>
                     </div>
 
@@ -363,6 +434,17 @@
     string PriceError = "";
     string CashError = "";
 
+    string TypeFilter = "all";
+    int YearFilter = 0;
+    int MonthFilter = 0;
+
+    List<int> Years =>
+        (List ?? new())
+        .Select(x => x.purchase_date.Year)
+        .Distinct()
+        .OrderByDescending(x => x)
+        .ToList();
+
     bool ShowDiffDialog;
 
     decimal OldTotal;
@@ -370,6 +452,8 @@
     decimal DiffTotal;
 
     int adminId = 20;
+
+    string PurchaseMode = "local";
 
     protected override async Task OnInitializedAsync()
     {
@@ -386,15 +470,35 @@
 
     void OpenAddDialog()
     {
+        PurchaseMode = "local";
+
         Form = new Purchase
         {
             quantity = 1,
-            purchase_date = DateTime.UtcNow
+            purchase_date = DateTime.UtcNow,
+            customs_cost = 0,
+            shipping_cost = 0,
+            local_transport_cost = 0
         };
+
+
 
         ResetErrors();
         ShowAddDialog = true;
     }
+
+    IEnumerable<Purchase> FilteredPurchases =>
+    (List ?? new List<Purchase>())
+    .Where(p =>
+        (TypeFilter == "all" ||
+         p.purchase_type == TypeFilter)
+        &&
+        (YearFilter == 0 ||
+         p.purchase_date.Year == YearFilter)
+        &&
+        (MonthFilter == 0 ||
+         p.purchase_date.Month == MonthFilter)
+    );
 
     string GetCashBoxName(int? id)
     {
@@ -411,16 +515,20 @@
             quantity = p.quantity,
             unit_price = p.unit_price,
             customs_cost = p.customs_cost,
-            transport_cost = p.transport_cost,
+            shipping_cost = p.shipping_cost,
+            local_transport_cost = p.local_transport_cost,
             purchase_date = p.purchase_date,
             arrival_date = p.arrival_date,
             cash_box_id = p.cash_box_id,
-            notes = p.notes
-        };
+            notes = p.notes,
+            purchase_type = p.purchase_type
+};
 
-        ResetErrors();
-        ShowEditDialog = true;
-        OldTotal = GetTotal(p);
+        PurchaseMode = p.purchase_type ?? "local";
+
+ResetErrors();
+ShowEditDialog = true;
+OldTotal = GetTotal(p);
     }
 
     void OpenDeleteDialog(Purchase p)
@@ -431,13 +539,36 @@
 
     async Task ConfirmEdit()
     {
-        await FinanceService.UpdatePurchase(Form, adminId);
+        Form.purchase_type = PurchaseMode;
+
+        var ok = await FinanceService.UpdatePurchase(Form, adminId);
+
+        if (!ok)
+        {
+            ToastService.ShowToast("رصيد الخزنة غير كافي", "error");
+            ShowDiffDialog = false;
+            ShowEditDialog = true;
+            return;
+        }
 
         await LoadData();
 
         Close();
 
         ToastService.ShowToast("تم التعديل بنجاح", "success");
+    }
+
+    void FillMaterialPrice(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int id))
+        {
+            Form.raw_material_id = id;
+
+            var item = RawMaterials.FirstOrDefault(x => x.raw_material_id == id);
+
+            if (item != null)
+                Form.unit_price = item.unit_cost;
+        }
     }
 
     async Task Save()
@@ -450,7 +581,7 @@
             return;
         }
 
-        if (Form.supplier_id <= 0)
+        if (PurchaseMode == "import" && (Form.supplier_id == null || Form.supplier_id <= 0))
         {
             SupplierError = "اختر المورد";
             return;
@@ -474,7 +605,7 @@
             return;
         }
 
-        if (Form.transport_cost < 0)
+        if (Form.shipping_cost < 0 || Form.local_transport_cost < 0)
         {
             ToastService.ShowToast("النقل لا يمكن أن يكون أقل من 0", "error");
             return;
@@ -485,6 +616,16 @@
             CashError = "اختر الخزنة";
             return;
         }
+
+        if (PurchaseMode == "local")
+        {
+            Form.supplier_id = null;
+            Form.customs_cost = 0;
+            Form.shipping_cost = 0;
+            Form.arrival_date = null;
+        }
+
+        Form.purchase_type = PurchaseMode;
 
         try
         {
@@ -517,7 +658,8 @@
         }
         catch (Exception ex)
         {
-            ToastService.ShowToast(ex.Message, "error");
+            var msg = ex.InnerException?.Message ?? ex.Message;
+            ToastService.ShowToast(msg, "error");
         }
     }
 
@@ -565,14 +707,16 @@
 
             ws.Cell(1, 1).Value = "المادة";
             ws.Cell(1, 2).Value = "المورد";
-            ws.Cell(1, 3).Value = "الكمية";
-            ws.Cell(1, 4).Value = "سعر الوحدة";
-            ws.Cell(1, 5).Value = "جمرك";
-            ws.Cell(1, 6).Value = "نقل";
-            ws.Cell(1, 7).Value = "الإجمالي";
-            ws.Cell(1, 8).Value = "الخزنة";
-            ws.Cell(1, 9).Value = "التاريخ";
-            ws.Cell(1, 10).Value = "ملاحظات";
+            ws.Cell(1, 3).Value = "النوع";
+            ws.Cell(1, 4).Value = "الكمية";
+            ws.Cell(1, 5).Value = "سعر الوحدة";
+            ws.Cell(1, 6).Value = "جمرك";
+            ws.Cell(1, 7).Value = "شحن";
+            ws.Cell(1, 8).Value = "نقل";
+            ws.Cell(1, 9).Value = "الإجمالي";
+            ws.Cell(1, 10).Value = "الخزنة";
+            ws.Cell(1, 11).Value = "التاريخ";
+            ws.Cell(1, 12).Value = "ملاحظات";
             ws.Row(1).Style.Font.Bold = true;
             ws.Row(1).Style.Fill.BackgroundColor = XLColor.LightGreen;
 
@@ -582,15 +726,16 @@
             {
                 ws.Cell(row, 1).Value = GetMaterialName(p.raw_material_id);
                 ws.Cell(row, 2).Value = GetSupplierName(p.supplier_id);
-                ws.Cell(row, 3).Value = p.quantity;
-                ws.Cell(row, 4).Value = p.unit_price;
-                ws.Cell(row, 5).Value = p.customs_cost;
-                ws.Cell(row, 6).Value = p.transport_cost;
-                ws.Cell(row, 7).Value = GetTotal(p);
-                ws.Cell(row, 8).Value = GetCashBoxName(p.cash_box_id);
-                ws.Cell(row, 9).Value = p.purchase_date.ToString("yyyy-MM-dd");
-                ws.Cell(row, 10).Value = p.notes;
-
+                ws.Cell(row, 3).Value = p.purchase_type == "import" ? "خارجي" : "داخلي";
+                ws.Cell(row, 4).Value = p.quantity;
+                ws.Cell(row, 5).Value = p.unit_price;
+                ws.Cell(row, 6).Value = p.customs_cost;
+                ws.Cell(row, 7).Value = p.shipping_cost;
+                ws.Cell(row, 8).Value = p.local_transport_cost;
+                ws.Cell(row, 9).Value = GetTotal(p);
+                ws.Cell(row, 10).Value = GetCashBoxName(p.cash_box_id);
+                ws.Cell(row, 11).Value = p.purchase_date.ToString("yyyy-MM-dd");
+                ws.Cell(row, 12).Value = p.notes;
                 row++;
             }
 
@@ -615,11 +760,17 @@
 
     decimal GetTotal(Purchase p)
     {
-        return (p.quantity * p.unit_price) + p.customs_cost + p.transport_cost;
+        return (p.quantity * p.unit_price)
+            + p.customs_cost
+            + p.shipping_cost
+            + p.local_transport_cost;
     }
 
-    string GetSupplierName(int id)
+    string GetSupplierName(int? id)
     {
+        if (id == null)
+            return "-";
+
         return Suppliers.FirstOrDefault(x => x.supplier_id == id)?.name ?? "-";
     }
 

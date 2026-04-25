@@ -89,7 +89,7 @@ namespace SultanCups.Services
                 .AnyAsync(s => s.employee_id == employeeId);
 
             var hasFinancialEvents = await _context.financial_events
-                .AnyAsync(f => f.employee_id == employeeId);
+     .AnyAsync(f => f.person_id == employeeId);
 
             // 🔥 لو له أي أثر مالي → لا نحذفه
             if (hasSalaries || hasFinancialEvents)

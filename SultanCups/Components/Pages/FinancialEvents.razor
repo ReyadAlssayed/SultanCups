@@ -66,6 +66,11 @@
             <option value="OUT">خارج</option>
         </select>
 
+        <div class="change-legend">
+            <span class="name-change-dot"></span>
+            <span>تعني تم تعديل هدا البيان إضغط على زر التفاصيل</span>
+        </div>
+
     </div>
 
     <div class="pro-card">
@@ -79,8 +84,8 @@
                         <th>الاتجاه</th>
                         <th>الخزنة</th>
                         <th>المسؤول</th>
-                        <th>الشخص المرتبط بالعملية</th>
-                        <th>التاريخ</th>
+                        <th>العنصر</th>
+                        <th>الشخص</th>
                         <th>التفاصيل</th>
                     </tr>
                 </thead>
@@ -133,6 +138,30 @@
                                 <td>@item.Admin?.full_name</td>
 
                                 <td>
+                                    @if (string.IsNullOrWhiteSpace(item.item_name_snapshot))
+                                    {
+                                        <span>-</span>
+                                    }
+                                    else
+                                    {
+                                        var pur = Purchases.FirstOrDefault(x => x.purchase_id == item.ref_id);
+
+                                        var currentItem = RawMaterials
+                                            .FirstOrDefault(x => x.raw_material_id == pur?.raw_material_id)?.name;
+
+                                        <span>
+                                            @item.item_name_snapshot (مادة خام)
+
+                                            @if (!string.IsNullOrWhiteSpace(currentItem) &&
+                                                                                                         currentItem != item.item_name_snapshot)
+                                            {
+                                                <span class="name-change-dot" title="تم تعديل الاسم"></span>
+                                            }
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
                                     @{
                                         string? currentName = null;
 
@@ -147,35 +176,30 @@
                                             var purchase = OtherPurchases.FirstOrDefault(x => x.other_purchase_id == item.ref_id);
                                             currentName = purchase?.name;
                                         }
+                                        else if (item.ref_table == "purchases")
+                                        {
+                                            var pur = Purchases.FirstOrDefault(x => x.purchase_id == item.ref_id);
+                                            var sup = Suppliers.FirstOrDefault(x => x.supplier_id == pur?.supplier_id);
+                                            currentName = sup?.name;
+                                        }
                                     }
 
                                     @if (string.IsNullOrWhiteSpace(item.person_name_snapshot))
                                     {
                                         <span>-</span>
                                     }
-                                    else if (!string.IsNullOrWhiteSpace(currentName) &&
-                                             currentName != item.person_name_snapshot)
-                                    {
-                                        <span>
-                                            @item.person_name_snapshot
-                                            <span class="name-change-green">
-                                                ← تغير إلى: @currentName
-                                            </span>
-                                        </span>
-                                    }
                                     else
                                     {
-                                        <span>@item.person_name_snapshot</span>
-                                    }
-                                </td>
+                                        <span>
+                                            @GetPersonDisplay(item)
 
-                                <td class="mg-date-cell">
-                                    <span class="mg-time">
-                                        @item.event_date.ToLocalTime().ToString("HH:mm")
-                                    </span>
-                                    <span class="mg-date">
-                                        @item.event_date.ToLocalTime().ToString("yyyy-MM-dd")
-                                    </span>
+                                            @if (!string.IsNullOrWhiteSpace(currentName) &&
+                                                             currentName != item.person_name_snapshot)
+                                            {
+                                                <span class="name-change-dot" title="تم تعديل العنصر"></span>
+                                            }
+                                        </span>
+                                    }
                                 </td>
 
                                 <td>
@@ -249,9 +273,53 @@
                         </span>
                     </div>
 
+                    @if (!string.IsNullOrWhiteSpace(SelectedItem.person_name_snapshot))
+                    {
+                        var newPerson = GetCurrentPersonName(SelectedItem);
+
+                        if (!string.IsNullOrWhiteSpace(newPerson) &&
+                            newPerson != SelectedItem.person_name_snapshot)
+                        {
+                            <div class="row">
+                                <span>تعديل الاسم</span>
+                                <span class="change-inline">
+                                    <b>@SelectedItem.person_name_snapshot</b>
+                                    <span class="arrow-change">←</span>
+                                    <b>@newPerson</b>
+                                </span>
+                            </div>
+                        }
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(SelectedItem.item_name_snapshot))
+                    {
+                        var newItem = GetCurrentItemName(SelectedItem);
+
+                        if (!string.IsNullOrWhiteSpace(newItem) &&
+                            newItem != SelectedItem.item_name_snapshot)
+                        {
+                            <div class="row">
+                                <span>تعديل العنصر</span>
+                                <span class="change-inline">
+                                    <b>@SelectedItem.item_name_snapshot</b>
+                                    <span class="arrow-change">←</span>
+                                    <b>@newItem</b>
+                                </span>
+                            </div>
+                        }
+                    }
+
+
                     <div class="row">
                         <span>التاريخ</span>
-                        <span>@SelectedItem.event_date.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</span>
+                        <span class="dt-box">
+                            <span class="dt-day">
+                                @SelectedItem.event_date.ToLocalTime().ToString("yyyy-MM-dd")
+                            </span>
+                            <span class="dt-time">
+                                @SelectedItem.event_date.ToLocalTime().ToString("HH:mm")
+                            </span>
+                        </span>
                     </div>
 
                     <div class="row">
@@ -306,6 +374,11 @@
     List<Salary> Salaries = new();
     List<OtherPurchase> OtherPurchases = new();
 
+    List<Supplier> Suppliers = new();
+    List<RawMaterial> RawMaterials = new();
+
+    List<Purchase> Purchases = new();
+
     bool IsExporting = false;
 
 
@@ -315,12 +388,43 @@
         Employees = await FinanceService.GetActiveEmployees();
         Salaries = await FinanceService.GetSalaries();
         OtherPurchases = await FinanceService.GetOtherPurchases();
+        Suppliers = await FinanceService.GetSuppliers();
+        RawMaterials = await FinanceService.GetRawMaterials();
+        Purchases = await FinanceService.GetPurchases();
     }
 
     void OpenDetails(FinancialEvent item)
     {
         SelectedItem = item;
         ShowDetailsDialog = true;
+    }
+
+    string? GetCurrentPersonName(FinancialEvent item)
+    {
+        if (item.ref_table == "salaries")
+        {
+            var sal = Salaries.FirstOrDefault(x => x.salary_id == item.ref_id);
+            return Employees.FirstOrDefault(x => x.employee_id == sal?.employee_id)?.full_name;
+        }
+
+        if (item.ref_table == "purchases")
+        {
+            var pur = Purchases.FirstOrDefault(x => x.purchase_id == item.ref_id);
+            return Suppliers.FirstOrDefault(x => x.supplier_id == pur?.supplier_id)?.name;
+        }
+
+        return null;
+    }
+
+    string? GetCurrentItemName(FinancialEvent item)
+    {
+        if (item.ref_table == "purchases")
+        {
+            var pur = Purchases.FirstOrDefault(x => x.purchase_id == item.ref_id);
+            return RawMaterials.FirstOrDefault(x => x.raw_material_id == pur?.raw_material_id)?.name;
+        }
+
+        return null;
     }
 
     async Task ExportToExcel()
@@ -383,6 +487,20 @@
             IsExporting = false;
             await InvokeAsync(StateHasChanged);
         }
+    }
+
+    string GetPersonDisplay(FinancialEvent item)
+    {
+        if (string.IsNullOrWhiteSpace(item.person_name_snapshot))
+            return "-";
+
+        if (item.ref_table == "purchases")
+            return item.person_name_snapshot + " (مورد)";
+
+        if (item.ref_table == "salaries")
+            return item.person_name_snapshot + " (موظف)";
+
+        return item.person_name_snapshot;
     }
 
     void CloseDetails()

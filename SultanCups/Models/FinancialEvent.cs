@@ -8,7 +8,7 @@ namespace SultanCups.Models
         [Key]
         public int event_id { get; set; }
 
-        // نوع العملية (دفع راتب، تحصيل، ...)
+        // نوع العملية
         public string event_type { get; set; } = null!;
 
         // IN / OUT
@@ -23,10 +23,18 @@ namespace SultanCups.Models
         // من قام بالعملية
         public int performed_by { get; set; }
 
-        // ربط اختياري
+        // مرجع الحركة
         public string? ref_table { get; set; }
         public int? ref_id { get; set; }
         public string? ref_code { get; set; }
+
+        // الشخص المرتبط
+        public int? person_id { get; set; }
+        public string? person_name_snapshot { get; set; }
+
+        // العنصر المرتبط
+        public int? item_id { get; set; }
+        public string? item_name_snapshot { get; set; }
 
         public DateTime event_date { get; set; }
 
@@ -38,7 +46,5 @@ namespace SultanCups.Models
 
         [ForeignKey("performed_by")]
         public Admain Admin { get; set; } = null!;
-        public int? employee_id { get; set; }
-        public string? person_name_snapshot { get; set; }
     }
 }
