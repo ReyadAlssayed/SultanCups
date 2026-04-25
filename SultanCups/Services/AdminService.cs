@@ -60,12 +60,14 @@ namespace SultanCups.Services
         // حذف مسؤول حسب admin_id
         public async Task<bool> DeleteAdmin(int adminId)
         {
-            var admin = await _context.admins.FirstOrDefaultAsync(a => a.admin_id == adminId);
+            var admin = await _context.admins
+                .FirstOrDefaultAsync(a => a.admin_id == adminId);
 
             if (admin == null)
                 return false;
 
-            _context.admins.Remove(admin);
+            admin.is_active = false;
+
             await _context.SaveChangesAsync();
 
             return true;

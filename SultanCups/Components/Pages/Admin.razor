@@ -76,7 +76,7 @@
 
                                 <td class="ad-actions">
                                     <button type="button" class="ad-edit" @onclick="() => OpenEditDialog(a)">تعديل</button>
-                                    <button type="button" class="ad-delete" @onclick="() => OpenDeleteDialog(a)">حذف</button>
+                                    <button type="button" class="ad-delete" @onclick="() => OpenDeleteDialog(a)">تعطيل</button>
                                 </td>
                             </tr>
                         }
@@ -191,14 +191,14 @@
                     <div class="ad-delete-icon">!</div>
                 </div>
 
-                <h3 class="ad-delete-title">تأكيد الحذف</h3>
+                <h3 class="ad-delete-title">تعطيل المسؤول</h3>
                 <p class="ad-delete-text">
-                    أنت على وشك حذف المسؤول <strong>@DeleteAdminItem.full_name</strong> نهائياً.
-                    <br /> لا يمكن التراجع عن هذا الإجراء.
+                    سيتم تعطيل المسؤول <strong>@DeleteAdminItem.full_name</strong>
+                    ومنعه من تسجيل الدخول.
                 </p>
 
                 <div class="ad-dialog-actions">
-                    <button type="button" class="ad-delete-confirm" @onclick="ConfirmDeleteAdmin">تأكيد الحذف</button>
+                    <button type="button" class="ad-delete-confirm" @onclick="ConfirmDeleteAdmin">تأكيد التعطيل</button>
                     <button type="button" class="ad-cancel" @onclick="CloseDialogs">إلغاء</button>
                 </div>
             </div>
@@ -361,7 +361,7 @@
         {
             Admins = await AdminService.GetAdmins();
             CloseDialogs();
-            _ = ShowToast("تم حذف المسؤول بنجاح"); // إشعار نجاح
+            _ = ShowToast("تم تعطيل المسؤول بنجاح");
         }
         else
         {

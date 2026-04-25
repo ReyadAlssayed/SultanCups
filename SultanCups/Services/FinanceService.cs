@@ -20,18 +20,18 @@ namespace SultanCups.Services
         // =========================================
 
         private void AddFinancialEvent(
-     string type,
-     string direction,
-     decimal amount,
-     int cashBoxId,
-     int adminId,
-     int refId,
-     string refTable,
-     int? personId,
-     string? personName,
-     string notes = "",
-int? itemId = null,
-string? itemName = null)
+      string type,
+      string direction,
+      decimal amount,
+      int cashBoxId,
+      int adminId,
+      int refId,
+      string refTable,
+      int? personId,
+      string? personName,
+      string notes = "",
+      int? itemId = null,
+      string? itemName = null)
         {
             var personEvents = new[]
             {
@@ -48,13 +48,21 @@ string? itemName = null)
                     throw new Exception("هذا النوع من العمليات يتطلب شخص");
             }
 
+            var adminName = _context.admins
+                .Where(x => x.admin_id == adminId)
+                .Select(x => x.full_name)
+                .FirstOrDefault();
+
             _context.financial_events.Add(new FinancialEvent
             {
                 event_type = type,
                 direction = direction,
                 amount = amount,
                 cash_box_id = cashBoxId,
+
                 performed_by = adminId,
+                admin_name_snapshot = adminName,
+
                 ref_table = refTable,
                 ref_id = refId,
 

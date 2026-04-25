@@ -135,7 +135,16 @@
 
                                 <td>@item.CashBox?.name</td>
 
-                                <td>@item.Admin?.full_name</td>
+                                <td>
+                                    @item.admin_name_snapshot
+
+                                    @if (item.Admin != null &&
+                                             !string.IsNullOrWhiteSpace(item.admin_name_snapshot) &&
+                                             item.Admin.full_name != item.admin_name_snapshot)
+                                    {
+                                        <span class="name-change-dot" title="تم تعديل الاسم"></span>
+                                    }
+                                </td>
 
                                 <td>
                                     @if (string.IsNullOrWhiteSpace(item.item_name_snapshot))
@@ -261,8 +270,22 @@
 
                     <div class="row">
                         <span>المسؤول</span>
-                        <span>@SelectedItem.Admin?.full_name</span>
+                        <span>@SelectedItem.admin_name_snapshot</span>
                     </div>
+
+                    @if (SelectedItem.Admin != null &&
+                        !string.IsNullOrWhiteSpace(SelectedItem.admin_name_snapshot) &&
+                        SelectedItem.Admin.full_name != SelectedItem.admin_name_snapshot)
+                    {
+                        <div class="row">
+                            <span>تعديل الاسم</span>
+                            <span class="change-inline">
+                                <b>@SelectedItem.admin_name_snapshot</b>
+                                <span class="arrow-change">←</span>
+                                <b>@SelectedItem.Admin.full_name</b>
+                            </span>
+                        </div>
+                    }
 
                     <div class="row">
                         <span>الشخص المرتبط بالعملية</span>
@@ -449,9 +472,10 @@
             ws.Cell(1, 5).Value = "الخزنة";
             ws.Cell(1, 6).Value = "المسؤول";
             ws.Cell(1, 7).Value = "الشخص المرتبط";
-            ws.Cell(1, 8).Value = "التاريخ";
-            ws.Cell(1, 9).Value = "التفاصيل";
-            ws.Cell(1, 10).Value = "المرجع";
+            ws.Cell(1, 8).Value = "العنصر";
+            ws.Cell(1, 9).Value = "التاريخ";
+            ws.Cell(1, 10).Value = "التفاصيل";
+            ws.Cell(1, 11).Value = "المرجع";
 
             int row = 2;
 
@@ -462,11 +486,46 @@
                 ws.Cell(row, 3).Value = item.amount;
                 ws.Cell(row, 4).Value = item.direction == "IN" ? "داخل" : "خارج";
                 ws.Cell(row, 5).Value = item.CashBox?.name;
-                ws.Cell(row, 6).Value = item.Admin?.full_name;
-                ws.Cell(row, 7).Value = item.person_name_snapshot;
-                ws.Cell(row, 8).Value = item.event_date.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
-                ws.Cell(row, 9).Value = item.notes;
-                ws.Cell(row, 10).Value = $"{item.ref_table} - {item.ref_id}";
+                var adminExcelName = item.admin_name_snapshot;
+
+                if (item.Admin != null &&
+                    !string.IsNullOrWhiteSpace(item.admin_name_snapshot) &&
+                    item.Admin.full_name != item.admin_name_snapshot)
+                {
+                    adminExcelName =
+                        item.admin_name_snapshot + " ← " + item.Admin.full_name;
+                }
+
+                ws.Cell(row, 6).Value = adminExcelName;
+                var personExcelName = item.person_name_snapshot;
+
+                var currentPerson = GetCurrentPersonName(item);
+
+                if (!string.IsNullOrWhiteSpace(item.person_name_snapshot) &&
+                    !string.IsNullOrWhiteSpace(currentPerson) &&
+                    currentPerson != item.person_name_snapshot)
+                {
+                    personExcelName =
+                        item.person_name_snapshot + " ← " + currentPerson;
+                }
+
+                var itemExcelName = item.item_name_snapshot;
+
+                var currentItem = GetCurrentItemName(item);
+
+                if (!string.IsNullOrWhiteSpace(item.item_name_snapshot) &&
+                    !string.IsNullOrWhiteSpace(currentItem) &&
+                    currentItem != item.item_name_snapshot)
+                {
+                    itemExcelName =
+                        item.item_name_snapshot + " ← " + currentItem;
+                }
+
+                ws.Cell(row, 7).Value = personExcelName;
+                ws.Cell(row, 8).Value = itemExcelName;
+                ws.Cell(row, 9).Value = item.event_date.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+                ws.Cell(row, 10).Value = item.notes;
+                ws.Cell(row, 11).Value = $"{item.ref_table} - {item.ref_id}";
                 row++;
             }
 
@@ -525,8 +584,8 @@
 
              x.event_type.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
 
-             (x.Admin != null &&
-              x.Admin.full_name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) ||
+             (!string.IsNullOrWhiteSpace(x.admin_name_snapshot) &&
+ x.admin_name_snapshot.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) ||
 
              (!string.IsNullOrWhiteSpace(x.person_name_snapshot) &&
  x.person_name_snapshot.Contains(SearchText, StringComparison.OrdinalIgnoreCase))

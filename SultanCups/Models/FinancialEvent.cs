@@ -8,20 +8,17 @@ namespace SultanCups.Models
         [Key]
         public int event_id { get; set; }
 
-        // نوع العملية
         public string event_type { get; set; } = null!;
 
-        // IN / OUT
         public string direction { get; set; } = null!;
 
-        // القيمة
         public decimal amount { get; set; }
 
-        // الخزنة
         public int cash_box_id { get; set; }
 
-        // من قام بالعملية
+        // المسؤول المنفذ
         public int performed_by { get; set; }
+        public string? admin_name_snapshot { get; set; }
 
         // مرجع الحركة
         public string? ref_table { get; set; }
@@ -40,7 +37,6 @@ namespace SultanCups.Models
 
         public string? notes { get; set; }
 
-        // Navigation
         [ForeignKey("cash_box_id")]
         public CashBox CashBox { get; set; } = null!;
 
