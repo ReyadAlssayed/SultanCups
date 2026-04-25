@@ -17,7 +17,7 @@ namespace SultanCups.Models
         public decimal paid_amount { get; set; }
 
         public string status { get; set; } = null!;
-
+        
         public DateTime salary_date { get; set; }
 
         public int cash_box_id { get; set; }

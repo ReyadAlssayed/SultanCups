@@ -532,7 +532,7 @@ string? itemName = null)
 "other_purchases",
 null,
 null,
-item.name
+"مصروف: " + item.name
             );
 
             await _context.SaveChangesAsync();
@@ -1018,6 +1018,8 @@ p.name
                 newData["notes"] = updated.notes ?? "";
             }
 
+
+
             // =====================================
             // Audit Log
             // =====================================
@@ -1050,6 +1052,17 @@ p.name
 
             return true;
         }
+
+        public async Task<decimal> GetEmployeeSalaryRemaining(int employeeId)
+        {
+            return await _context.salaries
+                .Where(x =>
+                    x.employee_id == employeeId &&
+                    x.status != "خالص")
+                .Select(x => x.amount - x.paid_amount)
+                .SumAsync();
+        }
+
         public async Task<bool> DeleteLoan(int loanId, int adminId)
         {
             var loan = await _context.employee_loans
@@ -1164,7 +1177,7 @@ p.name
                 "purchases",
                 item.supplier_id,
                 supplier?.name,
-                "شراء جديد",
+                "شراء مادة خام",
                 item.raw_material_id,
                 material?.name
             );
@@ -1217,7 +1230,7 @@ p.name
                     "purchases",
                     updated.supplier_id,
                     supplier?.name,
-                    "نقل شراء",
+                    "نقل تكلفة شراء",
                     updated.raw_material_id,
                     material?.name
                 );
@@ -1232,7 +1245,7 @@ p.name
                     "purchases",
                     updated.supplier_id,
                     supplier?.name,
-                    "نقل شراء",
+                    "نقل تكلفة شراء",
                     updated.raw_material_id,
                     material?.name
                 );
@@ -1254,7 +1267,7 @@ p.name
                     "purchases",
                     updated.supplier_id,
                     supplier?.name,
-                    "فرق تعديل شراء",
+                    "زيادة تكلفة شراء",
                     updated.raw_material_id,
                     material?.name
                 );
@@ -1271,7 +1284,7 @@ p.name
                     "purchases",
                     updated.supplier_id,
                     supplier?.name,
-                    "فرق تعديل شراء",
+                   "استرجاع فرق شراء",
                     updated.raw_material_id,
                     material?.name
                 );
@@ -1325,7 +1338,7 @@ p.name
                     "purchases",
                     p.supplier_id,
                     supplier?.name,
-                    "حذف شراء",
+                    "حذف شراء وإرجاع القيمة للخزنة",
                     p.raw_material_id,
                     material?.name
                 );

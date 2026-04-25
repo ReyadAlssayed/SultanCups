@@ -51,7 +51,12 @@
                     else if (Loan.Count == 0)
                     {
                         <tr>
-                            <td colspan="8" class="pro-empty">لا توجد بيانات</td>
+                            <td colspan="12" class="st-empty-text">
+                                <div class="empty-state">
+                                    <img src="images/Empty.jpg" class="empty-img" />
+                                    <span>لا توجد بيانات</span>
+                                </div>
+                            </td>
                         </tr>
                     }
                     else
@@ -150,7 +155,9 @@
                     <div class="pro-field">
                         <label class="pro-label">الموظف</label>
 
-                        <select @bind="SelectedEmployeeId" class="pro-input">
+                        <select @bind="SelectedEmployeeId"
+                                class="pro-input @(EmployeeError == "" ? "" : "is-invalid")">
+                            
                             <option value="0">اختر الموظف</option>
 
                             @foreach (var e in Employees)
@@ -158,12 +165,18 @@
                                 <option value="@e.employee_id">@e.full_name</option>
                             }
                         </select>
+                        @if (EmployeeError != "")
+                        {
+                            <div class="pro-error-text">@EmployeeError</div>
+                        }
                     </div>
 
                     <div class="pro-field">
                         <label class="pro-label">الخزنة</label>
 
-                        <select @bind="selectedCashBoxId" class="pro-input">
+                        <select @bind="selectedCashBoxId"
+                                class="pro-input @(CashError == "" ? "" : "is-invalid")">
+                           
                             <option value="0">اختر الخزنة</option>
 
                             @foreach (var c in CashBoxes)
@@ -171,14 +184,22 @@
                                 <option value="@c.cash_box_id">@c.name</option>
                             }
                         </select>
+                        @if (CashError != "")
+                        {
+                            <div class="pro-error-text">@CashError</div>
+                        }
                     </div>
 
                     <div class="pro-field">
                         <label class="pro-label">قيمة السلفة</label>
 
-                        <input class="pro-input"
+                        <input class="pro-input @(AmountError == "" ? "" : "is-invalid")"
                                @bind-value="LoanForm.loan_amount"
                                @bind-value:event="oninput" />
+                        @if (AmountError != "")
+                        {
+                            <div class="pro-error-text">@AmountError</div>
+                        }
                     </div>
 
                     <div class="pro-field">
@@ -243,7 +264,10 @@
 
             <div class="pro-dialog-body">
 
-                <h3>تعديل السلفة</h3>
+                <div class="money-head">
+                    <h3>تعديل سلفة</h3>
+                    <img src="images/Money.jpg" />
+                </div>
 
                 <div class="pro-fields-grid">
 
@@ -335,6 +359,18 @@
                     <img src="images/Money.jpg" />
                 </div>
 
+                <div class="diff-row">
+                    <span>قيمة السلفة</span>
+                    <b>@LoanForm.loan_amount</b>
+                </div>
+
+                <div class="diff-row">
+                    <span>المتبقي</span>
+                    <b>@(LoanForm.loan_amount - LoanForm.repaid_amount)</b>
+                </div>
+
+                <p class="diff-note">أدخل المبلغ الذي تم استرداده</p>
+
                 <div class="pro-field">
                     <label class="pro-label">المبلغ</label>
 
@@ -369,6 +405,21 @@
                     <img src="images/Money.jpg" />
                 </div>
 
+                <div class="diff-row">
+                    <span>قيمة السلفة</span>
+                    <b>@LoanForm.loan_amount</b>
+                </div>
+
+                <div class="diff-row">
+                    <span>المدفوع</span>
+                    <b>@LoanForm.repaid_amount</b>
+                </div>
+
+                <div class="diff-row">
+                    <span>المتبقي</span>
+                    <b>@(LoanForm.loan_amount - LoanForm.repaid_amount)</b>
+                </div>
+
                 <div class="pro-field">
                     <label class="pro-label">المبلغ</label>
 
@@ -390,18 +441,134 @@
 @if (ShowDeleteDialog)
 {
     <div class="pro-dialog-overlay">
+        <div class="pro-dialog-box inv-delete-dialog-box">
+
+            <div class="pro-dialog-top-image inv-delete-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="pro-dialog-body inv-delete-dialog-body">
+
+                <div class="inv-delete-icon-wrap">
+                    <div class="inv-delete-icon">!</div>
+                </div>
+
+                <div class="money-head">
+                    <h3 class="inv-delete-title">تأكيد حذف السلفة</h3>
+                    <img src="images/Money.jpg" />
+                </div>
+
+                <p class="inv-delete-text">
+
+                    قيمة السلفة:
+                    @LoanForm.loan_amount.ToString("0.00") د.ل
+
+                    <br />
+
+                    المدفوع:
+                    @LoanForm.repaid_amount.ToString("0.00") د.ل
+
+                    <br />
+
+                    المتبقي:
+                    @((LoanForm.loan_amount - LoanForm.repaid_amount).ToString("0.00")) د.ل
+
+                    <br /><br />
+
+                    <span style="color:#dc2626;font-weight:800;">
+                        سيتم حذف السلفة بالكامل
+                    </span>
+
+                </p>
+
+                <div class="pro-dialog-actions">
+
+                    <button class="pro-delete-confirm"
+                            @onclick="DeleteLoanAction">
+                        حذف الآن
+                    </button>
+
+                    <button class="pro-cancel"
+                            @onclick="CloseDialogs">
+                        إلغاء
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowDiffDialog)
+{
+    <div class="pro-dialog-overlay">
         <div class="pro-dialog-box">
 
             <div class="pro-dialog-body">
 
-                <h3>تأكيد الحذف</h3>
+                <div class="money-head">
+                    <h3>تأكيد التعديل المالي</h3>
+                    <img src="images/Money.jpg" />
+                </div>
 
-                <p>سيتم حذف السلفة</p>
+                <div class="diff-row">
+                    <span>السلفة السابقة</span>
+                    <b>@OldLoanAmount د.ل</b>
+                </div>
+
+                <div class="diff-row">
+                    <span>السلفة الجديدة</span>
+                    <b>@NewLoanAmount د.ل</b>
+                </div>
+
+                <div class="diff-row">
+                    <span>الفرق</span>
+                    <b>@Math.Abs(LoanDiff) د.ل</b>
+                </div>
+
+                <p class="diff-note">
+                    @(LoanDiff > 0
+                    ? "سيتم إخراج فرق المبلغ من الخزنة"
+                    : "سيتم إدخال فرق المبلغ إلى الخزنة")
+                </p>
+
+                <div class="pro-dialog-actions">
+                    <button class="pro-save" @onclick="ConfirmLoanEdit">
+                        متابعة
+                    </button>
+
+                    <button class="pro-cancel" @onclick="CloseDialogs">
+                        إلغاء
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+@if (ShowFinalDeleteDialog)
+{
+    <div class="pro-dialog-overlay">
+        <div class="pro-dialog-box">
+
+            <div class="pro-dialog-body">
+
+                <div class="money-head delete-head">
+                    <h3>تأكيد نهائي</h3>
+                    <img src="images/Money.jpg" />
+                </div>
+
+                <p style="white-space:pre-line;text-align:center;line-height:2">
+                    @FinalDeleteMessage
+                </p>
 
                 <div class="pro-dialog-actions">
                     <button class="pro-delete-confirm"
-                            @onclick="DeleteLoanAction">
-                        حذف
+                            @onclick="ConfirmFinalDelete">
+                        نعم احذف
                     </button>
 
                     <button class="pro-cancel"
@@ -411,10 +578,10 @@
                 </div>
 
             </div>
-
         </div>
     </div>
 }
+
 
 @code {
 
@@ -433,9 +600,24 @@
     bool ShowReverseDialog;
     bool ShowDeleteDialog;
 
+    bool ShowFinalDeleteDialog;
+    string FinalDeleteMessage = "";
+    
+    string EmployeeError = "";
+    string CashError = "";
+    string AmountError = "";
+
+    bool ShowDiffDialog;
+
+    decimal OldLoanAmount;
+    decimal NewLoanAmount;
+    decimal LoanDiff;
+
     int DeleteLoanId;
 
     decimal PaymentAmount;
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -453,6 +635,9 @@
 
         SelectedEmployeeId = 0;
         selectedCashBoxId = 0;
+        EmployeeError = "";
+        CashError = "";
+        AmountError = "";
 
         ShowAddDialog = true;
     }
@@ -474,7 +659,23 @@
         SelectedEmployeeId = row.employee_id;
         selectedCashBoxId = row.cash_box_id;
 
+        OldLoanAmount = row.loan_amount;
+
         ShowEditDialog = true;
+    }
+
+    async Task ConfirmLoanEdit()
+    {
+        LoanForm.employee_id = SelectedEmployeeId;
+        LoanForm.cash_box_id = selectedCashBoxId;
+
+        await FinanceService.UpdateLoan(LoanForm, 20);
+
+        Loan = await FinanceService.GetLoans();
+
+        CloseDialogs();
+
+        ToastService.ShowToast("تم تعديل السلفة", "success");
     }
 
     void OpenPaymentDialog(EmployeeLoan row)
@@ -493,28 +694,71 @@
 
     void OpenDeleteDialog(EmployeeLoan row)
     {
+        LoanForm = row;
         DeleteLoanId = row.loan_id;
         ShowDeleteDialog = true;
     }
 
     async Task SaveLoan()
     {
+        EmployeeError = "";
+        CashError = "";
+        AmountError = "";
+
+        if (SelectedEmployeeId <= 0)
+        {
+            EmployeeError = "اختر الموظف";
+            return;
+        }
+
+        if (selectedCashBoxId <= 0)
+        {
+            CashError = "اختر الخزنة";
+            return;
+        }
+
+        if (LoanForm.loan_amount <= 0)
+        {
+            AmountError = "القيمة يجب أن تكون أكبر من 0";
+            return;
+        }
+
         try
         {
             LoanForm.employee_id = SelectedEmployeeId;
             LoanForm.cash_box_id = selectedCashBoxId;
 
-            await FinanceService.AddLoan(LoanForm, 1);
+            // 🔥 تنبيه إذا لديه راتب غير خالص
+            var salaryRemaining =
+                await FinanceService.GetEmployeeSalaryRemaining(SelectedEmployeeId);
+
+            if (salaryRemaining > 0)
+            {
+                var ok = await JS.InvokeAsync<bool>(
+                    "confirm",
+                    $"تنبيه:\n\nهذا الموظف لديه راتب متبقي بقيمة {salaryRemaining:0.00} د.ل.\n\nهل تريد الاستمرار؟");
+
+                if (!ok)
+                    return;
+            }
+
+            await FinanceService.AddLoan(LoanForm, 20);
 
             Loan = await FinanceService.GetLoans();
 
             CloseDialogs();
 
-            ToastService.ShowToast("تمت إضافة السلفة", "success");
+            ToastService.ShowToast(
+                "تمت إضافة السلفة وخرج المبلغ فعليًا من الخزنة",
+                "success"
+            );
         }
         catch (Exception ex)
         {
-            ToastService.ShowToast(ex.Message, "error");
+            ToastService.ShowToast(
+                ex.InnerException?.Message ?? ex.Message,
+                "error"
+            );
         }
     }
 
@@ -522,62 +766,150 @@
     {
         try
         {
-            LoanForm.employee_id = SelectedEmployeeId;
-            LoanForm.cash_box_id = selectedCashBoxId;
+            if (LoanForm.loan_amount <= 0)
+            {
+                ToastService.ShowToast("القيمة يجب أن تكون أكبر من 0", "error");
+                return;
+            }
 
-            await FinanceService.UpdateLoan(LoanForm, 1);
+            NewLoanAmount = LoanForm.loan_amount;
+            LoanDiff = NewLoanAmount - OldLoanAmount;
 
-            Loan = await FinanceService.GetLoans();
+            if (LoanDiff == 0)
+            {
+                LoanForm.employee_id = SelectedEmployeeId;
+                LoanForm.cash_box_id = selectedCashBoxId;
 
-            CloseDialogs();
+                await FinanceService.UpdateLoan(LoanForm, 20);
 
-            ToastService.ShowToast("تم تعديل السلفة", "success");
+                Loan = await FinanceService.GetLoans();
+
+                CloseDialogs();
+
+                ToastService.ShowToast("تم تعديل السلفة", "success");
+                return;
+            }
+
+            ShowEditDialog = false;
+            ShowDiffDialog = true;
         }
         catch (Exception ex)
         {
-            ToastService.ShowToast(ex.Message, "error");
+            ToastService.ShowToast(ex.InnerException?.Message ?? ex.Message, "error");
         }
     }
 
     async Task AddPaymentAction()
     {
+        if (LoanForm.status == "خالص")
+        {
+            ToastService.ShowToast("هذه السلفة خالصة فعليًا", "error");
+            return;
+        }
+
+        if (PaymentAmount <= 0)
+        {
+            ToastService.ShowToast("القيمة يجب أن تكون أكبر من 0", "error");
+            return;
+        }
+
+        var remaining = LoanForm.loan_amount - LoanForm.repaid_amount;
+
+        if (PaymentAmount > remaining)
+        {
+            ToastService.ShowToast("المبلغ أكبر من المتبقي", "error");
+            return;
+        }
+
         var ok = await FinanceService.AddLoanPayment(
             LoanForm.loan_id,
             PaymentAmount,
-            1);
+            20);
 
         if (ok)
         {
             Loan = await FinanceService.GetLoans();
             CloseDialogs();
-            ToastService.ShowToast("تم السداد", "success");
+
+            ToastService.ShowToast("تم سداد السلفة بنجاح", "success");
         }
     }
-
+  
     async Task ReversePaymentAction()
     {
+        if (LoanForm.repaid_amount <= 0)
+        {
+            ToastService.ShowToast("هو لم يدفع شيئًا أساسًا", "error");
+            return;
+        }
+
+        if (PaymentAmount <= 0)
+        {
+            ToastService.ShowToast("القيمة يجب أن تكون أكبر من 0", "error");
+            return;
+        }
+
+        if (PaymentAmount > LoanForm.repaid_amount)
+        {
+            ToastService.ShowToast("المبلغ أكبر من المدفوع", "error");
+            return;
+        }
+
         var ok = await FinanceService.ReverseLoanPayment(
             LoanForm.loan_id,
             PaymentAmount,
-            1);
+            20);
 
         if (ok)
         {
             Loan = await FinanceService.GetLoans();
             CloseDialogs();
+
             ToastService.ShowToast("تم إلغاء السداد", "success");
         }
     }
 
-    async Task DeleteLoanAction()
+    Task DeleteLoanAction()
     {
-        await FinanceService.DeleteLoan(DeleteLoanId, 1);
+        var paid = LoanForm.repaid_amount;
+        var remaining = LoanForm.loan_amount - LoanForm.repaid_amount;
+        var total = LoanForm.loan_amount;
+
+        if (paid == 0)
+        {
+            FinalDeleteMessage =
+            $"لم يتم سداد أي مبلغ من هذه السلفة.\n\n" +
+            $"سيتم حذف السلفة بالكامل ورجوع المال إلى الخزنة.";
+        }
+        else if (remaining == 0)
+        {
+            FinalDeleteMessage =
+            $"تم سداد السلفة بالكامل بقيمة {total:0.00} د.ل.\n\n" +
+            $"تأكد أنك أرجعت المبلغ المدفوع للموظف أولاً.";
+        }
+        else
+        {
+            FinalDeleteMessage =
+            $"تم سداد {paid:0.00} د.ل والمتبقي {remaining:0.00} د.ل.\n\n" +
+            $"تأكد أنك أرجعت {paid:0.00} د.ل للموظف، " +
+            $"ورجعت كامل مبلغ السلفة إلى الخزنة ليتم حذف السلفة نهائيًا.";
+        }
+
+        ShowDeleteDialog = false;
+        ShowFinalDeleteDialog = true;
+
+        return Task.CompletedTask;
+    }
+
+    async Task ConfirmFinalDelete()
+    {
+        await FinanceService.DeleteLoan(DeleteLoanId, 20);
 
         Loan = await FinanceService.GetLoans();
 
         CloseDialogs();
 
-        ToastService.ShowToast("تم الحذف", "success");
+        ToastService.ShowToast("تم حذف السلفة", "success");
     }
 
     void CloseDialogs()
@@ -589,6 +921,25 @@
         ShowDeleteDialog = false;
 
         PaymentAmount = 0;
+
+        EmployeeError = "";
+        CashError = "";
+        AmountError = "";
+
+        SelectedEmployeeId = 0;
+        selectedCashBoxId = 0;
+
+        ShowDiffDialog = false;
+        LoanDiff = 0;
+        OldLoanAmount = 0;
+        NewLoanAmount = 0;
+
+        ShowDiffDialog = false;
+
+        ShowFinalDeleteDialog = false;
+        FinalDeleteMessage = "";
+
+        LoanForm = new EmployeeLoan();
     }
 
 }
