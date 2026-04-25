@@ -8,6 +8,7 @@
 @using ClosedXML.Excel
 @inject IJSRuntime JS
 
+
 <div class="pro-page">
 
     
@@ -651,6 +652,20 @@
             if (hasError)
                 return;
 
+            // 🔥 تنبيه إذا عنده سلفة
+            var loanRemaining =
+                await FinanceService.GetEmployeeLoanRemaining(SelectedEmployeeId);
+
+            if (loanRemaining > 0)
+            {
+                var ok = await JS.InvokeAsync<bool>(
+                    "confirm",
+                    $"هذا الموظف لديه سلفة متبقية بقيمة {loanRemaining:0.00} د.ل هل تريد الاستمرار؟");
+
+                if (!ok)
+                    return;
+            }
+
             SalaryForm.employee_id = SelectedEmployeeId;
             SalaryForm.cash_box_id = selectedCashBoxId;
 
@@ -666,9 +681,9 @@
 
             ToastService.ShowToast("تم إضافة الراتب بنجاح", "success");
         }
-        catch
+        catch (Exception ex)
         {
-            ToastService.ShowToast("تعذر حفظ الراتب، تحقق من البيانات المدخلة", "error");
+            ToastService.ShowToast(ex.Message, "error");
         }
     }
 

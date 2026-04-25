@@ -97,6 +97,15 @@ string? itemName = null)
             else
                 salary.status = "خالص";
         }
+        private void UpdateLoanStatus(EmployeeLoan loan)
+        {
+            if (loan.repaid_amount == 0)
+                loan.status = "غير خالص";
+            else if (loan.repaid_amount < loan.loan_amount)
+                loan.status = "خالص جزئي";
+            else
+                loan.status = "خالص";
+        }
 
         // =========================================
         // 🔹 Employees
@@ -685,6 +694,405 @@ p.name
             }
 
             _context.other_purchases.Remove(p);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // =========================================
+        // 🔹 employee_loans (السلف)
+        // =========================================
+
+        public async Task<List<EmployeeLoan>> GetLoans()
+        {
+            return await _context.employee_loans
+                .AsNoTracking()
+                .Include(x => x.Employee)
+                .Include(x => x.CashBox)
+                .OrderByDescending(x => x.loan_date)
+                .ToListAsync();
+        }
+        public async Task<decimal> GetEmployeeLoanRemaining(int employeeId)
+        {
+            return await _context.employee_loans
+                .Where(x => x.employee_id == employeeId && x.status != "خالص")
+                .Select(x => x.loan_amount - x.repaid_amount)
+                .SumAsync();
+        }
+
+        public async Task AddLoan(EmployeeLoan loan, int adminId)
+        {
+            if (loan.employee_id <= 0)
+                throw new Exception("اختر الموظف");
+
+            if (loan.cash_box_id <= 0)
+                throw new Exception("اختر الخزنة");
+
+            if (loan.loan_amount <= 0)
+                throw new Exception("قيمة السلفة غير صحيحة");
+
+            var balance = await GetBalanceFromView(loan.cash_box_id);
+
+            if (loan.loan_amount > balance)
+                throw new Exception("رصيد الخزنة غير كاف");
+
+            loan.loan_date = DateTime.SpecifyKind(
+                loan.loan_date,
+                DateTimeKind.Utc);
+
+            loan.repaid_amount = 0;
+
+            UpdateLoanStatus(loan);
+
+            _context.employee_loans.Add(loan);
+            await _context.SaveChangesAsync();
+
+            var emp = await _context.employees
+                .AsNoTracking()
+                .FirstAsync(x => x.employee_id == loan.employee_id);
+
+            AddFinancialEvent(
+                "صرف سلفة",
+                "OUT",
+                loan.loan_amount,
+                loan.cash_box_id,
+                adminId,
+                loan.loan_id,
+                "employee_loans",
+                loan.employee_id,
+                emp.full_name,
+                "صرف سلفة لموظف"
+            );
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> AddLoanPayment(int loanId, decimal amount, int adminId)
+        {
+            var loan = await _context.employee_loans
+                .Include(x => x.Employee)
+                .FirstOrDefaultAsync(x => x.loan_id == loanId);
+
+            if (loan == null) return false;
+
+            var remaining = loan.loan_amount - loan.repaid_amount;
+
+            if (amount <= 0 || amount > remaining)
+                return false;
+
+            loan.repaid_amount += amount;
+
+            UpdateLoanStatus(loan);
+
+            AddFinancialEvent(
+                "سداد سلفة",
+                "IN",
+                amount,
+                loan.cash_box_id,
+                adminId,
+                loan.loan_id,
+                "employee_loans",
+                loan.employee_id,
+                loan.Employee.full_name,
+                "سداد يدوي لسلفة"
+            );
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ReverseLoanPayment(int loanId, decimal amount, int adminId)
+        {
+            var loan = await _context.employee_loans
+                .Include(x => x.Employee)
+                .FirstOrDefaultAsync(x => x.loan_id == loanId);
+
+            if (loan == null) return false;
+
+            if (amount <= 0 || amount > loan.repaid_amount)
+                return false;
+
+            var balance = await GetBalanceFromView(loan.cash_box_id);
+
+            if (amount > balance)
+                return false;
+
+            loan.repaid_amount -= amount;
+
+            UpdateLoanStatus(loan);
+
+            AddFinancialEvent(
+                "إلغاء سداد سلفة",
+                "OUT",
+                amount,
+                loan.cash_box_id,
+                adminId,
+                loan.loan_id,
+                "employee_loans",
+                loan.employee_id,
+                loan.Employee.full_name,
+                "إلغاء سداد سابق"
+            );
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateLoan(EmployeeLoan updated, int adminId)
+        {
+            var loan = await _context.employee_loans
+                .Include(x => x.Employee)
+                .FirstOrDefaultAsync(x => x.loan_id == updated.loan_id);
+
+            if (loan == null)
+                return false;
+
+            if (updated.employee_id <= 0)
+                throw new Exception("اختر الموظف");
+
+            if (updated.cash_box_id <= 0)
+                throw new Exception("اختر الخزنة");
+
+            if (updated.loan_amount <= 0)
+                throw new Exception("قيمة السلفة غير صحيحة");
+
+            var oldData = new Dictionary<string, object>();
+            var newData = new Dictionary<string, object>();
+
+            // =====================================
+            // تغيير الموظف
+            // =====================================
+            if (loan.employee_id != updated.employee_id)
+            {
+                var oldEmp = await _context.employees
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.employee_id == loan.employee_id);
+
+                var newEmp = await _context.employees
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.employee_id == updated.employee_id);
+
+                oldData["employee"] = oldEmp?.full_name ?? "";
+                newData["employee"] = newEmp?.full_name ?? "";
+
+                // تحديث كل الحركات المرتبطة بهذه السلفة
+                var events = await _context.financial_events
+                    .Where(x =>
+                        x.ref_table == "employee_loans" &&
+                        x.ref_id == loan.loan_id)
+                    .ToListAsync();
+
+                foreach (var ev in events)
+                {
+                    ev.person_id = updated.employee_id;
+                    ev.person_name_snapshot = newEmp?.full_name;
+
+                    var note = $"تم نقل السلفة من {oldEmp?.full_name} إلى {newEmp?.full_name}";
+
+                    if (string.IsNullOrWhiteSpace(ev.notes))
+                        ev.notes = note;
+                    else if (!ev.notes.Contains(note))
+                        ev.notes += " | " + note;
+                }
+            }
+
+            // =====================================
+            // تغيير الخزنة
+            // =====================================
+            if (loan.cash_box_id != updated.cash_box_id)
+            {
+                oldData["cash_box_id"] = loan.cash_box_id;
+                newData["cash_box_id"] = updated.cash_box_id;
+
+                var remaining = loan.loan_amount - loan.repaid_amount;
+
+                var balance = await GetBalanceFromView(updated.cash_box_id);
+
+                if (remaining > balance)
+                    throw new Exception("رصيد الخزنة الجديدة غير كاف");
+
+                var empName = await _context.employees
+                    .Where(x => x.employee_id == updated.employee_id)
+                    .Select(x => x.full_name)
+                    .FirstOrDefaultAsync();
+
+                AddFinancialEvent(
+                    "نقل سلفة",
+                    "IN",
+                    remaining,
+                    loan.cash_box_id,
+                    adminId,
+                    loan.loan_id,
+                    "employee_loans",
+                    updated.employee_id,
+                    empName,
+                    "إرجاع السلفة من الخزنة القديمة"
+                );
+
+                AddFinancialEvent(
+                    "نقل سلفة",
+                    "OUT",
+                    remaining,
+                    updated.cash_box_id,
+                    adminId,
+                    loan.loan_id,
+                    "employee_loans",
+                    updated.employee_id,
+                    empName,
+                    "صرف السلفة من الخزنة الجديدة"
+                );
+            }
+
+            // =====================================
+            // تعديل القيمة
+            // =====================================
+            if (loan.loan_amount != updated.loan_amount)
+            {
+                oldData["loan_amount"] = loan.loan_amount;
+                newData["loan_amount"] = updated.loan_amount;
+
+                if (updated.loan_amount < loan.repaid_amount)
+                    throw new Exception("القيمة الجديدة أقل من المسدد");
+
+                var empName = await _context.employees
+                    .Where(x => x.employee_id == updated.employee_id)
+                    .Select(x => x.full_name)
+                    .FirstOrDefaultAsync();
+
+                if (updated.loan_amount > loan.loan_amount)
+                {
+                    var diff = updated.loan_amount - loan.loan_amount;
+
+                    var balance = await GetBalanceFromView(updated.cash_box_id);
+
+                    if (diff > balance)
+                        throw new Exception("رصيد الخزنة غير كاف");
+
+                    AddFinancialEvent(
+                        "زيادة سلفة",
+                        "OUT",
+                        diff,
+                        updated.cash_box_id,
+                        adminId,
+                        loan.loan_id,
+                        "employee_loans",
+                        updated.employee_id,
+                        empName,
+                        "زيادة قيمة السلفة"
+                    );
+                }
+                else
+                {
+                    var diff = loan.loan_amount - updated.loan_amount;
+
+                    AddFinancialEvent(
+                        "تخفيض سلفة",
+                        "IN",
+                        diff,
+                        updated.cash_box_id,
+                        adminId,
+                        loan.loan_id,
+                        "employee_loans",
+                        updated.employee_id,
+                        empName,
+                        "تخفيض قيمة السلفة"
+                    );
+                }
+            }
+
+            // =====================================
+            // تعديل التاريخ
+            // =====================================
+            if (loan.loan_date.Date != updated.loan_date.Date)
+            {
+                oldData["loan_date"] = loan.loan_date;
+                newData["loan_date"] = updated.loan_date;
+            }
+
+            // =====================================
+            // تعديل الملاحظات
+            // =====================================
+            if ((loan.notes ?? "") != (updated.notes ?? ""))
+            {
+                oldData["notes"] = loan.notes ?? "";
+                newData["notes"] = updated.notes ?? "";
+            }
+
+            // =====================================
+            // Audit Log
+            // =====================================
+            if (oldData.Count > 0)
+            {
+                AddAudit(
+                    "employee_loans",
+                    "UPDATE",
+                    loan.loan_id.ToString(),
+                    oldData,
+                    newData,
+                    adminId
+                );
+            }
+
+            // =====================================
+            // تحديث سجل السلفة
+            // =====================================
+            loan.employee_id = updated.employee_id;
+            loan.cash_box_id = updated.cash_box_id;
+            loan.loan_amount = updated.loan_amount;
+            loan.notes = updated.notes;
+            loan.loan_date = DateTime.SpecifyKind(
+                updated.loan_date,
+                DateTimeKind.Utc);
+
+            UpdateLoanStatus(loan);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+        public async Task<bool> DeleteLoan(int loanId, int adminId)
+        {
+            var loan = await _context.employee_loans
+                .Include(x => x.Employee)
+                .FirstOrDefaultAsync(x => x.loan_id == loanId);
+
+            if (loan == null) return false;
+
+            var remaining = loan.loan_amount - loan.repaid_amount;
+
+            if (remaining > 0)
+            {
+                AddFinancialEvent(
+                    "إلغاء سلفة",
+                    "IN",
+                    remaining,
+                    loan.cash_box_id,
+                    adminId,
+                    loan.loan_id,
+                    "employee_loans",
+                    loan.employee_id,
+                    loan.Employee.full_name,
+                    "إلغاء سجل السلفة"
+                );
+            }
+
+            AddAudit(
+                "employee_loans",
+                "DELETE",
+                loan.loan_id.ToString(),
+                new
+                {
+                    loan.employee_id,
+                    loan.loan_amount,
+                    loan.repaid_amount,
+                    loan.status,
+                    loan.cash_box_id
+                },
+                null,
+                adminId
+            );
+
+            _context.employee_loans.Remove(loan);
 
             await _context.SaveChangesAsync();
             return true;

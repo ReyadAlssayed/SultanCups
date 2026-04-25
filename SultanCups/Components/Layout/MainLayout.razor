@@ -75,6 +75,7 @@
                 <div class="nav-children @(OpenKey == "finance" ? "open" : "")">
                     <button type="button" class="nav-child" @onclick='@(() => Go("/CashBoxes"))'>إدارة الخزنات</button>
                     <button type="button" class="nav-child" @onclick='@(() => Go("/Salaries"))'>رواتب الموظفين</button>
+                    <button type="button" class="nav-child" @onclick='@(() => Go("/Loans"))'>سلف الموظفين</button>
                     <button type="button" class="nav-child" @onclick='@(() => Go("/OtherPurchases"))'>مصاريف أخرى</button>
                     <button type="button" class="nav-child" @onclick='@(() => Go("/FinancialEvents"))'>الحركات المالية</button>
                 </div>

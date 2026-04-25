@@ -422,7 +422,11 @@
             PhoneError = "رقم الهاتف مطلوب";
             hasError = true;
         }
-        else if (SupplierForm.phone.Length < 10 || SupplierForm.phone.Length > 20)
+        else if (SupplierForm.phone.Length < 10 || SupplierForm.phone.Length > 0
+        
+        
+
+)
         {
             PhoneError = "رقم الهاتف يجب أن يكون بين 10 و 20 خانة";
             hasError = true;

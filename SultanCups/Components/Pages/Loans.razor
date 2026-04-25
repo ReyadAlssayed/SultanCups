@@ -1,0 +1,594 @@
+﻿@page "/Loans"
+@using SultanCups.Models
+@layout Layout.MainLayout
+@inject NavigationManager Nav
+@inject SultanCups.Services.FinanceService FinanceService
+@inject SultanCups.Services.ToastService ToastService
+@inject IJSRuntime JS
+
+<div class="pro-page">
+
+    <div class="pro-topbar">
+
+        <button class="pro-btn-add" @onclick="OpenAddDialog">
+            إضافة سلفة
+        </button>
+
+        <h2 class="pro-title">السلف</h2>
+
+        <div></div>
+
+        <div></div>
+
+    </div>
+
+    <div class="pro-card">
+        <div class="pro-table-wrap">
+
+            <table class="pro-table">
+
+                <thead>
+                    <tr>
+                        <th>الموظف</th>
+                        <th>قيمة السلفة</th>
+                        <th>المسدد</th>
+                        <th>المتبقي</th>
+                        <th>الحالة</th>
+                        <th>التاريخ</th>
+                        <th>الخزنة</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Loan == null)
+                    {
+                        <tr>
+                            <td colspan="8" class="pro-empty">جاري التحميل...</td>
+                        </tr>
+                    }
+                    else if (Loan.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="8" class="pro-empty">لا توجد بيانات</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var l in Loan)
+                        {
+                            <tr>
+
+                                <td>@l.Employee.full_name</td>
+
+                                <td class="pro-money">
+                                    @l.loan_amount.ToString("0.00") د.ل
+                                </td>
+
+                                <td class="pro-money">
+                                    @l.repaid_amount.ToString("0.00") د.ل
+                                </td>
+
+                                <td class="pro-money">
+                                    @l.Remaining.ToString("0.00") د.ل
+                                </td>
+
+                                <td>
+                                    <span class="emp-badge @(l.status == "خالص" ? "emp-on" : "emp-off")">
+                                        @l.status
+                                    </span>
+                                </td>
+
+                                <td class="mg-date-cell">
+                                    <span class="mg-time">
+                                        @l.loan_date.ToLocalTime().ToString("HH:mm")
+                                    </span>
+
+                                    <span class="mg-date">
+                                        @l.loan_date.ToLocalTime().ToString("yyyy-MM-dd")
+                                    </span>
+                                </td>
+
+                                <td>@l.CashBox.name</td>
+
+                                <td class="emp-actions">
+
+                                    <button class="emp-edit"
+                                            @onclick="() => OpenPaymentDialog(l)">
+                                        سداد
+                                    </button>
+
+                                    <button class="emp-edit"
+                                            @onclick="() => OpenReverseDialog(l)">
+                                        إلغاء سداد
+                                    </button>
+
+                                    <button class="emp-edit"
+                                            @onclick="() => OpenEditDialog(l)">
+                                        تعديل
+                                    </button>
+
+                                    <button class="emp-delete"
+                                            @onclick="() => OpenDeleteDialog(l)">
+                                        حذف
+                                    </button>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+@if (ShowAddDialog)
+{
+    <div class="pro-dialog-overlay">
+        <div class="pro-dialog-box">
+
+            <div class="pro-dialog-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="pro-dialog-body">
+
+                <div class="money-head">
+                    <h3>إضافة سلفة</h3>
+                    <img src="images/Money.jpg" />
+                </div>
+
+                <div class="pro-fields-grid">
+
+                    <div class="pro-field">
+                        <label class="pro-label">الموظف</label>
+
+                        <select @bind="SelectedEmployeeId" class="pro-input">
+                            <option value="0">اختر الموظف</option>
+
+                            @foreach (var e in Employees)
+                            {
+                                <option value="@e.employee_id">@e.full_name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="pro-field">
+                        <label class="pro-label">الخزنة</label>
+
+                        <select @bind="selectedCashBoxId" class="pro-input">
+                            <option value="0">اختر الخزنة</option>
+
+                            @foreach (var c in CashBoxes)
+                            {
+                                <option value="@c.cash_box_id">@c.name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="pro-field">
+                        <label class="pro-label">قيمة السلفة</label>
+
+                        <input class="pro-input"
+                               @bind-value="LoanForm.loan_amount"
+                               @bind-value:event="oninput" />
+                    </div>
+
+                    <div class="pro-field">
+                        <label class="pro-label">المسدد</label>
+
+                        <input class="pro-input"
+                               value="0.00"
+                               disabled />
+                    </div>
+
+                    <div class="pro-field">
+                        <label class="pro-label">المتبقي</label>
+
+                        <input class="pro-input"
+                               value="@LoanForm.loan_amount"
+                               disabled />
+                    </div>
+
+                    <div class="pro-field">
+                        <label class="pro-label">الحالة</label>
+
+                        <input class="pro-input"
+                               value="غير خالص"
+                               disabled />
+                    </div>
+
+                    <div class="pro-field">
+                        <label class="pro-label">التاريخ</label>
+
+                        <input type="date"
+                               class="pro-input"
+                               @bind="LoanForm.loan_date" />
+                    </div>
+
+                    <div class="pro-field" style="grid-column: span 2;">
+                        <label class="pro-label">ملاحظة</label>
+
+                        <input class="pro-input"
+                               @bind="LoanForm.notes" />
+                    </div>
+
+                </div>
+
+                <div class="pro-dialog-actions">
+                    <button class="pro-save" @onclick="SaveLoan">حفظ</button>
+                    <button class="pro-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowEditDialog)
+{
+    <div class="pro-dialog-overlay">
+        <div class="pro-dialog-box">
+
+            <div class="pro-dialog-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="pro-dialog-body">
+
+                <h3>تعديل السلفة</h3>
+
+                <div class="pro-fields-grid">
+
+                    <div class="pro-field">
+                        <label class="pro-label">الموظف</label>
+
+                        <select @bind="SelectedEmployeeId" class="pro-input">
+                            @foreach (var e in Employees)
+                            {
+                                <option value="@e.employee_id">@e.full_name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="pro-field">
+                        <label class="pro-label">الخزنة</label>
+
+                        <select @bind="selectedCashBoxId" class="pro-input">
+                            @foreach (var c in CashBoxes)
+                            {
+                                <option value="@c.cash_box_id">@c.name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="pro-field">
+                        <label class="pro-label">قيمة السلفة</label>
+
+                        <input class="pro-input"
+                               @bind="LoanForm.loan_amount" />
+                    </div>
+
+                    <div class="pro-field">
+                        <label class="pro-label">المسدد</label>
+
+                        <input class="pro-input"
+                               value="@LoanForm.repaid_amount"
+                               disabled />
+                    </div>
+
+                    <div class="pro-field">
+                        <label class="pro-label">الحالة</label>
+
+                        <input class="pro-input"
+                               value="@LoanForm.status"
+                               disabled />
+                    </div>
+
+                    <div class="pro-field">
+                        <label class="pro-label">التاريخ</label>
+
+                        <input type="date"
+                               class="pro-input"
+                               @bind="LoanForm.loan_date" />
+                    </div>
+
+                    <div class="pro-field" style="grid-column: span 2;">
+                        <label class="pro-label">ملاحظة</label>
+
+                        <input class="pro-input"
+                               @bind="LoanForm.notes" />
+                    </div>
+
+                </div>
+
+                <div class="pro-dialog-actions">
+                    <button class="pro-save" @onclick="UpdateLoanAction">حفظ</button>
+                    <button class="pro-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowPaymentDialog)
+{
+    <div class="pro-dialog-overlay">
+        <div class="pro-dialog-box">
+
+            <div class="pro-dialog-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="pro-dialog-body">
+
+                <div class="money-head">
+                    <h3>سداد سلفة</h3>
+                    <img src="images/Money.jpg" />
+                </div>
+
+                <div class="pro-field">
+                    <label class="pro-label">المبلغ</label>
+
+                    <input class="pro-input"
+                           @bind-value="PaymentAmount"
+                           @bind-value:event="oninput" />
+                </div>
+
+                <div class="pro-dialog-actions">
+                    <button class="pro-save" @onclick="AddPaymentAction">حفظ</button>
+                    <button class="pro-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowReverseDialog)
+{
+    <div class="pro-dialog-overlay">
+        <div class="pro-dialog-box">
+
+            <div class="pro-dialog-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="pro-dialog-body">
+
+                <div class="money-head">
+                    <h3>إلغاء سداد</h3>
+                    <img src="images/Money.jpg" />
+                </div>
+
+                <div class="pro-field">
+                    <label class="pro-label">المبلغ</label>
+
+                    <input class="pro-input"
+                           @bind-value="PaymentAmount"
+                           @bind-value:event="oninput" />
+                </div>
+
+                <div class="pro-dialog-actions">
+                    <button class="pro-save" @onclick="ReversePaymentAction">حفظ</button>
+                    <button class="pro-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowDeleteDialog)
+{
+    <div class="pro-dialog-overlay">
+        <div class="pro-dialog-box">
+
+            <div class="pro-dialog-body">
+
+                <h3>تأكيد الحذف</h3>
+
+                <p>سيتم حذف السلفة</p>
+
+                <div class="pro-dialog-actions">
+                    <button class="pro-delete-confirm"
+                            @onclick="DeleteLoanAction">
+                        حذف
+                    </button>
+
+                    <button class="pro-cancel"
+                            @onclick="CloseDialogs">
+                        إلغاء
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+@code {
+
+    List<EmployeeLoan>? Loan;
+    List<Employee> Employees = new();
+    List<CashBox> CashBoxes = new();
+
+    EmployeeLoan LoanForm = new();
+
+    int SelectedEmployeeId;
+    int selectedCashBoxId;
+
+    bool ShowAddDialog;
+    bool ShowEditDialog;
+    bool ShowPaymentDialog;
+    bool ShowReverseDialog;
+    bool ShowDeleteDialog;
+
+    int DeleteLoanId;
+
+    decimal PaymentAmount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Loan = await FinanceService.GetLoans();
+        Employees = await FinanceService.GetActiveEmployees();
+        CashBoxes = await FinanceService.GetActiveCashBoxes();
+    }
+
+    void OpenAddDialog()
+    {
+        LoanForm = new EmployeeLoan
+        {
+            loan_date = DateTime.UtcNow
+        };
+
+        SelectedEmployeeId = 0;
+        selectedCashBoxId = 0;
+
+        ShowAddDialog = true;
+    }
+
+    void OpenEditDialog(EmployeeLoan row)
+    {
+        LoanForm = new EmployeeLoan
+        {
+            loan_id = row.loan_id,
+            employee_id = row.employee_id,
+            cash_box_id = row.cash_box_id,
+            loan_amount = row.loan_amount,
+            repaid_amount = row.repaid_amount,
+            status = row.status,
+            loan_date = row.loan_date,
+            notes = row.notes
+        };
+
+        SelectedEmployeeId = row.employee_id;
+        selectedCashBoxId = row.cash_box_id;
+
+        ShowEditDialog = true;
+    }
+
+    void OpenPaymentDialog(EmployeeLoan row)
+    {
+        LoanForm = row;
+        PaymentAmount = 0;
+        ShowPaymentDialog = true;
+    }
+
+    void OpenReverseDialog(EmployeeLoan row)
+    {
+        LoanForm = row;
+        PaymentAmount = 0;
+        ShowReverseDialog = true;
+    }
+
+    void OpenDeleteDialog(EmployeeLoan row)
+    {
+        DeleteLoanId = row.loan_id;
+        ShowDeleteDialog = true;
+    }
+
+    async Task SaveLoan()
+    {
+        try
+        {
+            LoanForm.employee_id = SelectedEmployeeId;
+            LoanForm.cash_box_id = selectedCashBoxId;
+
+            await FinanceService.AddLoan(LoanForm, 1);
+
+            Loan = await FinanceService.GetLoans();
+
+            CloseDialogs();
+
+            ToastService.ShowToast("تمت إضافة السلفة", "success");
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowToast(ex.Message, "error");
+        }
+    }
+
+    async Task UpdateLoanAction()
+    {
+        try
+        {
+            LoanForm.employee_id = SelectedEmployeeId;
+            LoanForm.cash_box_id = selectedCashBoxId;
+
+            await FinanceService.UpdateLoan(LoanForm, 1);
+
+            Loan = await FinanceService.GetLoans();
+
+            CloseDialogs();
+
+            ToastService.ShowToast("تم تعديل السلفة", "success");
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowToast(ex.Message, "error");
+        }
+    }
+
+    async Task AddPaymentAction()
+    {
+        var ok = await FinanceService.AddLoanPayment(
+            LoanForm.loan_id,
+            PaymentAmount,
+            1);
+
+        if (ok)
+        {
+            Loan = await FinanceService.GetLoans();
+            CloseDialogs();
+            ToastService.ShowToast("تم السداد", "success");
+        }
+    }
+
+    async Task ReversePaymentAction()
+    {
+        var ok = await FinanceService.ReverseLoanPayment(
+            LoanForm.loan_id,
+            PaymentAmount,
+            1);
+
+        if (ok)
+        {
+            Loan = await FinanceService.GetLoans();
+            CloseDialogs();
+            ToastService.ShowToast("تم إلغاء السداد", "success");
+        }
+    }
+
+    async Task DeleteLoanAction()
+    {
+        await FinanceService.DeleteLoan(DeleteLoanId, 1);
+
+        Loan = await FinanceService.GetLoans();
+
+        CloseDialogs();
+
+        ToastService.ShowToast("تم الحذف", "success");
+    }
+
+    void CloseDialogs()
+    {
+        ShowAddDialog = false;
+        ShowEditDialog = false;
+        ShowPaymentDialog = false;
+        ShowReverseDialog = false;
+        ShowDeleteDialog = false;
+
+        PaymentAmount = 0;
+    }
+
+}
