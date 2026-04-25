@@ -4,6 +4,8 @@
 @layout Layout.MainLayout
 @inject FinanceService FinanceService
 @inject ToastService ToastService
+@inject NavigationManager Nav
+@inject SultanCups.Services.UserSession Session
 
 @using ClosedXML.Excel
 @inject IJSRuntime JS
@@ -332,10 +334,16 @@
     decimal ReturnAmount;
 
 
-    int adminId = 20;
+    int adminId => Session.AdminId;
 
     protected override async Task OnInitializedAsync()
     {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+
         List = await FinanceService.GetOtherPurchases();
         CashBoxes = await FinanceService.GetActiveCashBoxes();
     }

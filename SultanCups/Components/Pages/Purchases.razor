@@ -3,10 +3,11 @@
 @layout Layout.MainLayout
 @using SultanCups.Models
 @using SultanCups.Services
-
+@inject NavigationManager Nav
 @inject FinanceService FinanceService
 @inject InventoryService InventoryService
 @inject ToastService ToastService
+@inject SultanCups.Services.UserSession Session
 
 @using ClosedXML.Excel
 @inject IJSRuntime JS
@@ -455,12 +456,18 @@
     decimal NewTotal;
     decimal DiffTotal;
 
-    int adminId = 20;
+    int adminId => Session.AdminId;
 
     string PurchaseMode = "local";
 
     protected override async Task OnInitializedAsync()
     {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+
         await LoadData();
     }
 

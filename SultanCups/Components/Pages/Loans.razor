@@ -4,6 +4,7 @@
 @inject NavigationManager Nav
 @inject SultanCups.Services.FinanceService FinanceService
 @inject SultanCups.Services.ToastService ToastService
+@inject SultanCups.Services.UserSession Session
 @inject IJSRuntime JS
 
 <div class="pro-page">
@@ -621,6 +622,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+
         Loan = await FinanceService.GetLoans();
         Employees = await FinanceService.GetActiveEmployees();
         CashBoxes = await FinanceService.GetActiveCashBoxes();
@@ -669,7 +676,7 @@
         LoanForm.employee_id = SelectedEmployeeId;
         LoanForm.cash_box_id = selectedCashBoxId;
 
-        await FinanceService.UpdateLoan(LoanForm, 20);
+        await FinanceService.UpdateLoan(LoanForm, Session.AdminId);
 
         Loan = await FinanceService.GetLoans();
 
@@ -742,7 +749,7 @@
                     return;
             }
 
-            await FinanceService.AddLoan(LoanForm, 20);
+            await FinanceService.AddLoan(LoanForm, Session.AdminId);
 
             Loan = await FinanceService.GetLoans();
 
@@ -780,7 +787,7 @@
                 LoanForm.employee_id = SelectedEmployeeId;
                 LoanForm.cash_box_id = selectedCashBoxId;
 
-                await FinanceService.UpdateLoan(LoanForm, 20);
+                await FinanceService.UpdateLoan(LoanForm, Session.AdminId);
 
                 Loan = await FinanceService.GetLoans();
 
@@ -824,7 +831,7 @@
         var ok = await FinanceService.AddLoanPayment(
             LoanForm.loan_id,
             PaymentAmount,
-            20);
+            Session.AdminId);
 
         if (ok)
         {
@@ -858,7 +865,7 @@
         var ok = await FinanceService.ReverseLoanPayment(
             LoanForm.loan_id,
             PaymentAmount,
-            20);
+            Session.AdminId);
 
         if (ok)
         {
@@ -903,7 +910,7 @@
 
     async Task ConfirmFinalDelete()
     {
-        await FinanceService.DeleteLoan(DeleteLoanId, 20);
+        await FinanceService.DeleteLoan(DeleteLoanId, Session.AdminId);
 
         Loan = await FinanceService.GetLoans();
 

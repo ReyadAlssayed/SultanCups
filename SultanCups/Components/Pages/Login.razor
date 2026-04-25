@@ -1,6 +1,8 @@
 ﻿@page "/"
 @layout AuthLayout
 @inject NavigationManager Nav
+@inject SultanCups.Services.AdminService AdminService
+@inject SultanCups.Services.UserSession Session
 
 <EditForm Model="@this" OnSubmit="Submit" FormName="LoginForm">
 
@@ -29,10 +31,10 @@
         <div class="auth-fields">
 
             <div class="auth-field">
-                <label>اسم المسؤول</label>
-                <input placeholder="اكتب اسمك الكامل"
+                <label>اسم المستخدم</label>
+                <input placeholder="اكتب اسم المستخدم"
                        maxlength="40"
-                       @bind="fullName"
+                       @bind="username"
                        disabled="@isLoading" />
             </div>
 
@@ -78,7 +80,7 @@
 
 
 @code {
-    string fullName = "";
+    string username = "";
     string password = "";
     string passwordType = "password";
 
@@ -97,13 +99,62 @@
 
     async Task Submit()
     {
+
+        showDialog = false;
+
         if (isLoading) return;
 
-        isLoading = true;
-        await Task.Delay(400);
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            ShowError("اسم المستخدم مطلوب");
+            return;
+        }
 
-        Nav.NavigateTo("/Stats");
-        isLoading = false;
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            ShowError("كلمة المرور مطلوبة");
+            return;
+        }
+
+        isLoading = true;
+
+        try
+        {
+            await Task.Delay(250);
+
+            var admin = await AdminService.LoginAsync(username, password);
+
+            if (admin == null)
+            {
+                ShowError("اسم المستخدم أو كلمة المرور غير صحيحة");
+                return;
+            }
+
+            Session.AdminId = admin.admin_id;
+            Session.FullName = admin.full_name;
+            Session.Role = admin.role;
+
+            Nav.NavigateTo("/Stats");
+
+            username = "";
+            password = "";
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    void ShowError(string text)
+    {
+        dialogMessage = text;
+        dialogType = "error";
+        dialogIcon = "✖";
+        showDialog = true;
     }
 
     void CloseDialog() => showDialog = false;

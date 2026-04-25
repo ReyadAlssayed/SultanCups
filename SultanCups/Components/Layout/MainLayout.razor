@@ -6,6 +6,7 @@
 @inject SultanCups.Services.ToastService ToastService
 @using SultanCups.Components
 @using SultanCups.Components.Pages
+@inject SultanCups.Services.UserSession Session
 
 <div class="app-shell @(IsSidebarCollapsed ? "sidebar-collapsed" : "")">
 
@@ -121,7 +122,7 @@
                     <div class="user-info">
                         <span class="user-name greet-user">
                             <span class="greet-text">@Greeting</span>
-                            <span class="greet-name">رياض</span>
+                            <span class="greet-name">@Session.FullName</span>
                         </span>
                     </div>
                 </div>
@@ -205,10 +206,14 @@
 
     protected override void OnInitialized()
     {
-        // تحديث الوقت فوراً عند الدخول
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+
         UpdateTime(null, null);
 
-        // إعداد مؤقت يعمل كل ثانية واحدة
         _timer = new Timer(1000);
         _timer.Elapsed += UpdateTime;
         _timer.AutoReset = true;
@@ -229,6 +234,7 @@
     [JSInvokable]
     public void Logout()
     {
+        Session.Logout();
         Nav.NavigateTo("/?reason=idle");
     }
 
@@ -241,6 +247,7 @@
     // للخروج اليدوي (من الزر) - نذهب للرئيسية مباشرة بدون سبب
     void ManualLogout()
     {
+        Session.Logout();
         Nav.NavigateTo("/");
     }
 

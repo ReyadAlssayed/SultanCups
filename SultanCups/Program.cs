@@ -19,6 +19,7 @@ builder.Services.AddTransient<InventoryService>();
 builder.Services.AddScoped<FinanceService>();
 builder.Services.AddScoped<HrService>();
 builder.Services.AddScoped<SultanCups.Services.ToastService>();
+builder.Services.AddScoped<UserSession>();
 
 var app = builder.Build();
 

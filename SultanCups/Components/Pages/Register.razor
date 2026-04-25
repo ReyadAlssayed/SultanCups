@@ -1,6 +1,7 @@
 ﻿@page "/register"
 @layout AuthLayout
 @inject SultanCups.Services.AdminService AdminService
+@inject NavigationManager Nav
 
 @using BCrypt.Net
 
@@ -122,6 +123,7 @@
     string dialogMessage = "";
     string dialogType = "";
     string dialogIcon = "";
+    bool goToLoginAfterClose = false;
 
     void TogglePassword()
         => passwordType = passwordType == "password" ? "text" : "password";
@@ -263,6 +265,7 @@
         dialogType = "success";
         dialogIcon = "✔";
         showDialog = true;
+        goToLoginAfterClose = true;
     }
 
     void ShowError(string text)
@@ -277,5 +280,11 @@
     void CloseDialog()
     {
         showDialog = false;
+
+        if (goToLoginAfterClose)
+        {
+            goToLoginAfterClose = false;
+            Nav.NavigateTo("/", true);
+        }
     }
 }

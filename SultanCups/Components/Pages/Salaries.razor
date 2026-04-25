@@ -4,6 +4,7 @@
 @inject NavigationManager Nav
 @inject SultanCups.Services.FinanceService FinanceService
 @inject SultanCups.Services.ToastService ToastService
+@inject SultanCups.Services.UserSession Session
 
 @using ClosedXML.Excel
 @inject IJSRuntime JS
@@ -573,6 +574,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+
         Salarie = await FinanceService.GetSalaries();
         Employees = await FinanceService.GetActiveEmployees();
         CashBoxes = await FinanceService.GetActiveCashBoxes();
@@ -668,7 +675,7 @@
                 SalaryForm.salary_date,
                 DateTimeKind.Utc);
 
-            await FinanceService.AddSalary(SalaryForm, 20);
+            await FinanceService.AddSalary(SalaryForm, Session.AdminId);
 
             Salarie = await FinanceService.GetSalaries();
 
@@ -725,7 +732,7 @@
             SalaryForm.employee_id = SelectedEmployeeId;
             SalaryForm.cash_box_id = selectedCashBoxId;
 
-            await FinanceService.UpdateSalary(SalaryForm, 20);
+            await FinanceService.UpdateSalary(SalaryForm, Session.AdminId);
 
             Salarie = await FinanceService.GetSalaries();
 
@@ -783,7 +790,7 @@
             var ok = await FinanceService.AddSalaryPayment(
                 SalaryForm.salary_id,
                 PaymentAmount,
-                20);
+                Session.AdminId);
 
             if (!ok)
             {
@@ -833,7 +840,7 @@
             await FinanceService.ReverseSalary(
                 SalaryForm.salary_id,
                 PaymentAmount,
-                20);
+                Session.AdminId);
 
             Salarie = await FinanceService.GetSalaries();
 
@@ -851,7 +858,7 @@
     {
         try
         {
-            await FinanceService.DeleteSalary(DeleteSalaryId, 20);
+            await FinanceService.DeleteSalary(DeleteSalaryId, Session.AdminId);
 
             Salarie = await FinanceService.GetSalaries();
 
