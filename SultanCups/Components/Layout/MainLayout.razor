@@ -129,10 +129,6 @@
 
    <div class="topbar-center">
     <span class="brand-text">مصنع السلطان للأكواب الورقية</span>
-
-   <button class="system-info-btn" @onclick='() => ShowSystemInfo = true'>
-        معلومات النظام
-    </button>
 </div>
 
                 <div class="top-datetime">
@@ -151,43 +147,6 @@
         </div>
     </div>
 
-    @if (ShowSystemInfo)
-{
-    <div class="pro-dialog-overlay">
-            <div class="pro-dialog-box sys-info-dialog">
-
-            <div class="pro-dialog-body">
-
-                <div class="sys-head">
-    <img src="images/Info.png" class="sys-title-icon" />
-    <h3 class="sys-info-title">معلومات النظام</h3>
-</div>
-
-                    <div class="sys-info-list">
-                        <div class="sys-note money">
-                            • إذا رأيت شعار 💵 داخل أي مربع حوار في النظام، فاعلم أن العملية مرتبطة بحركة مالية فعلية (دخول أو خروج مبلغ).
-                        </div>
-                        <div class="sys-note money sys-note-flex">
-
-                            <div class="sys-note-text">
-                                • في صفحة المشتريات: عند تعديل الكمية أو سعر الوحدة أو تكلفة النقل أو الجمرك، يتم إعادة حساب المبلغ الكلي تلقائيًا، وإذا أصبح المبلغ الجديد أكبر يتم خصم فرق القيمة من الخزنة، وإذا أصبح أقل يتم إرجاع الفرق إلى الخزنة بشكل تلقائي.
-                            </div>
-
-                            <button class="sys-go-btn" @onclick="GoPurchases">
-                                الانتقال إلى المشتريات
-                            </button>
-
-                        </div>
-                    </div>
-                <div class="pro-dialog-actions">
-                    <button class="pro-cancel" @onclick="() => ShowSystemInfo = false">إغلاق</button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-}
-
 </div>
 
 @code {
@@ -202,7 +161,6 @@
 
     private Timer? _timer;
 
-    bool ShowSystemInfo = false;
 
     protected override void OnInitialized()
     {
@@ -238,11 +196,6 @@
         Nav.NavigateTo("/?reason=idle");
     }
 
-    void GoPurchases()
-    {
-        ShowSystemInfo = false;
-        Nav.NavigateTo("/Purchases");
-    }
 
     // للخروج اليدوي (من الزر) - نذهب للرئيسية مباشرة بدون سبب
     void ManualLogout()

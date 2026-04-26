@@ -5,6 +5,7 @@
 @inject NavigationManager Nav
 @inject FinanceService FinanceService
 @inject ToastService ToastService
+@inject SultanCups.Services.UserSession Session
 @using ClosedXML.Excel
 @inject IJSRuntime JS
 
@@ -12,18 +13,8 @@
 
     <div class="pro-topbar">
         <button type="button" class="pro-btn-add" @onclick="OpenAddDialog">إضافة خزنة</button>
-        @* =========================================
-   أضف هذه الأزرار داخل pro-topbar بعد زر إضافة خزنة
-   ========================================= *@
 
-        <button type="button" class="pro-btn-add" @onclick="OpenDepositDialog">
-            إيداع
-        </button>
-
-        <button type="button" class="pro-btn-add" @onclick="OpenTransferDialog">
-            تحويل
-        </button>
-
+    
         <h2 class="pro-title">الخزنات</h2>
 
         <button class="pro-btn-excel"
@@ -31,6 +22,28 @@
                 disabled="@IsExporting">
             أرشفة Excel
         </button>
+    </div>
+
+    <div class="emp-search-bar">
+
+        <button type="button"
+                class="pro-btn-add"
+                @onclick="OpenDepositDialog">
+            إيداع
+        </button>
+
+        <button type="button"
+                class="pro-btn-add"
+                @onclick="OpenTransferDialog">
+            تحويل
+        </button>
+
+        <select class="emp-filter-select" @bind="CashBoxStatusFilter">
+            <option value="active">النشطة</option>
+            <option value="all">الكل</option>
+            <option value="inactive">غير النشطة</option>
+        </select>
+
     </div>
 
     <div class="pro-card">
@@ -47,7 +60,7 @@
                 </thead>
 
                 <tbody>
-                    @foreach (var c in CashBoxes)
+                    @foreach (var c in FilteredCashBoxes)
                     {
                         <tr>
                             <td class="cb-name">@c.name</td>
@@ -64,7 +77,11 @@
 
                             <td style="text-align:center;">
                                 <button type="button" class="inv-small inv-edit" @onclick="() => OpenEditDialog(c)">تعديل</button>
-                                <button type="button" class="inv-small inv-del" @onclick="() => OpenDeleteDialog(c)">حذف</button>
+                                <button type="button"
+                                        class="inv-small inv-del"
+                                        @onclick="() => OpenDeleteDialog(c)">
+                                    @(c.is_active ? "تعطيل" : "تنشيط")
+                                </button>
                             </td>
                         </tr>
                     }
@@ -239,7 +256,15 @@
 
                 <div class="pro-field">
                     <label class="pro-label">المبلغ</label>
-                    <input class="pro-input" @bind="DepositAmount" />
+
+                    <input class="pro-input @(string.IsNullOrEmpty(DepositAmountError) ? "" : "is-invalid")"
+                           @bind="DepositAmount"
+                           @oninput="@(e => DepositAmountError = "")" />
+
+                    @if (!string.IsNullOrEmpty(DepositAmountError))
+                    {
+                        <div class="pro-error-text">@DepositAmountError</div>
+                    }
                 </div>
 
                 <div class="pro-field">
@@ -285,7 +310,7 @@
                 <div class="pro-field">
                     <label class="pro-label">إلى خزنة</label>
 
-                    <select class="pro-input" @bind="ToCashBoxId">
+                    <select class="pro-input" @bind="ToCashBoxId" @key="FromCashBoxId">
                         <option value="0">اختر الخزنة</option>
 
                         @foreach (var c in CashBoxes.Where(x => x.cash_box_id != FromCashBoxId))
@@ -297,7 +322,15 @@
 
                 <div class="pro-field">
                     <label class="pro-label">المبلغ</label>
-                    <input class="pro-input" @bind="TransferAmount" />
+
+                    <input class="pro-input @(string.IsNullOrEmpty(TransferAmountError) ? "" : "is-invalid")"
+                           @bind="TransferAmount"
+                           @oninput="@(e => TransferAmountError = "")" />
+
+                    @if (!string.IsNullOrEmpty(TransferAmountError))
+                    {
+                        <div class="pro-error-text">@TransferAmountError</div>
+                    }
                 </div>
 
                 <div class="pro-field">
@@ -325,6 +358,9 @@
     string Message = "";
     string NameError = "";
     bool IsExporting = false;
+    string CashBoxStatusFilter = "active";
+
+    int adminId => Session.AdminId;
 
     bool ShowActivatePrompt = false;
     CashBox? DuplicateCashBox;
@@ -343,17 +379,20 @@
     int DepositCashBoxId;
     decimal DepositAmount;
     string DepositNote = "";
+    string DepositAmountError = "";
 
     int FromCashBoxId;
     int ToCashBoxId;
     decimal TransferAmount;
     string TransferNote = "";
+    string TransferAmountError = "";
 
     void OpenDepositDialog()
     {
         DepositCashBoxId = 0;
         DepositAmount = 0;
         DepositNote = "";
+        DepositAmountError = "";
         ShowDepositDialog = true;
     }
 
@@ -363,77 +402,98 @@
         ToCashBoxId = 0;
         TransferAmount = 0;
         TransferNote = "";
+        TransferAmountError = "";
         ShowTransferDialog = true;
     }
 
     async Task SaveDeposit()
     {
-        if (DepositCashBoxId <= 0)
+        try
         {
-            ToastService.ShowToast("اختر الخزنة", "error");
-            return;
-        }
+            if (DepositCashBoxId <= 0)
+            {
+                ToastService.ShowToast("اختر الخزنة", "error");
+                return;
+            }
 
-        if (DepositAmount <= 0)
+            if (DepositAmount <= 0)
+            {
+                DepositAmountError = "أدخل مبلغًا صحيحًا أكبر من صفر للإيداع";
+                return;
+            }
+
+            await FinanceService.DepositCashBox(
+                DepositCashBoxId,
+                DepositAmount,
+                DepositNote,
+                adminId
+            );
+
+            CashBoxes = await FinanceService.GetCashBoxes();
+            await RefreshBalances();
+
+            CloseDialogs();
+
+            ToastService.ShowToast("تم الإيداع بنجاح", "success");
+        }
+        catch (Exception ex)
         {
-            ToastService.ShowToast("المبلغ غير صحيح", "error");
-            return;
+            ToastService.ShowToast(ex.InnerException?.Message ?? ex.Message, "error");
         }
-
-        await FinanceService.DepositCashBox(
-            DepositCashBoxId,
-            DepositAmount,
-            DepositNote,
-            1
-        );
-
-        CashBoxes = await FinanceService.GetActiveCashBoxes();
-        await RefreshBalances();
-
-        CloseDialogs();
-
-        ToastService.ShowToast("تم الإيداع بنجاح", "success");
     }
 
     async Task SaveTransfer()
     {
-        if (FromCashBoxId <= 0 || ToCashBoxId <= 0)
+        try
         {
-            ToastService.ShowToast("اختر الخزنات", "error");
-            return;
-        }
+            if (FromCashBoxId <= 0 || ToCashBoxId <= 0)
+            {
+                ToastService.ShowToast("اختر الخزنات", "error");
+                return;
+            }
 
-        if (FromCashBoxId == ToCashBoxId)
+            if (FromCashBoxId == ToCashBoxId)
+            {
+                ToastService.ShowToast("لا يمكن التحويل لنفس الخزنة", "error");
+                return;
+            }
+
+            if (TransferAmount <= 0)
+            {
+                TransferAmountError = "أدخل مبلغًا صحيحًا أكبر من صفر للتحويل";
+                return;
+            }
+
+            await FinanceService.TransferBetweenCashBoxes(
+                FromCashBoxId,
+                ToCashBoxId,
+                TransferAmount,
+                TransferNote,
+                adminId
+            );
+
+            CashBoxes = await FinanceService.GetCashBoxes();
+            await RefreshBalances();
+
+            CloseDialogs();
+
+            ToastService.ShowToast("تم التحويل بنجاح", "success");
+        }
+        catch (Exception ex)
         {
-            ToastService.ShowToast("لا يمكن التحويل لنفس الخزنة", "error");
-            return;
+            ToastService.ShowToast(ex.Message, "error");
         }
-
-        if (TransferAmount <= 0)
-        {
-            ToastService.ShowToast("المبلغ غير صحيح", "error");
-            return;
-        }
-
-        await FinanceService.TransferBetweenCashBoxes(
-            FromCashBoxId,
-            ToCashBoxId,
-            TransferAmount,
-            TransferNote,
-            1
-        );
-
-        CashBoxes = await FinanceService.GetActiveCashBoxes();
-        await RefreshBalances();
-
-        CloseDialogs();
-
-        ToastService.ShowToast("تم التحويل بنجاح", "success");
     }
 
     protected override async Task OnInitializedAsync()
     {
-        CashBoxes = await FinanceService.GetActiveCashBoxes();
+        if (!Session.IsLoggedIn)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+
+        CashBoxes = await FinanceService.GetCashBoxes();
         Balances = await FinanceService.GetCashBoxBalances();
     }
 
@@ -558,7 +618,7 @@
             ToastService.ShowToast("تم تحديث الخزنة بنجاح", "success");
         }
 
-        CashBoxes = await FinanceService.GetActiveCashBoxes();
+        CashBoxes = await FinanceService.GetCashBoxes();
         await RefreshBalances();
         CloseDialogs();
     }
@@ -573,7 +633,7 @@
 
             ToastService.ShowToast("تم إعادة تنشيط الخزنة بنجاح", "success");
 
-            CashBoxes = await FinanceService.GetActiveCashBoxes();
+            CashBoxes = await FinanceService.GetCashBoxes();
             CloseDialogs();
         }
     }
@@ -594,7 +654,7 @@
 
         ToastService.ShowToast("تم تغيير حالة الخزنة بنجاح", "success");
 
-        CashBoxes = await FinanceService.GetActiveCashBoxes();
+        CashBoxes = await FinanceService.GetCashBoxes();
         CloseDialogs();
     }
 
@@ -651,6 +711,13 @@
         }
     }
 
+    IEnumerable<CashBox> FilteredCashBoxes =>
+    CashBoxes.Where(c =>
+        CashBoxStatusFilter == "all" ||
+        (CashBoxStatusFilter == "active" && c.is_active) ||
+        (CashBoxStatusFilter == "inactive" && !c.is_active)
+    );
+
 // =========================================
 // عدل CloseDialogs
 // =========================================
@@ -667,6 +734,8 @@ void CloseDialogs()
     NameError = "";
     ShowActivatePrompt = false;
     DuplicateCashBox = null;
+        TransferAmountError = "";
+        DepositAmountError = "";
 }
 
 }

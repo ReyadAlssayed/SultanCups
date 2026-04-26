@@ -171,17 +171,8 @@ body {
     display: grid;
     place-items: center;
     padding: 40px;
-    background: linear-gradient(90deg, var(--accent-2), #3b82f6);
+    background: url('images/Forward.png') center center / cover no-repeat;
 }
-
-    .auth-right::before {
-        content: "";
-        position: absolute;
-        inset: -60px -60px -60px -60px;
-        background: radial-gradient(circle at 20% 20%, rgba(96,165,250,.55), transparent 55%), radial-gradient(circle at 80% 30%, rgba(37,99,235,.45), transparent 55%), radial-gradient(circle at 40% 90%, rgba(11,42,90,.55), transparent 60%), linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
-        opacity: .95;
-        z-index: 0;
-    }
 
 .auth-right-inner {
     position: relative;

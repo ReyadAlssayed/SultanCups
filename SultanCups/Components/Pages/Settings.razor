@@ -40,6 +40,15 @@
             <span class="arrow">›</span>
         </div>
 
+
+        <div class="settings-item" @onclick="() => ShowSystemInfoDialog = true">
+            <div class="item-left">
+                <img src="images/information.png" class="item-icon" />
+                <span>معلومات النظام</span>
+            </div>
+            <span class="arrow">›</span>
+        </div>
+
         <div class="settings-item" @onclick="() => ShowSupportDialog = true">
             <div class="item-left">
                 <img src="images/tracking.png" class="item-icon" />
@@ -47,6 +56,7 @@
             </div>
             <span class="arrow">›</span>
         </div>
+
 
         <div class="settings-item" @onclick="() => ShowAboutDialog = true">
             <div class="item-left">
@@ -177,6 +187,39 @@
     </div>
 }
 
+
+@if (ShowSystemInfoDialog)
+{
+    <div class="dialog-overlay">
+        <div class="dialog-box dialog-about">
+
+            <h3 class="about-title-black">معلومات النظام</h3>
+
+            <div class="about-grid">
+
+                <div class="about-box">
+                    <strong>
+                        إذا رأيت 💵 داخل أي نافذة فهذا يعني حركة مالية فعلية.
+                    </strong>
+                </div>
+
+                <div class="about-box">
+                    <strong>
+                        في المشتريات عند تعديل السعر أو الكمية يتم إعادة حساب الفرق تلقائيًا.
+                    </strong>
+                </div>
+
+            </div>
+
+            <button class="dialog-close"
+                    @onclick="() => ShowSystemInfoDialog = false">
+                إغلاق
+            </button>
+
+        </div>
+    </div>
+}
+
 @code {
     string CurrentUserName = "رياض";
     string CurrentUserRole = "مسؤول أول";
@@ -188,6 +231,7 @@
 
     string SupportNotes = "";
     string Message = "";
+    bool ShowSystemInfoDialog;
 
     bool IsWarningMessage = false;
 

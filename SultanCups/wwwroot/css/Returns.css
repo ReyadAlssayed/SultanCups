@@ -218,7 +218,8 @@
     font-size: 12px;
     font-weight: 900;
     color: var(--text-muted);
-    margin-bottom: 4px;
+    margin-bottom: 10px;
+    padding-right: 2px;
 }
 
 .inv-input-dialog, .pro-input, .sp-input-dialog {
