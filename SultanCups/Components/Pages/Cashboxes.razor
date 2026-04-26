@@ -12,6 +12,17 @@
 
     <div class="pro-topbar">
         <button type="button" class="pro-btn-add" @onclick="OpenAddDialog">إضافة خزنة</button>
+        @* =========================================
+   أضف هذه الأزرار داخل pro-topbar بعد زر إضافة خزنة
+   ========================================= *@
+
+        <button type="button" class="pro-btn-add" @onclick="OpenDepositDialog">
+            إيداع
+        </button>
+
+        <button type="button" class="pro-btn-add" @onclick="OpenTransferDialog">
+            تحويل
+        </button>
 
         <h2 class="pro-title">الخزنات</h2>
 
@@ -197,6 +208,113 @@
     </div>
 }
 
+@* =========================================
+   أضف هذه النوافذ قبل @code
+   ========================================= *@
+
+@if (ShowDepositDialog)
+{
+    <div class="pro-dialog-overlay">
+        <div class="pro-dialog-box">
+            <div class="pro-dialog-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="pro-dialog-body">
+
+                <h3>إيداع في خزنة</h3>
+
+                <div class="pro-field">
+                    <label class="pro-label">الخزنة</label>
+
+                    <select class="pro-input" @bind="DepositCashBoxId">
+                        <option value="0">اختر الخزنة</option>
+
+                        @foreach (var c in CashBoxes)
+                        {
+                            <option value="@c.cash_box_id">@c.name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="pro-field">
+                    <label class="pro-label">المبلغ</label>
+                    <input class="pro-input" @bind="DepositAmount" />
+                </div>
+
+                <div class="pro-field">
+                    <label class="pro-label">ملاحظة</label>
+                    <input class="pro-input" @bind="DepositNote" />
+                </div>
+
+                <div class="pro-dialog-actions">
+                    <button class="pro-save" @onclick="SaveDeposit">حفظ</button>
+                    <button class="pro-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowTransferDialog)
+{
+    <div class="pro-dialog-overlay">
+        <div class="pro-dialog-box">
+            <div class="pro-dialog-top-image">
+                <img src="images/Background.png" />
+            </div>
+
+            <div class="pro-dialog-body">
+
+                <h3>تحويل بين الخزنات</h3>
+
+                <div class="pro-field">
+                    <label class="pro-label">من خزنة</label>
+
+                    <select class="pro-input" @bind="FromCashBoxId">
+                        <option value="0">اختر الخزنة</option>
+
+                        @foreach (var c in CashBoxes)
+                        {
+                            <option value="@c.cash_box_id">@c.name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="pro-field">
+                    <label class="pro-label">إلى خزنة</label>
+
+                    <select class="pro-input" @bind="ToCashBoxId">
+                        <option value="0">اختر الخزنة</option>
+
+                        @foreach (var c in CashBoxes.Where(x => x.cash_box_id != FromCashBoxId))
+                        {
+                            <option value="@c.cash_box_id">@c.name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="pro-field">
+                    <label class="pro-label">المبلغ</label>
+                    <input class="pro-input" @bind="TransferAmount" />
+                </div>
+
+                <div class="pro-field">
+                    <label class="pro-label">ملاحظة</label>
+                    <input class="pro-input" @bind="TransferNote" />
+                </div>
+
+                <div class="pro-dialog-actions">
+                    <button class="pro-save" @onclick="SaveTransfer">حفظ</button>
+                    <button class="pro-cancel" @onclick="CloseDialogs">إلغاء</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
 
 @code {
 
@@ -214,6 +332,104 @@
     bool ShowAddDialog = false;
     bool ShowEditDialog = false;
     bool ShowDeleteDialog = false;
+
+    // =========================================
+    // أضف داخل @code
+    // =========================================
+
+    bool ShowDepositDialog;
+    bool ShowTransferDialog;
+
+    int DepositCashBoxId;
+    decimal DepositAmount;
+    string DepositNote = "";
+
+    int FromCashBoxId;
+    int ToCashBoxId;
+    decimal TransferAmount;
+    string TransferNote = "";
+
+    void OpenDepositDialog()
+    {
+        DepositCashBoxId = 0;
+        DepositAmount = 0;
+        DepositNote = "";
+        ShowDepositDialog = true;
+    }
+
+    void OpenTransferDialog()
+    {
+        FromCashBoxId = 0;
+        ToCashBoxId = 0;
+        TransferAmount = 0;
+        TransferNote = "";
+        ShowTransferDialog = true;
+    }
+
+    async Task SaveDeposit()
+    {
+        if (DepositCashBoxId <= 0)
+        {
+            ToastService.ShowToast("اختر الخزنة", "error");
+            return;
+        }
+
+        if (DepositAmount <= 0)
+        {
+            ToastService.ShowToast("المبلغ غير صحيح", "error");
+            return;
+        }
+
+        await FinanceService.DepositCashBox(
+            DepositCashBoxId,
+            DepositAmount,
+            DepositNote,
+            1
+        );
+
+        CashBoxes = await FinanceService.GetActiveCashBoxes();
+        await RefreshBalances();
+
+        CloseDialogs();
+
+        ToastService.ShowToast("تم الإيداع بنجاح", "success");
+    }
+
+    async Task SaveTransfer()
+    {
+        if (FromCashBoxId <= 0 || ToCashBoxId <= 0)
+        {
+            ToastService.ShowToast("اختر الخزنات", "error");
+            return;
+        }
+
+        if (FromCashBoxId == ToCashBoxId)
+        {
+            ToastService.ShowToast("لا يمكن التحويل لنفس الخزنة", "error");
+            return;
+        }
+
+        if (TransferAmount <= 0)
+        {
+            ToastService.ShowToast("المبلغ غير صحيح", "error");
+            return;
+        }
+
+        await FinanceService.TransferBetweenCashBoxes(
+            FromCashBoxId,
+            ToCashBoxId,
+            TransferAmount,
+            TransferNote,
+            1
+        );
+
+        CashBoxes = await FinanceService.GetActiveCashBoxes();
+        await RefreshBalances();
+
+        CloseDialogs();
+
+        ToastService.ShowToast("تم التحويل بنجاح", "success");
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -435,16 +651,22 @@
         }
     }
 
-    void CloseDialogs()
-    {
-        ShowAddDialog = false;
-        ShowEditDialog = false;
-        ShowDeleteDialog = false;
+// =========================================
+// عدل CloseDialogs
+// =========================================
 
-        Message = "";
-        NameError = "";
-        ShowActivatePrompt = false;
-        DuplicateCashBox = null;
-    }
+void CloseDialogs()
+{
+    ShowAddDialog = false;
+    ShowEditDialog = false;
+    ShowDeleteDialog = false;
+    ShowDepositDialog = false;
+    ShowTransferDialog = false;
+
+    Message = "";
+    NameError = "";
+    ShowActivatePrompt = false;
+    DuplicateCashBox = null;
+}
 
 }

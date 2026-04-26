@@ -492,6 +492,121 @@ namespace SultanCups.Services
                 .ToListAsync();
         }
 
+        public async Task DepositCashBox(
+           int cashBoxId,
+           decimal amount,
+           string notes,
+           int adminId)
+        {
+            if (cashBoxId <= 0)
+                throw new Exception("اختر الخزنة");
+
+            if (amount <= 0)
+                throw new Exception("المبلغ غير صحيح");
+
+            AddFinancialEvent(
+                "إيداع خزنة",
+                "IN",
+                amount,
+                cashBoxId,
+                adminId,
+                0,
+                "cash_boxes",
+                null,
+                null,
+                string.IsNullOrWhiteSpace(notes) ? "إيداع في الخزنة" : notes
+            );
+
+            AddAudit(
+                "cash_boxes",
+                "INSERT",
+                cashBoxId.ToString(),
+                null,
+                new
+                {
+                    action = "deposit",
+                    cashBoxId,
+                    amount,
+                    notes
+                },
+                adminId
+            );
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task TransferBetweenCashBoxes(
+            int fromCashBoxId,
+            int toCashBoxId,
+            decimal amount,
+            string notes,
+            int adminId)
+        {
+            if (fromCashBoxId <= 0 || toCashBoxId <= 0)
+                throw new Exception("اختر الخزنات");
+
+            if (fromCashBoxId == toCashBoxId)
+                throw new Exception("لا يمكن التحويل لنفس الخزنة");
+
+            if (amount <= 0)
+                throw new Exception("المبلغ غير صحيح");
+
+            var balance = await GetBalanceFromView(fromCashBoxId);
+
+            if (amount > balance)
+                throw new Exception("رصيد الخزنة المصدر غير كاف");
+
+            var fromBox = await _context.cash_boxes
+                .FirstOrDefaultAsync(x => x.cash_box_id == fromCashBoxId);
+
+            var toBox = await _context.cash_boxes
+                .FirstOrDefaultAsync(x => x.cash_box_id == toCashBoxId);
+
+            AddFinancialEvent(
+                "تحويل بين خزنات",
+                "OUT",
+                amount,
+                fromCashBoxId,
+                adminId,
+                toCashBoxId,
+                "cash_boxes",
+                null,
+                null,
+                $"تحويل إلى {toBox?.name} | {notes}"
+            );
+
+            AddFinancialEvent(
+                "تحويل بين خزنات",
+                "IN",
+                amount,
+                toCashBoxId,
+                adminId,
+                fromCashBoxId,
+                "cash_boxes",
+                null,
+                null,
+                $"تحويل من {fromBox?.name} | {notes}"
+            );
+
+            AddAudit(
+                "cash_boxes",
+                "INSERT",
+                fromCashBoxId.ToString(),
+                null,
+                new
+                {
+                    action = "transfer",
+                    from = fromBox?.name,
+                    to = toBox?.name,
+                    amount,
+                    notes
+                },
+                adminId
+            );
+
+            await _context.SaveChangesAsync();
+        }
+
 
 
         // =========================================
