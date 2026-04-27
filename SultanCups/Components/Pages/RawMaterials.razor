@@ -8,7 +8,8 @@
 @inject IJSRuntime JS
 
 <div class="rm-page">
-    <div class="pro-topbar">
+    <div class="pro-topbar">  
+
         <button class="rm-add-btn" @onclick="OpenAddDialog">إضافة مادة خام</button>
 
         <h2 class="pro-title">المواد الخام</h2>
@@ -20,6 +21,14 @@
         </button>
     </div>
 
+    <div class="mk-search-bar">
+        <select class="mk-filter-select" @bind="StatusFilter">
+            <option value="all">الكل</option>
+            <option value="active">النشط</option>
+            <option value="inactive">المعطل</option>
+        </select>
+    </div>
+
     <div class="rm-card">
         <div class="rm-table-wrap">
             <table class="rm-table">
@@ -29,6 +38,7 @@
                         <th>الحجم</th>
                         <th>وحدة القياس</th>
                         <th>تكلفة الوحدة</th>
+                        <th>الحالة</th>
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
@@ -53,13 +63,24 @@
                     }
                     else
                     {
-                        @foreach (var r in RawMaterial)
+                        @foreach (var r in FilteredRawMaterials)
                         {
                             <tr>
                                 <td>@r.name</td>
                                 <td>@r.size</td>
                                 <td>@r.unit_of_measure</td>
                                 <td>@r.unit_cost.ToString("0.00") د.ل</td>
+
+                                <td>
+                                    @if (r.is_active)
+                                    {
+                                        <span class="badge-active">نشط</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-inactive">معطل</span>
+                                    }
+                                </td>
 
                                 <td class="rm-actions">
                                     <button class="rm-edit" @onclick="() => OpenEditDialog(r)">تعديل</button>
@@ -107,11 +128,13 @@
                     @if (!string.IsNullOrEmpty(Message))
                     {
                         <div class="prod-alert-curtain">
-                            <div class="prod-error-message">@Message</div>
+                            <div class="restore-box">
+                                <div class="restore-text">@Message</div>
+                            </div>
 
                             @if (ShowActivatePrompt)
                             {
-                                <button @onclick="ActivateExisting" class="prod-btn-activate-link">
+                                <button @onclick="ActivateExisting" class="restore-btn">
                                     تنشيط المادة الآن؟
                                 </button>
                             }
@@ -261,6 +284,8 @@
     </div>
 }
 
+
+
 @code {
 
 
@@ -278,6 +303,8 @@
 
     bool ShowDeleteDialog = false;
 
+    string StatusFilter = "all";
+
 List<SultanCups.Models.RawMaterial>? RawMaterial;
 
     bool ShowAddDialog, ShowEditDialog;
@@ -286,7 +313,7 @@ List<SultanCups.Models.RawMaterial>? RawMaterial;
 
     protected override async Task OnInitializedAsync()
     {
-        RawMaterial = await InventoryService.GetActiveRawMaterials();
+        RawMaterial = await InventoryService.GetAllRawMaterials();
     }
 
     void OpenAddDialog()
@@ -314,7 +341,7 @@ List<SultanCups.Models.RawMaterial>? RawMaterial;
 
             ToastService.ShowToast("تم إعادة تنشيط المادة بنجاح", "success");
 
-            RawMaterial = await InventoryService.GetActiveRawMaterials();
+            RawMaterial = await InventoryService.GetAllRawMaterials();
             CloseDialogs();
         }
     }
@@ -453,7 +480,7 @@ List<SultanCups.Models.RawMaterial>? RawMaterial;
                 ToastService.ShowToast("تم تحديث المادة بنجاح", "success");
             }
 
-            RawMaterial = await InventoryService.GetActiveRawMaterials();
+            RawMaterial = await InventoryService.GetAllRawMaterials();
             CloseDialogs();
         }
         catch
@@ -464,8 +491,8 @@ List<SultanCups.Models.RawMaterial>? RawMaterial;
 
     async Task ToggleRawMaterial(int id)
     {
-        await InventoryService.ToggleRawMaterial(id);
-        RawMaterial = await InventoryService.GetActiveRawMaterials();
+        await InventoryService.DeleteOrDisableRawMaterial(id);
+        RawMaterial = await InventoryService.GetAllRawMaterials();
     }
 
     void OpenDeleteDialog(SultanCups.Models.RawMaterial r)
@@ -536,19 +563,30 @@ List<SultanCups.Models.RawMaterial>? RawMaterial;
     {
         try
         {
-            await InventoryService.ToggleRawMaterial(RawMaterialForm.raw_material_id);
+            var result = await InventoryService.DeleteOrDisableRawMaterial(RawMaterialForm.raw_material_id);
 
-            RawMaterial = await InventoryService.GetActiveRawMaterials();
+            if (result == "deleted")
+                ToastService.ShowToast("تم حذف المادة نهائياً", "success");
+            else if (result == "disabled")
+                ToastService.ShowToast("تم تعطيل المادة لأنها مرتبطة بمشتريات", "warning");
+            else
+                ToastService.ShowToast("المادة غير موجودة", "error");
 
-            ToastService.ShowToast("تم تغيير حالة المادة بنجاح", "success");
-
-            CloseDialogs(); // 🔥 مهم
+            RawMaterial = await InventoryService.GetAllRawMaterials();
+            CloseDialogs();
         }
         catch
         {
             ToastService.ShowToast("فشل تنفيذ العملية", "error");
         }
     }
+
+    IEnumerable<SultanCups.Models.RawMaterial> FilteredRawMaterials =>
+        (RawMaterial ?? new())
+        .Where(r =>
+            StatusFilter == "all" ||
+            (StatusFilter == "active" && r.is_active) ||
+            (StatusFilter == "inactive" && !r.is_active));
 
     void CloseDialogs()
     {

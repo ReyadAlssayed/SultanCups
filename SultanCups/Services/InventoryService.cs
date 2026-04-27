@@ -251,18 +251,28 @@ namespace SultanCups.Services
             return true;
         }
 
-        public async Task<bool> ToggleRawMaterial(int id)
+        public async Task<string> DeleteOrDisableRawMaterial(int id)
         {
             var material = await _context.raw_materials
                 .FirstOrDefaultAsync(r => r.raw_material_id == id);
 
             if (material == null)
-                return false;
+                return "not_found";
 
-            material.is_active = !material.is_active;
+            var hasPurchases = await _context.purchases
+                .AnyAsync(p => p.raw_material_id == id);
 
+            if (hasPurchases)
+            {
+                material.is_active = false;
+                await _context.SaveChangesAsync();
+                return "disabled";
+            }
+
+            _context.raw_materials.Remove(material);
             await _context.SaveChangesAsync();
-            return true;
+
+            return "deleted";
         }
     }
 }

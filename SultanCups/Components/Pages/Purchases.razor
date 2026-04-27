@@ -119,6 +119,9 @@
                                 <td>@GetCashBoxName(p.cash_box_id)</td>
                                 <td>@p.purchase_date.ToString("yyyy-MM-dd")</td>
                                 <td class="pro-actions-cell">
+                                    <button class="pro-view" @onclick="() => OpenDetailsDialog(p)">
+                                        تفاصيل
+                                    </button>
                                     <button class="pro-edit" @onclick="() => OpenEditDialog(p)">تعديل</button>
                                     <button class="pro-del" @onclick="() => OpenDeleteDialog(p)">حذف</button>
                                 </td>
@@ -178,7 +181,7 @@
                         }
                     </div>
 
-                    <div class="smooth-field @(PurchaseMode == "import" ? "" : "hide-field")">
+                    <div>
                             <label>المورد</label>
 
                             <select class="pro-input @(SupplierError == "" ? "" : "is-invalid")"
@@ -417,6 +420,106 @@
 }
 
 
+@if (ShowDetailsDialog)
+{
+    var raw = GetRawInfo(DetailsItem.raw_material_id);
+
+    <div class="pro-dialog-overlay">
+        <div class="sal-dialog-box">
+            <div class="sal-dialog-top"></div>
+            <div class="sal-dialog-body">
+
+                <h3>معاينة فاتورة الشراء</h3>
+
+                <div class="details-list">
+
+                    <div class="row head-row">
+                        <span>بيانات المادة الحالية</span>
+                        <span></span>
+                    </div>
+
+                    <div class="row">
+                        <span>المادة</span>
+                        <span>@raw?.name</span>
+                    </div>
+
+                    <div class="row head-row line-top">
+                        <span>بيانات الشراء</span>
+                        <span></span>
+                    </div>
+
+                    <div class="row">
+                        <span>المورد</span>
+                        <span>@GetSupplierName(DetailsItem.supplier_id)</span>
+                    </div>
+
+                    <div class="row">
+                        <span>النوع</span>
+                        <span>@(DetailsItem.purchase_type == "import" ? "خارجي" : "داخلي")</span>
+                    </div>
+
+                    <div class="row">
+                        <span>الكمية</span>
+                        <span>@DetailsItem.quantity</span>
+                    </div>
+
+                    <div class="row">
+                        <span>سعر الشراء</span>
+                        <span>@DetailsItem.unit_price.ToString("0.00") د.ل</span>
+                    </div>
+
+                    @if (DetailsItem.purchase_type == "import")
+                    {
+                        <div class="row">
+                            <span>الجمرك</span>
+                            <span>@DetailsItem.customs_cost.ToString("0.00") د.ل</span>
+                        </div>
+
+                        <div class="row">
+                            <span>الشحن</span>
+                            <span>@DetailsItem.shipping_cost.ToString("0.00") د.ل</span>
+                        </div>
+                    }
+
+                    <div class="row">
+                        <span>النقل الداخلي</span>
+                        <span>@DetailsItem.local_transport_cost.ToString("0.00") د.ل</span>
+                    </div>
+
+                    <div class="row">
+                        <span>الخزنة</span>
+                        <span>@GetCashBoxName(DetailsItem.cash_box_id)</span>
+                    </div>
+
+                    <div class="row">
+                        <span>التاريخ</span>
+                        <span>@DetailsItem.purchase_date.ToString("yyyy-MM-dd")</span>
+                    </div>
+
+                    <div class="row total-row">
+                        <span>الإجمالي</span>
+                        <span>@GetTotal(DetailsItem).ToString("0.00") د.ل</span>
+                    </div>
+
+                </div>
+
+                <div class="pro-dialog-actions">
+
+                    <button class="btn-pdf-save" onclick="printPurchaseCard()">
+                        حفظ PDF
+                    </button>
+
+                    <button class="btn-cancel" @onclick="Close">
+                        إغلاق
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
 
 @code {
 
@@ -432,6 +535,9 @@
     bool ShowDeleteDialog;
 
     bool IsExporting = false;
+
+    bool ShowDetailsDialog;
+    Purchase DetailsItem = new();
 
     string RawError = "";
     string SupplierError = "";
@@ -548,6 +654,17 @@ OldTotal = GetTotal(p);
         ShowDeleteDialog = true;
     }
 
+    void OpenDetailsDialog(Purchase p)
+    {
+        DetailsItem = p;
+        ShowDetailsDialog = true;
+    }
+
+    RawMaterial? GetRawInfo(int id)
+    {
+        return RawMaterials.FirstOrDefault(x => x.raw_material_id == id);
+    }
+
     async Task ConfirmEdit()
     {
         Form.purchase_type = PurchaseMode;
@@ -592,7 +709,7 @@ OldTotal = GetTotal(p);
             return;
         }
 
-        if (PurchaseMode == "import" && (Form.supplier_id == null || Form.supplier_id <= 0))
+        if (Form.supplier_id == null || Form.supplier_id <= 0)
         {
             SupplierError = "اختر المورد";
             return;
@@ -630,7 +747,6 @@ OldTotal = GetTotal(p);
 
         if (PurchaseMode == "local")
         {
-            Form.supplier_id = null;
             Form.customs_cost = 0;
             Form.shipping_cost = 0;
             Form.arrival_date = null;
@@ -691,6 +807,8 @@ OldTotal = GetTotal(p);
         ShowDiffDialog = false;
         Form = new Purchase();
         ResetErrors();
+        ShowDetailsDialog = false;
+        DetailsItem = new Purchase();
     }
 
     void ResetErrors()

@@ -193,6 +193,55 @@
     align-self: end !important;
 }
 
+.pro-view {
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+    .pro-view:hover {
+        background: #2563eb;
+    }
+
+
+.head-row {
+    font-weight: 900 !important;
+    color: #2563eb !important;
+}
+
+.line-top {
+    border-top: 1px dashed #cbd5e1 !important;
+    margin-top: 18px !important;
+    padding-top: 18px !important;
+}
+
+.total-row span:last-child {
+    color: #ef4444 !important;
+    font-weight: 900 !important;
+    font-size: 20px !important;
+}
+
+.btn-pdf-save {
+    width: 100%;
+    background: #2563eb;
+    color: #fff;
+    border: 0;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: .2s;
+}
+
+    .btn-pdf-save:hover {
+        background: #1d4ed8;
+    }
+
 .pur-notes-input {
     height: 46px !important;
     min-height: 46px !important;
@@ -349,6 +398,27 @@
 .delete-head h3 {
     color: #dc2626;
 }
+
+.pro-dialog-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+    .pro-dialog-actions .btn-pdf-save,
+    .pro-dialog-actions .btn-cancel {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 12px !important;
+        border-radius: 12px !important;
+        display: block !important;
+        flex: none !important;
+    }
+
+    .pro-dialog-actions .btn-cancel {
+        background: #9ca3af !important;
+        color: #ffffff !important;
+    }
 
 @keyframes fieldGlow {
     0% {

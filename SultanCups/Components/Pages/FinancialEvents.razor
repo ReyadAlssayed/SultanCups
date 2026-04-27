@@ -314,6 +314,15 @@
                         }
                     }
 
+                    <div class="row">
+                        <span>العنصر المرتبط بالعملية</span>
+                        <span>
+                            @(string.IsNullOrWhiteSpace(SelectedItem.item_name_snapshot)
+                                ? "-"
+                                : SelectedItem.item_name_snapshot)
+                        </span>
+                    </div>
+
                     @if (!string.IsNullOrWhiteSpace(SelectedItem.item_name_snapshot))
                     {
                         var newItem = GetCurrentItemName(SelectedItem);

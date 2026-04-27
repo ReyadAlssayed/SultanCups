@@ -17,7 +17,8 @@
         </div>
     }
 
-    <div class="pro-topbar">
+    <div class="pro-topbar">   
+
         <button class="pro-btn-add" @onclick="OpenAddDialog">إضافة منتج</button>
 
         <h2 class="pro-title">المنتجات</h2>
@@ -27,6 +28,14 @@
                 disabled="@IsExporting">
             أرشفة Excel
         </button>
+    </div>
+
+    <div class="mk-search-bar">
+        <select class="mk-filter-select" @bind="StatusFilter">
+            <option value="all">الكل</option>
+            <option value="active">النشط</option>
+            <option value="inactive">المعطل</option>
+        </select>
     </div>
 
     <div class="pro-card">
@@ -60,7 +69,7 @@
                     }
                     else
                     {
-                        @foreach (var p in ProductList)
+                        @foreach (var p in FilteredProducts)
                         {
                             <tr>
                                 <td class="pro-name">@p.name</td>
@@ -68,11 +77,11 @@
                                 <td style="text-align:center">
                                     @if (p.is_active)
                                     {
-                                        <span class="status-badge active">نشط</span>
+                                        <span class="badge-active">نشط</span>
                                     }
                                     else
                                     {
-                                        <span class="status-badge inactive">غير نشط</span>
+                                        <span class="badge-inactive">غير نشط</span>
                                     }
                                 </td>
 
@@ -118,7 +127,7 @@
                     {
                         <div class="pro-alert-curtain">
 
-                            <div class="pro-error-text">@Message</div>
+                            <div class="restore-text">@Message</div>
 
                             @if (ShowActivatePrompt)
                             {
@@ -222,6 +231,8 @@
     string ToastMessage = string.Empty;
     string ToastClass = "success";
 
+    string StatusFilter = "all";
+
     bool ShowActivatePrompt = false;
     SultanCups.Models.Product? DuplicateProduct;
 
@@ -229,7 +240,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ProductList = await InventoryService.GetProducts();
+        ProductList = await InventoryService.GetAllProducts();
     }
 
     void OpenAddDialog()
@@ -426,19 +437,16 @@
         ProductForm = new SultanCups.Models.Product();
     }
 
-    async Task ToggleInactive()
-    {
-        ShowInactive = !ShowInactive;
-
-        if (ShowInactive)
-            ProductList = await InventoryService.GetAllProducts();
-        else
-            ProductList = await InventoryService.GetProducts();
-    }
+    IEnumerable<SultanCups.Models.Product> FilteredProducts =>
+      (ProductList ?? new())
+      .Where(p =>
+          StatusFilter == "all" ||
+          (StatusFilter == "active" && p.is_active) ||
+          (StatusFilter == "inactive" && !p.is_active));
 
     async Task RefreshData()
     {
-        ProductList = await InventoryService.GetProducts();
+        ProductList = await InventoryService.GetAllProducts();
         StateHasChanged();
     }
 

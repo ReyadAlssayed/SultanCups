@@ -1407,10 +1407,21 @@ p.name
                     "purchases",
                     updated.supplier_id,
                     supplier?.name,
-                   "استرجاع فرق شراء",
+                    "استرجاع فرق شراء",
                     updated.raw_material_id,
                     material?.name
                 );
+            }
+
+            // تحديث snapshot للحركات السابقة
+            var events = await _context.financial_events
+                .Where(x => x.ref_table == "purchases" && x.ref_id == p.purchase_id)
+                .ToListAsync();
+
+            foreach (var ev in events)
+            {
+                ev.person_id = updated.supplier_id;
+                ev.item_id = updated.raw_material_id;
             }
 
             p.raw_material_id = updated.raw_material_id;
@@ -1483,7 +1494,7 @@ p.name
 
         public async Task<List<RawMaterial>> GetRawMaterials()
         {
-            return await _context.raw_materials
+            return await _context.raw_materials .AsNoTracking()
                 .AsNoTracking()
                 .ToListAsync();
         }

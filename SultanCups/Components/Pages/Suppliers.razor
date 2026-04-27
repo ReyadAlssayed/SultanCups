@@ -121,10 +121,12 @@
                         @if (!string.IsNullOrEmpty(Message))
                         {
                             <div class="prod-alert-curtain">
-                                <div class="prod-error-message">@Message</div>
+                                <div class="restore-box">
+                                    <div class="restore-text">@Message</div>
+                                </div>
                                 @if (ShowActivatePrompt)
                                 {
-                                    <button type="button" @onclick="ActivateExisting" class="prod-btn-activate-link">
+                                    <button type="button" @onclick="ActivateExisting" class="restore-btn">
                                         تنشيط المورد المؤرشف الآن؟
                                     </button>
                                 }
@@ -422,11 +424,12 @@
             PhoneError = "رقم الهاتف مطلوب";
             hasError = true;
         }
-        else if (SupplierForm.phone.Length < 10 || SupplierForm.phone.Length > 0
-        
-        
-
-)
+        else if (!SupplierForm.phone.All(char.IsDigit))
+        {
+            PhoneError = "رقم الهاتف يجب أن يحتوي أرقام فقط";
+            hasError = true;
+        }
+        else if (SupplierForm.phone.Length < 10 || SupplierForm.phone.Length > 20)
         {
             PhoneError = "رقم الهاتف يجب أن يكون بين 10 و 20 خانة";
             hasError = true;

@@ -13,6 +13,20 @@
     --inv-shadow: 0 10px 30px rgba(2,6,23,0.08);
 }
 
+.restore-text {
+    display: block !important;
+    width: 100% !important;
+    color: #f59e0b !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-align: center !important;
+    margin-top: 6px !important;
+    margin-bottom: 8px !important;
+}
+
 .inv-page {
     padding: 26px;
     direction: rtl;

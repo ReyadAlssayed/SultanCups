@@ -380,7 +380,15 @@
 
     async Task ConfirmDelete()
     {
-        await SalesService.DeleteOrDisableCustomer(CustomerForm.customer_id);
+        var result = await SalesService.DeleteOrDisableCustomer(CustomerForm.customer_id);
+
+        if (result == "deleted")
+            ToastService.ShowToast("تم حذف الزبون نهائياً", "success");
+        else if (result == "disabled")
+            ToastService.ShowToast("تم تعطيل الزبون لأنه مرتبط بطلبيات", "warning");
+        else
+            ToastService.ShowToast("الزبون غير موجود", "error");
+
         CustomersList = await SalesService.GetCustomers();
         CloseDialogs();
     }

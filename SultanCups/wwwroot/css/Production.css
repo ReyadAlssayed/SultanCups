@@ -481,17 +481,18 @@ textarea.pro-input {
     line-height: 1.8;
 }
 
-.pro-alert-curtain {
-    margin-top: 10px;
-    min-height: 72px;
-    padding: 12px;
-    border-radius: 12px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    animation: fadeSoft .25s ease;
+.restore-text {
+    display: block !important;
+    width: 100% !important;
+    color: #f59e0b !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-align: center !important;
+    margin-top: 6px !important;
+    margin-bottom: 8px !important;
 }
 
 .mg-readonly {

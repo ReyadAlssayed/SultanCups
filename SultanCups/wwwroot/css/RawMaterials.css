@@ -19,6 +19,17 @@
     min-height: 100vh;
 }
 
+.rm-table th,
+.rm-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+    .rm-table th:last-child,
+    .rm-table td:last-child {
+        text-align: center;
+    }
+
 .rm-topbar {
     display: flex;
     align-items: center;
@@ -296,4 +307,18 @@
 .rm-delete-confirm,
 .status-btn {
     cursor: pointer;
+}
+
+.rm-table thead th {
+    text-align: center !important;
+    vertical-align: middle !important;
+    line-height: 1.2 !important;
+    padding: 20px 16px !important;
+}
+
+.rm-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
 }
