@@ -29,6 +29,11 @@
 
     <div class="pro-search-bar">
 
+        <input class="mk-search-input"
+               placeholder="بحث برقم الفاتورة"
+               @bind="InvoiceSearch"
+               @bind:event="oninput" />
+
         <select class="pro-filter-select" @bind="TypeFilter">
             <option value="all">الكل</option>
             <option value="local">داخلي</option>
@@ -429,7 +434,13 @@
             <div class="sal-dialog-top"></div>
             <div class="sal-dialog-body">
 
-                <h3>معاينة فاتورة الشراء</h3>
+                <h3>
+                    معاينة فاتورة الشراء
+                    <div style="height:10px;"></div>
+                    <span style="font-size:14px;color:#64748b;">
+                        رقم الفاتورة PUR-@DetailsItem.purchase_id.ToString("D4")
+                    </span>
+                </h3>
 
                 <div class="details-list">
 
@@ -545,6 +556,8 @@
     string PriceError = "";
     string CashError = "";
 
+    string InvoiceSearch = "";
+
     string TypeFilter = "all";
     int YearFilter = 0;
     int MonthFilter = 0;
@@ -605,18 +618,22 @@
     }
 
     IEnumerable<Purchase> FilteredPurchases =>
-    (List ?? new List<Purchase>())
-    .Where(p =>
-        (TypeFilter == "all" ||
-         p.purchase_type == TypeFilter)
-        &&
-        (YearFilter == 0 ||
-         p.purchase_date.Year == YearFilter)
-        &&
-        (MonthFilter == 0 ||
-         p.purchase_date.Month == MonthFilter)
-    );
-
+  (List ?? new List<Purchase>())
+  .Where(p =>
+      (TypeFilter == "all" ||
+       p.purchase_type == TypeFilter)
+      &&
+      (YearFilter == 0 ||
+       p.purchase_date.Year == YearFilter)
+      &&
+      (MonthFilter == 0 ||
+       p.purchase_date.Month == MonthFilter)
+      &&
+      (string.IsNullOrWhiteSpace(InvoiceSearch)
+       || p.purchase_id.ToString().Contains(InvoiceSearch)
+       || ("PUR-" + p.purchase_id.ToString("D4"))
+          .Contains(InvoiceSearch.ToUpper()))
+  );
     string GetCashBoxName(int? id)
     {
         return CashBoxes.FirstOrDefault(x => x.cash_box_id == id)?.name ?? "-";
