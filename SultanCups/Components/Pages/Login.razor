@@ -60,7 +60,17 @@
         <button type="submit"
                 class="auth-btn @(isLoading ? "is-busy" : "")"
                 disabled="@isLoading">
-            @(isLoading ? "جاري المعالجة..." : "دخول")
+
+            @if (isLoading)
+            {
+                <span class="btn-spinner"></span>
+                <span>جاري المعالجة...</span>
+            }
+            else
+            {
+                <span>دخول</span>
+            }
+
         </button>
 
     </div>

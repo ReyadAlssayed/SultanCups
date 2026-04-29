@@ -90,7 +90,7 @@ namespace SultanCups.Services
                 return "not_found";
 
             var hasOrders = await _context.orders
-                .AnyAsync(o => o.marketer_id == id);
+      .AnyAsync(o => o.person_id == id && o.person_type == "marketer");
 
             if (hasOrders)
             {
@@ -167,7 +167,7 @@ namespace SultanCups.Services
                 return "not_found";
 
             var hasOrders = await _context.orders
-                .AnyAsync(o => o.customer_id == id);
+    .AnyAsync(o => o.person_id == id && o.person_type == "customer");
 
             if (hasOrders)
             {

@@ -18,6 +18,8 @@ namespace SultanCups.Data
         public DbSet<RawMaterial> raw_materials { get; set; } = null!;
         public DbSet<Marketer> marketers { get; set; } = null!;
         public DbSet<Order> orders { get; set; } = null!;
+        public DbSet<OrderItem> order_items { get; set; } = null!;
+        public DbSet<ProductStock> product_stock { get; set; } = null!;
         public DbSet<Purchase> purchases { get; set; } = null!;
         public DbSet<Customer> customers { get; set; } = null!;
         public DbSet<OtherPurchase> other_purchases { get; set; } = null!;
@@ -39,6 +41,13 @@ namespace SultanCups.Data
             modelBuilder.Entity<CashBoxBalance>()
                 .HasNoKey()
                 .ToView("cash_box_balances");
+
+
+            modelBuilder.Entity<OrderItem>()
+    .HasOne(o => o.Order)
+    .WithMany(o => o.Items)
+    .HasForeignKey(o => o.order_id)
+    .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -80,49 +80,128 @@ namespace SultanCups.Services
 
         public async Task AddProduction(Production production)
         {
-            production.production_date = DateTime.SpecifyKind(
-                production.production_date,
-                DateTimeKind.Unspecified);
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            production.notes = production.notes?.Trim();
+            try
+            {
+                production.production_date = DateTime.SpecifyKind(
+                    production.production_date,
+                    DateTimeKind.Unspecified);
 
-            _context.production.Add(production);
-            await _context.SaveChangesAsync();
+                production.notes = production.notes?.Trim();
+
+                // 1. حفظ الإنتاج
+                _context.production.Add(production);
+
+                // 2. تحديث المخزون
+                var stock = await _context.product_stock
+                    .FirstOrDefaultAsync(s => s.product_id == production.product_id);
+
+                if (stock == null)
+                {
+                    stock = new ProductStock
+                    {
+                        product_id = production.product_id,
+                        quantity = production.box_count
+                    };
+
+                    _context.product_stock.Add(stock);
+                }
+                else
+                {
+                    stock.quantity += production.box_count;
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<bool> UpdateProduction(Production updated)
         {
-            var prod = await _context.production
-                .FirstOrDefaultAsync(p => p.production_id == updated.production_id);
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            if (prod == null)
+            try
+            {
+                var prod = await _context.production
+                    .FirstOrDefaultAsync(p => p.production_id == updated.production_id);
+
+                if (prod == null)
+                    return false;
+
+                var oldQuantity = prod.box_count;
+                var newQuantity = updated.box_count;
+
+                var diff = newQuantity - oldQuantity;
+
+                // تحديث الإنتاج
+                prod.product_id = updated.product_id;
+                prod.box_cost = updated.box_cost;
+                prod.box_count = newQuantity;
+                prod.notes = updated.notes?.Trim();
+
+                prod.production_date = DateTime.SpecifyKind(
+                    updated.production_date,
+                    DateTimeKind.Unspecified);
+
+                // تحديث المخزون
+                var stock = await _context.product_stock
+                    .FirstOrDefaultAsync(s => s.product_id == prod.product_id);
+
+                if (stock != null)
+                {
+                    stock.quantity += diff;
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
                 return false;
-
-            prod.product_id = updated.product_id;
-            prod.box_cost = updated.box_cost;
-            prod.box_count = updated.box_count;
-            prod.notes = updated.notes?.Trim(); 
-
-            prod.production_date = DateTime.SpecifyKind(
-                updated.production_date,
-                DateTimeKind.Unspecified);
-
-            await _context.SaveChangesAsync();
-            return true;
+            }
         }
 
         public async Task<bool> DeleteProduction(int id)
         {
-            var prod = await _context.production
-                .FirstOrDefaultAsync(p => p.production_id == id);
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            if (prod == null)
+            try
+            {
+                var prod = await _context.production
+                    .FirstOrDefaultAsync(p => p.production_id == id);
+
+                if (prod == null)
+                    return false;
+
+                var stock = await _context.product_stock
+                    .FirstOrDefaultAsync(s => s.product_id == prod.product_id);
+
+                if (stock != null)
+                {
+                    stock.quantity -= prod.box_count;
+                }
+
+                _context.production.Remove(prod);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
                 return false;
-
-            _context.production.Remove(prod);
-            await _context.SaveChangesAsync();
-
-            return true;
+            }
         }
 
         // =========================================

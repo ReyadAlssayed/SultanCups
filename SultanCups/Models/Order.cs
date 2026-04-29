@@ -7,22 +7,21 @@ namespace SultanCups.Models
         [Key]
         public int order_id { get; set; }
 
-        public string? order_number { get; set; }
+        public int person_id { get; set; } // زبون أو مسوق
+        public string person_type { get; set; } = ""; // customer / marketer
 
-        public int marketer_id { get; set; }
+        public string sale_type { get; set; } = ""; // direct / marketer
 
-        public int? customer_id { get; set; } // 👈 أضف هذا
-
-        public int product_id { get; set; }
-
-        public int box_count { get; set; }
-
-        public decimal unit_price { get; set; }
+        public decimal discount_total { get; set; }
 
         public decimal commission_per_box { get; set; }
+        public bool commission_paid { get; set; }
 
         public DateTime order_date { get; set; }
 
         public string? notes { get; set; }
+
+        // 🔗 تفاصيل الفاتورة
+        public List<OrderItem> Items { get; set; } = new();
     }
 }
