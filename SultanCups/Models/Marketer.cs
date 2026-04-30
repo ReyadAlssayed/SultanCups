@@ -15,7 +15,7 @@ namespace SultanCups.Models
 
         public decimal commission_per_box { get; set; }
 
-        public string marketer_type { get; set; } = "خارجي"; // 👈 جديد
+        public bool is_special { get; set; } = false;
 
         public string? notes { get; set; } // 👈 جديد
         public bool is_active { get; set; } = true;

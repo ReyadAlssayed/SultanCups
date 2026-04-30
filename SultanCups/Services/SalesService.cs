@@ -57,7 +57,9 @@ namespace SultanCups.Services
             m.phone = updated.phone?.Trim();
             m.address = updated.address?.Trim();
             m.commission_per_box = updated.commission_per_box;
-            m.marketer_type = updated.marketer_type;
+
+            m.is_special = updated.is_special; // 🔥 هذا الصحيح
+
             m.notes = updated.notes?.Trim();
             m.is_active = updated.is_active;
 

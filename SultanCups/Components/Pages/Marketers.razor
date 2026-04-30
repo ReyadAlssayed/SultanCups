@@ -78,6 +78,9 @@
                                 <td>@m.phone</td>
                                 <td>@m.address</td>
                                 <td>@m.commission_per_box.ToString("0.00") د.ل</td>
+                                <td>
+                                    @(m.is_special ? "خاص" : "عادي")
+                                </td>
 
                                 <td>
                                     @if (m.is_active)
@@ -175,11 +178,21 @@
                 </div>
 
                 <div class="inv-field">
-                    <label class="inv-label">النوع</label>
-                    <select class="inv-input-dialog" @bind="MarketerForm.marketer_type">
-                        <option value="خارجي">خارجي</option>
-                        <option value="داخلي">داخلي</option>
-                    </select>
+                    <label class="inv-label">نوع المسوق</label>
+
+                    <div class="status-toggle-container">
+                        <button type="button"
+                                class="status-btn @(MarketerForm.is_special ? "selected" : "")"
+                                @onclick="() => MarketerForm.is_special = true">
+                            خاص
+                        </button>
+
+                        <button type="button"
+                                class="status-btn @(!MarketerForm.is_special ? "selected" : "")"
+                                @onclick="() => MarketerForm.is_special = false">
+                            عادي
+                        </button>
+                    </div>
                 </div>
 
                 @if (ShowEditDialog)
@@ -298,7 +311,7 @@
 
     void OpenAddDialog()
     {
-        MarketerForm = new() { marketer_type = "داخلي" };
+        MarketerForm = new() { is_special = false };
         ShowAddDialog = true;
     }
 
@@ -311,9 +324,9 @@
             phone = m.phone,
             address = m.address,
             commission_per_box = m.commission_per_box,
-            marketer_type = m.marketer_type,
             notes = m.notes,
-            is_active = m.is_active
+            is_active = m.is_active,
+            is_special = m.is_special // 🔥 هذا الناقص
         };
 
         ShowEditDialog = true;
@@ -516,7 +529,7 @@
                 ws.Cell(row, 3).Value = m.phone;
                 ws.Cell(row, 4).Value = m.address;
                 ws.Cell(row, 5).Value = m.commission_per_box;
-                ws.Cell(row, 6).Value = m.marketer_type;
+                ws.Cell(row, 6).Value = m.is_special ? "خاص" : "عادي";
                 ws.Cell(row, 7).Value = m.is_active ? "نشط" : "معطل";
                 ws.Cell(row, 8).Value = m.notes;
                 row++;
@@ -554,7 +567,7 @@
         ShowActivatePrompt = false;
         DuplicateMarketer = null;
 
-        MarketerForm = new() { marketer_type = "داخلي" };
+        MarketerForm = new() { is_special = false };
     }
 
 }
