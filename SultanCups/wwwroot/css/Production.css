@@ -258,7 +258,7 @@ textarea.pro-input {
     background: #fff;
     border-radius: 24px;
     width: 100%;
-    max-width: 500px;
+    max-width: 720px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     animation: proPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow: hidden;
@@ -728,11 +728,15 @@ textarea.pro-input:focus {
     }
 
 .invoice-summary {
-    margin-top: 15px;
-    padding: 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    position: sticky;
+    bottom: 80px; /* نزّل شوي */
+
     background: #f8fafc;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0; /* بوردر خفيف */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    margin-top: 20px;
 }
 
     .invoice-summary div {
@@ -760,6 +764,61 @@ textarea.pro-input:focus {
     font-size: 12px;
     color: #f59e0b; /* برتقالي هادئ */
 }
+
+
+.pro-dialog-box {
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.pro-dialog-body {
+    overflow-y: auto;
+}
+
+.pro-dialog-actions {
+    position: sticky;
+    bottom: 0;
+    background: white;
+}
+
+.totals-box {
+    margin-top: 12px;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0; /* 🔥 بوردر خفيف */
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+.totals-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.pro-total {
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.commission-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.commission-value {
+    font-weight: 600;
+    color: #2563eb; /* نفس لون الأرقام */
+}
+
+.commission-note {
+    font-size: 12px;
+    color: #f59e0b;
+}
+
 
 @media (max-width: 600px) {
     .pro-dialog-box {

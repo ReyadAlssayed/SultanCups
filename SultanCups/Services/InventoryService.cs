@@ -45,7 +45,7 @@ namespace SultanCups.Services
                 return false;
 
             product.name = updatedProduct.name;
-            // السطر الناقص الذي يجب إضافته:
+            product.sale_price = updatedProduct.sale_price; // 🔥 هذا الناقص
             product.is_active = updatedProduct.is_active;
 
             await _context.SaveChangesAsync();

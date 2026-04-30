@@ -8,6 +8,9 @@ namespace SultanCups.Models
         public int product_id { get; set; }
 
         public string name { get; set; } = string.Empty;
+
+        public decimal sale_price { get; set; } // 🔥 أضفه هنا
+
         public bool is_active { get; set; } = true;
     }
 }

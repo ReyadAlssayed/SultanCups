@@ -152,7 +152,11 @@
 
                     <div>
                         <label>الخصم</label>
-                        <input type="number" step="0.01" class="pro-input" @bind="Form.discount_total" />
+                        <input type="number"
+                               step="0.01"
+                               class="pro-input"
+                               @bind-value="Form.discount_total"
+                               @bind-value:event="oninput" />
                     </div>
 
                 </div>
@@ -169,7 +173,7 @@
                             <label>المنتج</label>
                             <select class="pro-input"
                                     value="@item.product_id"
-                                    @onchange="e => item.product_id = int.Parse(e.Value.ToString())">
+                                    @onchange="e => OnProductChanged(e, item)">
                                 <option value="0">اختر منتج</option>
                                 @foreach (var p in Products)
                                 {
@@ -180,12 +184,20 @@
 
                         <div>
                             <label>الكمية</label>
-                            <input type="number" class="pro-input" @bind="item.quantity" />
+                            <input type="number"
+                                   class="pro-input"
+                                   @bind-value="item.quantity"
+                                   @bind-value:event="oninput" />
+
                         </div>
 
                         <div>
                             <label>السعر</label>
-                            <input type="number" step="0.01" class="pro-input" @bind="item.unit_price" />
+                            <input type="number"
+                                   step="0.01"
+                                   class="pro-input"
+                                   @bind-value="item.unit_price"
+                                   @bind-value:event="oninput" />
                         </div>
 
                         <!-- 🔥 زر حذف -->
@@ -206,45 +218,47 @@
                 }
 
                 <button class="pro-btn-add" @onclick="AddItem">إضافة صنف أخر</button>
-
                 <div class="invoice-summary">
 
-    <div>
-        <span>الإجمالي:</span>
-        <strong>@Fmt(Total)</strong>
-    </div>
+                    <div class="sum-row">
+                        <span>الإجمالي:</span>
+                        <strong class="sum-value">@Fmt(Total)</strong>
+                    </div>
 
-    <div>
-        <span>الخصم:</span>
-        <strong>@Fmt(Form.discount_total)</strong>
-    </div>
+                    <div class="sum-row">
+                        <span>الخصم:</span>
+                        <strong class="sum-value">@Fmt(Form.discount_total)</strong>
+                    </div>
 
-    <div>
-        <span>الصافي:</span>
-        <strong>@Fmt(Net)</strong>
-    </div>
+                    <div class="sum-row">
+                        <span>الصافي:</span>
+                        <strong class="sum-value">@Fmt(Net)</strong>
+                    </div>
 
                     @if (Form.person_type == "marketer")
                     {
-                        <div>
+                        <div class="sum-row">
                             <span>العمولة:</span>
-                            <strong>@Fmt(Commission)</strong>
 
-                            @if (Form.person_id != 0)
-                            {
-                                var m = Marketers.FirstOrDefault(x => x.marketer_id == Form.person_id);
+                            <div class="commission-wrap">
+                                <strong class="sum-value">@Fmt(Commission)</strong>
 
-                                if (m != null && !m.is_special)
+                                @if (Form.person_id != 0)
                                 {
-                                    <small class="commission-note">
-                                        (تحسب بعد الدفع)
-                                    </small>
+                                    var m = Marketers.FirstOrDefault(x => x.marketer_id == Form.person_id);
+
+                                    if (m != null && !m.is_special)
+                                    {
+                                        <small class="commission-note">
+                                            (تحسب بعد الدفع)
+                                        </small>
+                                    }
                                 }
-                            }
+                            </div>
                         </div>
                     }
 
-</div>
+                </div>
 
                 <div class="pro-dialog-actions">
                     <button class="pro-save" @onclick="SaveOrder">حفظ</button>
@@ -357,6 +371,20 @@
 
             // 🔥 مسوق عادي (لا نحسب هنا)
             return 0;
+        }
+    }
+
+    void OnProductChanged(ChangeEventArgs e, OrderItem item)
+    {
+        int id = int.Parse(e.Value.ToString());
+
+        item.product_id = id;
+
+        var product = Products.FirstOrDefault(p => p.product_id == id);
+
+        if (product != null)
+        {
+            item.unit_price = product.sale_price; // 🔥 أهم سطر
         }
     }
 

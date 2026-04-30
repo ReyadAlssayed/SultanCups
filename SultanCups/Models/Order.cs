@@ -10,8 +10,6 @@ namespace SultanCups.Models
         public int person_id { get; set; } // زبون أو مسوق
         public string person_type { get; set; } = ""; // customer / marketer
 
-        public string sale_type { get; set; } = ""; // direct / marketer
-
         public decimal discount_total { get; set; }
 
         public decimal commission_per_box { get; set; }
