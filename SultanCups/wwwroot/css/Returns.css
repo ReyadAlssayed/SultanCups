@@ -167,26 +167,53 @@
     backdrop-filter: blur(2px);
 }
 
-.inv-dialog-box, .pro-dialog-box, .sp-dialog-box {
+.inv-dialog-box, .sp-dialog-box {
     background: #fff;
     border-radius: 24px;
     width: 92%;
     max-width: 620px;
-    box-shadow: 0 20px 40px rgba(0,0,0,.2);
-    overflow: hidden;
 }
+
+/* خاص بالفواتير فقط */
+.pro-dialog-box {
+    background: #fff;
+    border-radius: 24px;
+    width: 80%;
+    max-width: 1200px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border-top: 6px solid #2563eb;
+}
+
+.pro-dialog-box {
+    background: #fff;
+    border-radius: 24px;
+    width: 80%;
+    max-width: 1200px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border-top: 6px solid #2563eb; /* 🔥 الخط الأزرق العلوي */
+}
+
 
 .inv-dialog-top-image, .pro-dialog-top-image, .sp-dialog-top-image {
     width: 100%;
     height: 110px;
     overflow: hidden;
-    border-bottom: 1px solid #e2e8f0;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
 }
 
     .inv-dialog-top-image img, .pro-dialog-top-image img, .sp-dialog-top-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        border-top-left-radius: 24px;
+        border-top-right-radius: 24px;
     }
 
 .inv-dialog-body, .pro-dialog-body, .sp-dialog-body {
@@ -202,11 +229,22 @@
     }
 
 /* التعديل الجديد لتقسيم الحقول لعمودين */
-.inv-fields-grid, .pro-fields-grid, .sp-fields-grid {
+.inv-fields-grid, .sp-fields-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* حقلين في السطر */
-    gap: 14px;
+    grid-template-columns: 1fr 1fr;
 }
+
+/* 🔥 هذا خاص بالفواتير */
+.pro-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+    .pro-fields-grid > div {
+        display: flex;
+        flex-direction: column;
+    }
 
 .full-width {
     grid-column: 1 / -1;
@@ -308,9 +346,15 @@
 
 /* ================= Media Queries ================= */
 @media (max-width: 768px) {
-    .inv-fields-grid, .pro-fields-grid, .sp-fields-grid {
-        grid-template-columns: 1fr; /* حقل واحد في السطر للجوال */
+    .inv-fields-grid, .sp-fields-grid {
+        grid-template-columns: 1fr;
     }
+
+    /* 🔥 خلي الفواتير عمودين بدل واحد */
+    .pro-fields-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 
     .inv-page, .pro-page {
         padding: 16px;

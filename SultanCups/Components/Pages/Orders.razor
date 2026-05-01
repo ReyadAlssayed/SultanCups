@@ -4,6 +4,7 @@
 @using SultanCups.Models
 @using SultanCups.Services
 
+@inject SultanCups.Services.UserSession Session
 @inject FinanceService2 FinanceService
 @inject InventoryService InventoryService
 @inject SalesService SalesService
@@ -97,6 +98,10 @@
 {
     <div class="pro-dialog-overlay">
         <div class="pro-dialog-box">
+
+            <div class="pro-dialog-top-image inv-delete-top-image">
+                <img src="images/Background.png" />
+            </div>
             <div class="pro-dialog-body">
 
                 <h3>إضافة فاتورة</h3>
@@ -150,14 +155,30 @@
                         <input type="date" class="pro-input" @bind="Form.order_date" />
                     </div>
 
+                   
+
                     <div>
-                        <label>الخصم</label>
-                        <input type="number"
-                               step="0.01"
-                               class="pro-input"
-                               @bind-value="Form.discount_total"
-                               @bind-value:event="oninput" />
+                        <label>الخزنة</label>
+                        <select class="pro-input" @bind="Form.cash_box_id">
+                            <option value="0">اختر خزنة</option>
+                            @foreach (var cb in CashBoxes)
+                            {
+                                <option value="@cb.cash_box_id">@cb.name</option>
+                            }
+                        </select>
                     </div>
+
+                    <div>
+                        <label>طريقة الدفع</label>
+                        <select class="pro-input" @bind="Form.payment_method">
+                            <option value="cash">نقدي</option>
+                            <option value="card">بطاقة مصرفية</option>
+                            <option value="transfer">تحويل</option>
+                            <option value="check">شيك</option>
+                        </select>
+                    </div>
+
+                    
 
                 </div>
 
@@ -168,6 +189,8 @@
                 @foreach (var item in Form.Items)
                 {
                     <div class="pro-fields-grid pro-item-animate" @key="item">
+
+
 
                         <div>
                             <label>المنتج</label>
@@ -180,6 +203,13 @@
                                     <option value="@p.product_id">@p.name</option>
                                 }
                             </select>
+                        </div>
+
+                        <div>
+                            <label>سعر البيع</label>
+                            <input class="pro-input"
+                                   value="@Products.FirstOrDefault(p => p.product_id == item.product_id)?.sale_price"
+                                   disabled />
                         </div>
 
                         <div>
@@ -203,15 +233,14 @@
                         <!-- 🔥 زر حذف -->
                         @if (Form.Items.Count > 1)
                         {
-                            <div class="item-remove-wrap">
-                                <button type="button"
-                                        class="btn-delete-item"
-                                        @onclick="() => RemoveItem(item)">
-                                    ✕
-                                </button>
-                            </div>
+                            <button type="button"
+                                    class="btn-delete-item"
+                                    @onclick="() => RemoveItem(item)">
+                                ✕
+                            </button>
                         }
 
+                       
                     </div>
 
                     <hr />
@@ -219,6 +248,27 @@
 
                 <button class="pro-btn-add" @onclick="AddItem">إضافة صنف أخر</button>
                 <div class="invoice-summary">
+
+                    <div class="pro-fields-grid" style="margin-top:10px;">
+
+                        <div>
+                            <label>الخصم</label>
+                            <input type="number"
+                                   step="0.01"
+                                   class="pro-input"
+                                   @bind-value="Form.discount_total"
+                                   @bind-value:event="oninput" />
+                        </div>
+
+                        <div>
+                            <label>المبلغ المدفوع</label>
+                            <input type="number"
+                                   class="pro-input"
+                                   @bind-value="Form.paid_amount"
+                                   @bind-value:event="oninput" />
+                        </div>
+
+                    </div>
 
                     <div class="sum-row">
                         <span>الإجمالي:</span>
@@ -231,33 +281,25 @@
                     </div>
 
                     <div class="sum-row">
-                        <span>الصافي:</span>
+                        <span>الإجمالي بعد الخصم:</span>
                         <strong class="sum-value">@Fmt(Net)</strong>
                     </div>
 
                     @if (Form.person_type == "marketer")
                     {
                         <div class="sum-row">
-                            <span>العمولة:</span>
-
-                            <div class="commission-wrap">
-                                <strong class="sum-value">@Fmt(Commission)</strong>
-
-                                @if (Form.person_id != 0)
-                                {
-                                    var m = Marketers.FirstOrDefault(x => x.marketer_id == Form.person_id);
-
-                                    if (m != null && !m.is_special)
-                                    {
-                                        <small class="commission-note">
-                                            (تحسب بعد الدفع)
-                                        </small>
-                                    }
-                                }
-                            </div>
+                            <span>عمولة المسوق:</span>
+                            <strong class="sum-value">@Fmt(Commission)</strong>
                         </div>
                     }
 
+                </div>
+
+                <div class="pur-notes-box">
+                    <label>ملاحظات</label>
+                    <textarea maxlength="200"
+                              class="pro-input pur-notes-input"
+                              @bind="Form.notes"></textarea>
                 </div>
 
                 <div class="pro-dialog-actions">
@@ -277,15 +319,19 @@
 
     bool ShowAddDialog = false;
 
+    int CurrentAdminId => Session.AdminId;
+
     Order Form = new();
     List<Customer> Customers = new();
     List<Marketer> Marketers = new();
+    List<CashBox> CashBoxes = new(); // 🔥 جديد
 
     protected override async Task OnInitializedAsync()
     {
         Products = await InventoryService.GetProducts();
         Customers = await SalesService.GetActiveCustomers();
         Marketers = await SalesService.GetActiveMarketers();
+        CashBoxes = await FinanceService.GetCashBoxes(); // 🔥 جديد
         OrdersList = await FinanceService.GetOrders();
     }
     void OpenAddDialog()
@@ -392,7 +438,6 @@
     {
         try
         {
-            // تحقق سريع
             if (Form.person_id == 0)
             {
                 ToastService.ShowToast("اختر الزبون أو المسوق", "warning");
@@ -417,7 +462,34 @@
                 return;
             }
 
-            var result = await FinanceService.AddOrder(Form, Form.Items);
+            if (Form.cash_box_id == 0)
+            {
+                ToastService.ShowToast("اختر الخزنة", "warning");
+                return;
+            }
+
+            // 🔥 حساب الصافي
+            var net = Form.Items.Sum(i => i.quantity * i.unit_price) - Form.discount_total;
+
+            if (Form.paid_amount <= 0)
+            {
+                ToastService.ShowToast("ادخل المبلغ المدفوع", "warning");
+                return;
+            }
+
+            if (Form.paid_amount > net)
+            {
+                ToastService.ShowToast("المبلغ أكبر من الإجمالي", "warning");
+                return;
+            }
+
+            Form.order_date = DateTime.UtcNow;
+
+            var result = await FinanceService.AddOrder(
+                Form,
+                Form.Items,
+                CurrentAdminId
+            );
 
             if (result.success)
             {

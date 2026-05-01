@@ -13,14 +13,59 @@ namespace SultanCups.Services
             _context = context;
         }
 
+        private void AddFinancialEvent(
+    string type,
+    string direction,
+    decimal amount,
+    int cashBoxId,
+    int adminId,
+    int refId,
+    string refTable,
+    int? personId,
+    string? personName,
+    string notes = "",
+    int? itemId = null,
+    string? itemName = null)
+        {
+            var adminName = _context.admins
+                .Where(x => x.admin_id == adminId)
+                .Select(x => x.full_name)
+                .FirstOrDefault();
+
+            _context.financial_events.Add(new FinancialEvent
+            {
+                event_type = type,
+                direction = direction,
+                amount = amount,
+                cash_box_id = cashBoxId,
+
+                performed_by = adminId,
+                admin_name_snapshot = adminName,
+
+                ref_table = refTable,
+                ref_id = refId,
+
+                person_id = personId,
+                person_name_snapshot = personName,
+
+                item_id = itemId,
+                item_name_snapshot = itemName,
+
+                event_date = DateTime.UtcNow,
+                notes = notes
+            });
+        }
+
         // ✅ إنشاء فاتورة
-        public async Task<(bool success, string message)> AddOrder(Order order, List<OrderItem> items)
+        public async Task<(bool success, string message)> AddOrder(
+      Order order,
+      List<OrderItem> items,
+      int adminId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
-                // 🔥 مهم
                 order.Items = new List<OrderItem>();
 
                 var productIds = items.Select(i => i.product_id).ToList();
@@ -29,6 +74,7 @@ namespace SultanCups.Services
                     .Where(s => productIds.Contains(s.product_id))
                     .ToDictionaryAsync(s => s.product_id);
 
+                // تحقق المخزون
                 foreach (var item in items)
                 {
                     if (!stocks.ContainsKey(item.product_id))
@@ -38,17 +84,74 @@ namespace SultanCups.Services
                         return (false, $"المخزون غير كافي (المتوفر={stocks[item.product_id].quantity})");
                 }
 
+                // حفظ الفاتورة
                 _context.orders.Add(order);
                 await _context.SaveChangesAsync();
 
+                // حفظ الأصناف + خصم المخزون
                 foreach (var item in items)
                 {
                     item.order_id = order.order_id;
-                    item.total = item.quantity * item.unit_price;
 
                     _context.order_items.Add(item);
 
                     stocks[item.product_id].quantity -= item.quantity;
+                }
+
+                await _context.SaveChangesAsync();
+
+                // =========================================
+                // 🔥 جلب اسم الشخص
+                // =========================================
+                string personName = "";
+
+                if (order.person_type == "customer")
+                {
+                    personName = await _context.customers
+                        .Where(c => c.customer_id == order.person_id)
+                        .Select(c => c.name)
+                        .FirstOrDefaultAsync();
+                }
+                else if (order.person_type == "marketer")
+                {
+                    personName = await _context.marketers
+                        .Where(m => m.marketer_id == order.person_id)
+                        .Select(m => m.name)
+                        .FirstOrDefaultAsync();
+                }
+
+                // 🔥 هنا
+                personName = order.person_type == "customer"
+                    ? $"{personName} (زبون)"
+                    : $"{personName} (مسوق)";
+
+                // =========================================
+                // 🔥 جلب أول منتج
+                // =========================================
+                var firstProduct = await _context.products
+                    .Where(p => p.product_id == items.First().product_id)
+                    .Select(p => new { p.product_id, p.name })
+                    .FirstOrDefaultAsync();
+
+                // =========================================
+                // 🔥 تسجيل الحركة المالية
+                // =========================================
+                if (order.payment_method != "debt" && order.paid_amount > 0)
+                {
+                    AddFinancialEvent(
+                        "فاتورة بيع جديدة",
+                        "IN",
+                        order.paid_amount,
+                        order.cash_box_id,
+                        adminId,
+                        order.order_id,
+                        "orders",
+                        order.person_id,
+                        personName,
+                        "تحصيل فاتورة",
+                        firstProduct?.product_id,
+                        firstProduct != null ? $"{firstProduct.name} (منتج)" : null
+                    );
                 }
 
                 await _context.SaveChangesAsync();
@@ -83,14 +186,14 @@ namespace SultanCups.Services
                     items_count = _context.order_items.Count(i => i.order_id == o.order_id),
 
                     total = _context.order_items
-                        .Where(i => i.order_id == o.order_id)
-                        .Sum(i => (decimal?)i.total) ?? 0,
+    .Where(i => i.order_id == o.order_id)
+    .Sum(i => (decimal?)(i.quantity * i.unit_price)) ?? 0,
 
                     net_total =
-                        ((_context.order_items
-                            .Where(i => i.order_id == o.order_id)
-                            .Sum(i => (decimal?)i.total) ?? 0)
-                        - o.discount_total),
+    ((_context.order_items
+        .Where(i => i.order_id == o.order_id)
+        .Sum(i => (decimal?)(i.quantity * i.unit_price)) ?? 0)
+    - o.discount_total),
 
                     commission_total = o.person_type == "marketer"
                         ? ((_context.order_items
@@ -106,6 +209,14 @@ namespace SultanCups.Services
                 .OrderByDescending(o => o.order_id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToListAsync();
+        }
+
+        //جلب الخزنات النشطة
+        public async Task<List<CashBox>> GetCashBoxes()
+        {
+            return await _context.cash_boxes
+                .Where(c => c.is_active)
                 .ToListAsync();
         }
 

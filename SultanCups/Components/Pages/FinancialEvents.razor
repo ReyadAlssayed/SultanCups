@@ -159,7 +159,7 @@
                                             .FirstOrDefault(x => x.raw_material_id == pur?.raw_material_id)?.name;
 
                                         <span>
-                                            @item.item_name_snapshot (مادة خام)
+                                            @item.item_name_snapshot
 
                                             @if (!string.IsNullOrWhiteSpace(currentItem) &&
                                                                                                          currentItem != item.item_name_snapshot)

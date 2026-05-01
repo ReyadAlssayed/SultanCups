@@ -220,11 +220,7 @@ textarea.pro-input {
     padding: 12px;
 }
 
-.pro-fields-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* تقسيم الحقول لعمودين */
-    gap: 15px;
-}
+
 
 .pro-btn-add, .pro-save {
     display: inline-flex;
@@ -254,15 +250,7 @@ textarea.pro-input {
     backdrop-filter: blur(4px);
 }
 
-.pro-dialog-box {
-    background: #fff;
-    border-radius: 24px;
-    width: 100%;
-    max-width: 720px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    animation: proPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    overflow: hidden;
-}
+
 
 @keyframes proPop {
     from {
@@ -645,6 +633,19 @@ textarea.pro-input:focus {
     text-align: right;
 }
 
+.pro-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+    .pro-fields-grid > div {
+        display: flex;
+        flex-direction: column;
+    }
+
+
+
 
 .pro-fields-grid label {
     display: block;
@@ -710,17 +711,31 @@ textarea.pro-input:focus {
 
 .item-remove-wrap {
     display: flex;
-    align-items: end;
+    justify-content: flex-start; /* النهاية يسار */
+    align-items: center;
+}
+
+
+
+.pur-notes-box label {
+    display: block;
+    margin-bottom: 6px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
 }
 
 .btn-delete-item {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
     background: #fee2e2;
     color: #b91c1c;
     border: none;
-    padding: 8px 12px;
+    padding: 8px 10px;
     border-radius: 10px;
     cursor: pointer;
-    transition: 0.2s;
 }
 
     .btn-delete-item:hover {
@@ -756,7 +771,14 @@ textarea.pro-input:focus {
 }
 
 .pro-item-animate {
-    animation: curtainDrop 0.25s ease;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 12px;
+    align-items: center;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    position: relative;
+    padding-left: 40px;
 }
 
 .commission-note {
@@ -765,12 +787,6 @@ textarea.pro-input:focus {
     color: #f59e0b; /* برتقالي هادئ */
 }
 
-
-.pro-dialog-box {
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-}
 
 .pro-dialog-body {
     overflow-y: auto;
@@ -819,9 +835,14 @@ textarea.pro-input:focus {
     color: #f59e0b;
 }
 
-
-@media (max-width: 600px) {
-    .pro-dialog-box {
-        width: 95%;
-    }
+/* ===== FINAL DIALOG ===== */
+.pro-dialog-box {
+    background: #fff;
+    border-radius: 24px;
+    width: 80%; /* 🔥 هنا التعديل */
+    max-width: 1200px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }

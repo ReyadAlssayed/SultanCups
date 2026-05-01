@@ -1,25 +1,29 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SultanCups.Models;
+using System.ComponentModel.DataAnnotations;
 
-namespace SultanCups.Models
+public class Order
 {
-    public class Order
-    {
-        [Key]
-        public int order_id { get; set; }
+    [Key]
+    public int order_id { get; set; }
 
-        public int person_id { get; set; } // زبون أو مسوق
-        public string person_type { get; set; } = ""; // customer / marketer
+    public int person_id { get; set; }
+    public string person_type { get; set; } = "";
 
-        public decimal discount_total { get; set; }
+    public decimal discount_total { get; set; }
 
-        public decimal commission_per_box { get; set; }
-        public bool commission_paid { get; set; }
+    public decimal commission_per_box { get; set; }
+    public bool commission_paid { get; set; }
 
-        public DateTime order_date { get; set; }
+    public DateTime order_date { get; set; }
 
-        public string? notes { get; set; }
+    // 🔥 الجديد
+    public int cash_box_id { get; set; } // الخزنة
+    public string payment_method { get; set; } = "cash";
 
-        // 🔗 تفاصيل الفاتورة
-        public List<OrderItem> Items { get; set; } = new();
-    }
+    // 🔥 الجديد
+    public decimal paid_amount { get; set; } = 0;
+
+    public string? notes { get; set; }
+
+    public List<OrderItem> Items { get; set; } = new();
 }

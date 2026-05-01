@@ -17,7 +17,8 @@ namespace SultanCups.Models
 
         public decimal unit_price { get; set; }
 
-        public decimal total { get; set; }
+        [NotMapped]
+        public decimal total => quantity * unit_price;
 
         public Order? Order { get; set; }
     }
