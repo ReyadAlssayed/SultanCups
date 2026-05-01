@@ -1,0 +1,73 @@
+﻿@page "/stock"
+@using SultanCups.Models
+@using SultanCups.Services
+@layout Layout.MainLayout
+
+@inject InventoryService InventoryService
+
+<div class="pro-page">
+
+    <div class="pro-topbar">
+        <h2 class="pro-title">المخزون</h2>
+    </div>
+
+    <div class="pro-card">
+        <div class="pro-table-wrap">
+
+            <table class="pro-table">
+                <thead>
+                    <tr>
+                        <th>المنتج</th>
+                        <th>الكمية</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (stockList == null)
+                    {
+                        <tr>
+                            <td colspan="2">تحميل...</td>
+                        </tr>
+                    }
+                    else if (!stockList.Any())
+                    {
+                        <tr>
+                            <td colspan="2" class="st-empty-text">
+                                <div class="empty-state">
+                                    <img src="images/Empty.jpg" class="empty-img" />
+                                    <span>لا يوجد إنتاج — المخزن فارغ</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var s in stockList)
+                        {
+                            <tr>
+                                <td class="pro-name">
+                                    @s.Product?.name
+                                </td>
+                                <td class="pro-money">
+                                    @s.quantity
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+@code {
+    List<ProductStock>? stockList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        stockList = await InventoryService.GetStock();
+    }
+}

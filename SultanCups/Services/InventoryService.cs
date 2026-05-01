@@ -353,5 +353,14 @@ namespace SultanCups.Services
 
             return "deleted";
         }
+
+        //this is for product strock (view only)
+        public async Task<List<ProductStock>> GetStock()
+        {
+            return await _context.product_stock
+                .Include(p => p.Product) // 🔥 هذا المهم
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }
