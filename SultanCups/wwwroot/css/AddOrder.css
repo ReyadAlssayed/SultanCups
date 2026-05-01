@@ -1,0 +1,331 @@
+﻿/* إزالة الشكل الصندوقي */
+.pro-page {
+    padding: 20px;
+    background: white;
+}
+
+.top-bar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+    .top-bar h3 {
+        text-align: center;
+        margin: 0;
+        color: #1d4ed8;
+        font-weight: 900;
+    }
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #1d4ed8, #2563eb, #3b82f6);
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, .18);
+    transition: .2s;
+}
+
+    .btn-back:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 25px rgba(37, 99, 235, .25);
+    }
+
+/* تكبير المساحة */
+.pro-fields-grid {
+    gap: 14px;
+}
+
+/* تحسين الأصناف */
+.pro-item-animate {
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.pro-page {
+    padding: 20px;
+    background: white;
+    width: 100%;
+    max-width: 100%;
+}
+
+.app-content {
+    max-width: 100% !important;
+    padding: 0 20px !important;
+}
+
+.order-layout1 {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 20px;
+}
+
+/* يمين */
+.order-right1 {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* جدول */
+.order-table1 {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .order-table1 th {
+        text-align: right;
+        padding: 10px;
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .order-table1 td {
+        padding: 8px;
+    }
+
+
+
+.summary-box1 {
+    background: linear-gradient(135deg, #f8fafc, #eef2ff);
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 20px;
+    display: grid;
+    gap: 12px;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.08);
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+    /* خط جانبي خفيف (هو اللي يعطي الشخصية) */
+    .summary-box1::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(to right, #3b82f6, #6366f1);
+        border-radius: 18px 18px 0 0;
+    }
+    /* hover ناعم جداً */
+    .summary-box1:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(37, 99, 235, 0.12);
+    }
+
+.sum-line1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    padding: 4px 0;
+}
+
+    .sum-line1 span {
+        color: #64748b;
+    }
+
+    .sum-line1 strong {
+        color: #1d4ed8;
+        font-size: 17px;
+        font-weight: 900;
+        letter-spacing: 0.3px;
+    }
+
+    .sum-line1:last-child strong {
+        color: #059669; /* الصافي بلون مميز */
+    }
+
+.notes1 {
+    height: 80px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    padding: 10px;
+    resize: none;
+    font-size: 13px;
+    transition: 0.25s;
+    outline: none;
+}
+
+    .notes1::placeholder {
+        color: #94a3b8;
+    }
+
+.summary-box1 label {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 2px;
+}
+
+.summary-box1 input {
+    text-align: right;
+}
+
+
+.summary-box1 hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 6px 0;
+}
+
+
+.order-table1 td {
+    border-top: 1px solid #e2e8f0;
+}
+
+.order-table1 tr:hover {
+    background: #f8fafc;
+    transition: 0.2s;
+}
+
+    .notes1:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+    }
+
+.btn-delete-item1 {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+}
+
+    .btn-delete-item1:hover {
+        background: #fecaca;
+    }
+
+
+.order-table1 td input[readonly] {
+    background: #f1f5f9;
+    font-weight: bold;
+}
+
+.order-left1 {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+}
+
+
+.order-table1 td:first-child {
+    width: 30%;
+}
+
+.order-table1 td:nth-child(2),
+.order-table1 td:nth-child(3),
+.order-table1 td:nth-child(4),
+.order-table1 td:nth-child(5) {
+    width: 17.5%;
+}
+
+
+.bottom-actions1 {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.pro-save {
+    transition: 0.2s;
+}
+
+    .pro-save:hover {
+        transform: translateY(-1px);
+    }
+
+
+.muted1 {
+    color: #94a3b8;
+}
+
+.note1 {
+    font-size: 11px;
+    color: #64748b;
+}
+
+
+.item-row1 {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.25s ease;
+}
+
+    /* عند الفتح */
+    .item-row1.open {
+        max-height: 120px; /* حسب ارتفاع السطر */
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+
+.new-row {
+    animation: highlightFade 2s ease;
+    background: #dcfce7;
+}
+
+
+.btn-info,
+.btn-edit,
+.btn-print {
+    background: #e0f2fe;
+    border: 1px solid #bae6fd;
+    color: #0369a1;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.2s;
+}
+
+    .btn-info:hover,
+    .btn-edit:hover,
+    .btn-print:hover {
+        background: #bae6fd;
+    }
+
+
+.btn-delete {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.2s;
+}
+
+    .btn-delete:hover {
+        background: #fecaca;
+    }
+
+@keyframes highlightFade {
+    0% {
+        background: #86efac;
+    }
+
+    100% {
+        background: transparent;
+    }
+}

@@ -21,5 +21,8 @@ namespace SultanCups.Models
         public decimal total => quantity * unit_price;
 
         public Order? Order { get; set; }
+
+        [NotMapped]
+        public bool IsRemoving { get; set; } = false;
     }
 }

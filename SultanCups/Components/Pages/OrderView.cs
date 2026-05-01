@@ -14,6 +14,8 @@
 
         public decimal commission_total { get; set; }
 
+        public decimal paid_amount { get; set; }   // 🔥 أضف هذا
+
         public DateTime order_date { get; set; }
     }
 }

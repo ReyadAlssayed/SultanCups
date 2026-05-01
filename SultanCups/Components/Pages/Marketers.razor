@@ -177,21 +177,23 @@
                     }
                 </div>
 
-                <div class="inv-field">
+                <div class="inv-field full-width">
                     <label class="inv-label">نوع المسوق</label>
 
-                    <div class="status-toggle-container">
+                    <div class="status-toggle-container full">
+
                         <button type="button"
-                                class="status-btn @(MarketerForm.is_special ? "selected" : "")"
+                                class="status-btn gold @(MarketerForm.is_special ? "selected" : "")"
                                 @onclick="() => MarketerForm.is_special = true">
-                            خاص
+                            👑 خاص
                         </button>
 
                         <button type="button"
-                                class="status-btn @(!MarketerForm.is_special ? "selected" : "")"
+                                class="status-btn green @(!MarketerForm.is_special ? "selected" : "")"
                                 @onclick="() => MarketerForm.is_special = false">
                             عادي
                         </button>
+
                     </div>
                 </div>
 

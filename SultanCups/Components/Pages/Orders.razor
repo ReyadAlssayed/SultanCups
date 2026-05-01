@@ -9,11 +9,15 @@
 @inject InventoryService InventoryService
 @inject SalesService SalesService
 @inject ToastService ToastService
+@inject NavigationManager Nav
+@using Microsoft.AspNetCore.Components
 
 <div class="pro-page">
 
     <div class="pro-topbar">
-        <button class="pro-btn-add" @onclick="OpenAddDialog">إضافة فاتورة</button>
+        <button class="pro-btn-add" @onclick='() => Nav.NavigateTo("/orders/add")'>
+            إضافة فاتورة
+        </button>
         <h2 class="pro-title">الفواتير</h2>
         <div></div>
     </div>
@@ -27,10 +31,7 @@
                         <th>النوع</th>
                         <th>الاسم</th>
                         <th>عدد الأصناف</th>
-                        <th>الإجمالي</th>
-                        <th>الخصم</th>
-                        <th>الصافي</th>
-                        <th>العمولة</th>
+                        <th>الحالة</th>
                         <th>التاريخ</th>
                         <th>الإجراءات</th>
                     </tr>
@@ -58,35 +59,42 @@
                     else
                     {
                         @foreach (var o in OrdersList)
-                        {
-                            <tr>
-                                <td>#@o.order_id</td>
+{
+    <tr class="@(o.order_id == HighlightId ? "new-row" : "")">
 
-                                <td>@(o.person_type == "customer" ? "زبون" : "مسوق")</td>
+        <td>@o.order_id</td>
 
-                                <td>@o.person_name</td>
+        <td>@(o.person_type == "customer" ? "زبون" : "مسوق")</td>
 
-                                <td>@o.items_count</td>
+        <td>@o.person_name</td>
 
-                                <td class="pro-total">@Fmt(o.total)</td>
-
-                                <td>@Fmt(o.discount_total)</td>
-
-                                <td class="pro-total">@Fmt(o.net_total)</td>
+        <td>@o.items_count</td>
 
                                 <td>
-                                    @(o.person_type == "marketer" ? Fmt(o.commission_total) : "-")
-                                </td>
+                                    @(o.paid_amount == 0
+    ? "غير مدفوع"
+    : o.paid_amount < o.net_total
+        ? "جزئي"
+        : "خالص")
+                                    
+        </td>
 
-                                <td>@o.order_date.ToString("yyyy-MM-dd")</td>
+        <td>@o.order_date.ToString("yyyy-MM-dd")</td>
 
-                                <td>
-                                    <button class="btn-info">تفاصيل</button>
-                                    <button class="btn-edit">تعديل</button>
-                                    <button class="btn-delete">تعطيل</button>
-                                </td>
-                            </tr>
-                        }
+        <td>
+            <button class="btn-info" @onclick="() => OpenDetails(o)">تفاصيل</button>
+
+                                    <button class="btn-edit"
+                                            @onclick='() => Nav.NavigateTo($"/orders/add?id={o.order_id}")'>
+                                        تعديل
+                                    </button>
+
+            <button class="btn-delete">تعطيل</button>
+                                    <button class="btn-print">طباعة</button>
+        </td>
+
+    </tr>
+}
                     }
                 </tbody>
             </table>
@@ -94,424 +102,157 @@
     </div>
 </div>
 
-@if (ShowAddDialog)
+@if (ShowDetails && SelectedOrder != null)
 {
-    <div class="pro-dialog-overlay">
-        <div class="pro-dialog-box">
+    <div class="sal-dialog-overlay">
 
-            <div class="pro-dialog-top-image inv-delete-top-image">
-                <img src="images/Background.png" />
-            </div>
-            <div class="pro-dialog-body">
+        <div class="sal-dialog-box">
 
-                <h3>إضافة فاتورة</h3>
+            <div class="sal-dialog-top"></div>
 
-                <div class="pro-fields-grid pro-animate">
+            <div class="sal-dialog-body">
 
-                    <div>
-                        <label>نوع الشخص</label>
-                        <select class="pro-input" @bind="Form.person_type">
-                            <option value="customer">زبون</option>
-                            <option value="marketer">مسوق</option>
-                        </select>
+                <h3>تفاصيل الفاتورة</h3>
+
+                <div class="details-list">
+
+                    <div class="row">
+                        <span>رقم الفاتورة</span>
+                        <span>@SelectedOrder.order_id</span>
                     </div>
 
-                    @if (Form.person_type == "customer")
-                    {
-                        <div>
-                            <label>الزبون</label>
-                            <select class="pro-input" @bind="Form.person_id">
-                                <option value="0">اختر زبون</option>
-                                @foreach (var c in Customers)
-                                {
-                                    <option value="@c.customer_id">@c.name</option>
-                                }
-                            </select>
-                        </div>
-                    }
-                    @if (Form.person_type == "marketer")
-                    {
-                        <div>
-                            <label>المسوق</label>
-                            <select class="pro-input"
-                                    value="@Form.person_id"
-                                    @onchange="OnMarketerChanged">
-                                <option value="0">اختر مسوق</option>
-                                @foreach (var m in Marketers)
-                                {
-                                    <option value="@m.marketer_id">@m.name</option>
-                                }
-                            </select>
-                        </div>
-
-                        <!-- 🔥 هنا -->
-                        <div>
-                            <label>عمولة الصندوق</label>
-                            <input class="pro-input" @bind="Form.commission_per_box" />
-                        </div>
-                    }
-                    <div>
-                        <label>التاريخ</label>
-                        <input type="date" class="pro-input" @bind="Form.order_date" />
+                    <div class="row">
+                        <span>الاسم</span>
+                        <span>@SelectedOrder.person_name</span>
                     </div>
 
-                   
-
-                    <div>
-                        <label>الخزنة</label>
-                        <select class="pro-input" @bind="Form.cash_box_id">
-                            <option value="0">اختر خزنة</option>
-                            @foreach (var cb in CashBoxes)
-                            {
-                                <option value="@cb.cash_box_id">@cb.name</option>
-                            }
-                        </select>
+                    <div class="row">
+                        <span>عدد الأصناف</span>
+                        <span>@SelectedOrder.items_count</span>
                     </div>
 
-                    <div>
-                        <label>طريقة الدفع</label>
-                        <select class="pro-input" @bind="Form.payment_method">
-                            <option value="cash">نقدي</option>
-                            <option value="card">بطاقة مصرفية</option>
-                            <option value="transfer">تحويل</option>
-                            <option value="check">شيك</option>
-                        </select>
+                    <div class="row">
+                        <span>الإجمالي</span>
+                        <span>@Fmt(SelectedOrder.total)</span>
                     </div>
 
-                    
+                    <div class="row">
+                        <span>الخصم</span>
+                        <span>@Fmt(SelectedOrder.discount_total)</span>
+                    </div>
+
+                    <div class="row">
+                        <span>الصافي</span>
+                        <span>@Fmt(SelectedOrder.net_total)</span>
+                    </div>
+
+                    <div class="row">
+                        <span>العمولة</span>
+                        <span>@Fmt(SelectedOrder.commission_total)</span>
+                    </div>
+
+                    <div class="row">
+                        <span>التاريخ</span>
+                        <span>@SelectedOrder.order_date.ToString("yyyy-MM-dd")</span>
+                    </div>
 
                 </div>
 
-                <hr />
-
-                <h4>الأصناف</h4>
-
-                @foreach (var item in Form.Items)
+                @if (SelectedItems.Any())
                 {
-                    <div class="pro-fields-grid pro-item-animate" @key="item">
+                    <div style="margin-top:15px">
 
+                        <h4>الأصناف</h4>
 
+                        <table class="pro-table">
+                            <thead>
+                                <tr>
+                                    <th>المنتج</th>
+                                    <th>الكمية</th>
+                                    <th>السعر</th>
+                                    <th>الإجمالي</th>
+                                </tr>
+                            </thead>
 
-                        <div>
-                            <label>المنتج</label>
-                            <select class="pro-input"
-                                    value="@item.product_id"
-                                    @onchange="e => OnProductChanged(e, item)">
-                                <option value="0">اختر منتج</option>
-                                @foreach (var p in Products)
+                            <tbody>
+                                @foreach (var item in SelectedItems)
                                 {
-                                    <option value="@p.product_id">@p.name</option>
+                                    <tr>
+                                        <td>@item.product_id</td>
+                                        <td>@item.quantity</td>
+                                        <td>@Fmt(item.unit_price)</td>
+                                        <td>@Fmt(item.total)</td>
+                                    </tr>
                                 }
-                            </select>
-                        </div>
+                            </tbody>
+                        </table>
 
-                        <div>
-                            <label>سعر البيع</label>
-                            <input class="pro-input"
-                                   value="@Products.FirstOrDefault(p => p.product_id == item.product_id)?.sale_price"
-                                   disabled />
-                        </div>
-
-                        <div>
-                            <label>الكمية</label>
-                            <input type="number"
-                                   class="pro-input"
-                                   @bind-value="item.quantity"
-                                   @bind-value:event="oninput" />
-
-                        </div>
-
-                        <div>
-                            <label>السعر</label>
-                            <input type="number"
-                                   step="0.01"
-                                   class="pro-input"
-                                   @bind-value="item.unit_price"
-                                   @bind-value:event="oninput" />
-                        </div>
-
-                        <!-- 🔥 زر حذف -->
-                        @if (Form.Items.Count > 1)
-                        {
-                            <button type="button"
-                                    class="btn-delete-item"
-                                    @onclick="() => RemoveItem(item)">
-                                ✕
-                            </button>
-                        }
-
-                       
                     </div>
-
-                    <hr />
                 }
 
-                <button class="pro-btn-add" @onclick="AddItem">إضافة صنف أخر</button>
-                <div class="invoice-summary">
-
-                    <div class="pro-fields-grid" style="margin-top:10px;">
-
-                        <div>
-                            <label>الخصم</label>
-                            <input type="number"
-                                   step="0.01"
-                                   class="pro-input"
-                                   @bind-value="Form.discount_total"
-                                   @bind-value:event="oninput" />
-                        </div>
-
-                        <div>
-                            <label>المبلغ المدفوع</label>
-                            <input type="number"
-                                   class="pro-input"
-                                   @bind-value="Form.paid_amount"
-                                   @bind-value:event="oninput" />
-                        </div>
-
-                    </div>
-
-                    <div class="sum-row">
-                        <span>الإجمالي:</span>
-                        <strong class="sum-value">@Fmt(Total)</strong>
-                    </div>
-
-                    <div class="sum-row">
-                        <span>الخصم:</span>
-                        <strong class="sum-value">@Fmt(Form.discount_total)</strong>
-                    </div>
-
-                    <div class="sum-row">
-                        <span>الإجمالي بعد الخصم:</span>
-                        <strong class="sum-value">@Fmt(Net)</strong>
-                    </div>
-
-                    @if (Form.person_type == "marketer")
-                    {
-                        <div class="sum-row">
-                            <span>عمولة المسوق:</span>
-                            <strong class="sum-value">@Fmt(Commission)</strong>
-                        </div>
-                    }
-
-                </div>
-
-                <div class="pur-notes-box">
-                    <label>ملاحظات</label>
-                    <textarea maxlength="200"
-                              class="pro-input pur-notes-input"
-                              @bind="Form.notes"></textarea>
-                </div>
-
-                <div class="pro-dialog-actions">
-                    <button class="pro-save" @onclick="SaveOrder">حفظ</button>
-                    <button class="pro-cancel" @onclick="Close">إلغاء</button>
-                </div>
+                <button class="btn-cancel" @onclick="CloseDetails">
+                    إغلاق
+                </button>
 
             </div>
+
         </div>
+
     </div>
 }
 
 @code {
 
     List<OrderView>? OrdersList;
-    List<Product> Products = new();
 
-    bool ShowAddDialog = false;
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "new")]
+    public string? newId { get; set; }
+
+    int HighlightId => int.TryParse(newId, out var id) ? id : 0;
 
     int CurrentAdminId => Session.AdminId;
-
-    Order Form = new();
-    List<Customer> Customers = new();
-    List<Marketer> Marketers = new();
-    List<CashBox> CashBoxes = new(); // 🔥 جديد
-
-    protected override async Task OnInitializedAsync()
-    {
-        Products = await InventoryService.GetProducts();
-        Customers = await SalesService.GetActiveCustomers();
-        Marketers = await SalesService.GetActiveMarketers();
-        CashBoxes = await FinanceService.GetCashBoxes(); // 🔥 جديد
-        OrdersList = await FinanceService.GetOrders();
-    }
-    void OpenAddDialog()
-    {
-        Form = new Order
-        {
-            order_date = DateTime.UtcNow,
-
-            person_type = "marketer", // 🔥 الافتراضي مسوق
-            person_id = 0,            // ❌ بدون اختيار
-
-            Items = new List<OrderItem>
-        {
-            new OrderItem
-            {
-                product_id = 0, // ❌ لا تختار تلقائي
-                quantity = 1,
-                unit_price = 0
-            }
-        }
-        };
-
-        ShowAddDialog = true;
-    }
-
-    void RemoveItem(OrderItem item)
-    {
-        Form.Items.Remove(item);
-    }
-
-    void OnMarketerChanged(ChangeEventArgs e)
-    {
-        int id = int.Parse(e.Value.ToString());
-
-        Form.person_id = id; // 🔥 مهم جداً
-
-        var marketer = Marketers.FirstOrDefault(m => m.marketer_id == id);
-
-        if (marketer != null)
-        {
-            Form.commission_per_box = marketer.commission_per_box;
-        }
-    }
-
-    void Close()
-    {
-        ShowAddDialog = false;
-    }
-
-    void AddItem()
-    {
-        Form.Items.Add(new OrderItem
-        {
-            product_id = 0,
-            quantity = 1,
-            unit_price = 0
-        });
-    }
-
-    //حساب الاجمالي
-
-    decimal Total => Form.Items.Sum(i => i.quantity * i.unit_price);
-
-    decimal Net => Math.Max(0, Total - Form.discount_total);
-
-    decimal Commission
-    {
-        get
-        {
-            if (Form.person_type != "marketer")
-                return 0;
-
-            var marketer = Marketers.FirstOrDefault(m => m.marketer_id == Form.person_id);
-
-            if (marketer == null)
-                return 0;
-
-            var qty = Form.Items.Sum(i => i.quantity);
-
-            // 🔥 مسوق خاص
-            if (marketer.is_special)
-                return qty * Form.commission_per_box;
-
-            // 🔥 مسوق عادي (لا نحسب هنا)
-            return 0;
-        }
-    }
-
-    void OnProductChanged(ChangeEventArgs e, OrderItem item)
-    {
-        int id = int.Parse(e.Value.ToString());
-
-        item.product_id = id;
-
-        var product = Products.FirstOrDefault(p => p.product_id == id);
-
-        if (product != null)
-        {
-            item.unit_price = product.sale_price; // 🔥 أهم سطر
-        }
-    }
-
-    async Task SaveOrder()
-    {
-        try
-        {
-            if (Form.person_id == 0)
-            {
-                ToastService.ShowToast("اختر الزبون أو المسوق", "warning");
-                return;
-            }
-
-            if (!Form.Items.Any())
-            {
-                ToastService.ShowToast("أضف صنف واحد على الأقل", "warning");
-                return;
-            }
-
-            if (Form.Items.Any(i => i.product_id == 0))
-            {
-                ToastService.ShowToast("اختر المنتج", "warning");
-                return;
-            }
-
-            if (Form.Items.Any(i => i.quantity <= 0))
-            {
-                ToastService.ShowToast("الكمية غير صحيحة", "warning");
-                return;
-            }
-
-            if (Form.cash_box_id == 0)
-            {
-                ToastService.ShowToast("اختر الخزنة", "warning");
-                return;
-            }
-
-            // 🔥 حساب الصافي
-            var net = Form.Items.Sum(i => i.quantity * i.unit_price) - Form.discount_total;
-
-            if (Form.paid_amount <= 0)
-            {
-                ToastService.ShowToast("ادخل المبلغ المدفوع", "warning");
-                return;
-            }
-
-            if (Form.paid_amount > net)
-            {
-                ToastService.ShowToast("المبلغ أكبر من الإجمالي", "warning");
-                return;
-            }
-
-            Form.order_date = DateTime.UtcNow;
-
-            var result = await FinanceService.AddOrder(
-                Form,
-                Form.Items,
-                CurrentAdminId
-            );
-
-            if (result.success)
-            {
-                ToastService.ShowToast(result.message, "success");
-                OrdersList = await FinanceService.GetOrders();
-
-                ShowAddDialog = false;
-                Form = new Order();
-            }
-            else
-            {
-                ToastService.ShowToast(result.message, "error");
-            }
-        }
-        catch (Exception ex)
-        {
-            var msg = ex.InnerException?.Message ?? ex.Message;
-            ToastService.ShowToast(msg, "error");
-        }
-    }
-
     string Fmt(decimal v) => $"{v:0.00} د.ل";
 
+    OrderView? SelectedOrder;
+    bool ShowDetails = false;
+
+    List<OrderItem> SelectedItems = new();
    
+    protected override async Task OnInitializedAsync()
+    {
+        OrdersList = await FinanceService.GetOrders();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrEmpty(newId))
+        {
+            _ = ClearHighlight();
+        }
+    }
+
+    async Task ClearHighlight()
+    {
+        await Task.Delay(3000); // 3 ثواني
+        Nav.NavigateTo("/orders");
+    }
+   
+async Task OpenDetails(OrderView o)
+{
+    var order = await FinanceService.GetOrderById(o.order_id);
+
+    if (order == null) return;
+
+    SelectedOrder = o;
+    SelectedItems = order.Items;
+
+    ShowDetails = true;
+}
+
+    void CloseDetails()
+{
+    ShowDetails = false;
+    SelectedOrder = null;
+}
 }

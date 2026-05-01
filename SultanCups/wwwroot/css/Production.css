@@ -743,9 +743,8 @@ textarea.pro-input:focus {
     }
 
 .invoice-summary {
-    position: sticky;
-    bottom: 80px; /* نزّل شوي */
-
+     position: sticky;
+    top: 20px;
     background: #f8fafc;
     padding: 14px 16px;
     border-radius: 12px;

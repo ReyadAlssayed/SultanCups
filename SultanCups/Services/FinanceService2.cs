@@ -157,7 +157,7 @@ namespace SultanCups.Services
                 await _context.SaveChangesAsync();
 
                 await transaction.CommitAsync();
-                return (true, "تم حفظ الفاتورة ✔");
+                return (true, order.order_id.ToString());
             }
             catch (Exception ex)
             {
@@ -202,6 +202,7 @@ namespace SultanCups.Services
                             * o.commission_per_box)
                         : 0,
 
+                    paid_amount = o.paid_amount,   // 🔥 هذا الناقص
                     order_date = o.order_date
                 };
 
@@ -218,6 +219,16 @@ namespace SultanCups.Services
             return await _context.cash_boxes
                 .Where(c => c.is_active)
                 .ToListAsync();
+        }
+
+
+        //جلب معلومات الفاتورة برقم القيد للفاتورة
+
+        public async Task<Order?> GetOrderById(int id)
+        {
+            return await _context.orders
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => o.order_id == id);
         }
 
     }
